@@ -138,6 +138,60 @@
 
   <!-- Scripts -->
   <script src="js/utils.js"></script>
+  <script>
+    // Long-press on main logo to reset all game data
+    (function () {
+      const logo = document.querySelector('.main-logo');
+      if (!logo) return;
+      let holdTimer = null;
+      const HOLD_MS = 800;
+
+      function startHold(e) {
+        holdTimer = setTimeout(() => {
+          e.preventDefault();
+          const confirmed = confirm('Reset ALL game data?\n\nThis clears saved player names, word pair history, and session data for all games.');
+          if (confirmed) {
+            // Odd One In / Mafia questions
+            localStorage.removeItem('ooi_used_tier1_broad');
+            localStorage.removeItem('ooi_used_tier2_medium');
+            localStorage.removeItem('ooi_used_tier3_narrow');
+            localStorage.removeItem('ooi_session');
+            // Undercover words
+            localStorage.removeItem('uc_used_tier1_broad');
+            localStorage.removeItem('uc_used_tier2_medium');
+            localStorage.removeItem('uc_used_tier3_narrow');
+            localStorage.removeItem('uc_session');
+            // Mafia
+            localStorage.removeItem('mafia_players');
+            localStorage.removeItem('mafia_session');
+            // Act-O-Matic
+            localStorage.removeItem('aom_used_actions');
+            // Also clear anything matching known patterns
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k && (k.startsWith('ooi_') || k.startsWith('uc_') || k.startsWith('mafia_') || k.startsWith('aom_'))) {
+                keysToRemove.push(k);
+              }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+            alert('All game data has been reset!');
+          }
+        }, HOLD_MS);
+      }
+
+      function cancelHold() {
+        if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+      }
+
+      logo.addEventListener('touchstart', startHold, { passive: true });
+      logo.addEventListener('touchend', cancelHold);
+      logo.addEventListener('touchcancel', cancelHold);
+      logo.addEventListener('mousedown', startHold);
+      logo.addEventListener('mouseup', cancelHold);
+      logo.addEventListener('mouseleave', cancelHold);
+    })();
+  </script>
 </body>
 
 </html>

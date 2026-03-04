@@ -3,10 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Act-O-Matic - Actions speak louder than words and look much dumber.">
     <meta name="theme-color" content="#111111">
-    <title>Act-O-Matic – Meenit's Playground</title>
+    <title>Act-O-Matic - Meenit's Playground</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/act-o-matic.css">
 </head>
@@ -22,22 +23,14 @@
             </div>
             <div class="content-card">
                 <div class="setup-box">
-                    <label><span class="step-badge">1</span> Players</label>
-                    <div class="counter-control">
-                        <button class="counter-btn" id="decrease-players">−</button>
-                        <span class="counter-value" id="player-count-display">4</span>
-                        <button class="counter-btn" id="increase-players">+</button>
-                    </div>
-                    <p class="hint" style="text-align:center;margin-top:var(--s2)">2 — ∞ players</p>
-                </div>
-                <div class="setup-box">
-                    <label><span class="step-badge">2</span> How It Works</label>
+                    <label><span class="step-badge">How to Play</span></label>
                     <p class="how-it-works-text">
-                        🎬 Two players come forward.<br>
-                        🎲 Roll to get a secret action.<br>
-                        🗣️ Leader <strong>directs</strong> (say "raise arms", etc.) — without naming the action.<br>
-                        🕹️ Actor <strong>does</strong> and tries to <strong>guess</strong> what it is!<br>
-                        ✅ Correct guess = safe. ❌ Wrong = eliminated!
+                        Two players step forward.<br>
+                        Roll to get a secret action.<br>
+                        Leader <strong>directs</strong> the Actor (say "raise arms", etc.) without naming the
+                        action.<br>
+                        Actor <strong>does the moves</strong> and tries to <strong>guess</strong> what it is!<br>
+                        Correct guess = safe. Wrong = eliminated!
                     </p>
                 </div>
                 <button class="btn btn-primary btn-full btn-lg" id="start-btn">Let's Play!</button>
@@ -45,48 +38,36 @@
             </div>
         </div>
 
-        <!-- SCREEN 2: Roll Action -->
+        <!-- SCREEN 2: Roll + Reveal (combined) -->
         <div id="screen-roller" class="screen hidden">
             <div class="screen-header">
-                <h1 class="game-title">Roll the Action</h1>
-                <p class="tagline" id="roller-round-info">Two players step up!</p>
+                <h1 class="game-title" id="roller-title">Roll the Action</h1>
+                <p class="tagline" id="roller-subtitle">Two players step up and roll!</p>
             </div>
             <div class="content-card roller-card">
-                <div class="roller-outer">
+
+                <!-- Roller animation -->
+                <div class="roller-outer" id="roller-outer">
                     <div class="roller-fade-top"></div>
                     <div class="roller-viewfinder">
-                        <div class="roller-track" id="roller-track">
-                            <!-- Items injected by JS -->
-                        </div>
+                        <div class="roller-track" id="roller-track"></div>
                     </div>
                     <div class="roller-fade-bottom"></div>
                 </div>
-                <div id="roller-result-banner" class="roller-result-banner hidden">
-                    <span id="roller-result-text"></span>
-                </div>
-                <button class="btn btn-primary btn-full btn-lg" id="roll-btn">🎲 Roll Action!</button>
-                <button class="btn btn-outline btn-full hidden" id="reveal-btn" style="margin-top:var(--s3)">👁️ Reveal
-                    to Actor</button>
-            </div>
-            <a href="#" class="back-link" id="back-to-setup-btn">Back to Setup</a>
-        </div>
 
-        <!-- SCREEN 3: Action Reveal (only the actor sees this) -->
-        <div id="screen-reveal" class="screen hidden">
-            <div class="screen-header">
-                <h1 class="game-title">Your Action</h1>
-                <p class="tagline">Actor only! Don't show the Leader 🙈</p>
-            </div>
-            <div class="content-card reveal-card">
-                <div class="reveal-action-box">
-                    <p class="reveal-action-text" id="reveal-action-text">—</p>
+                <!-- Action Reveal Box (shown after roll) -->
+                <div id="reveal-box" class="reveal-box hidden">
+                    <p class="reveal-label">Your Action:</p>
+                    <p class="reveal-action-text" id="reveal-action-text">-</p>
+                    <p class="reveal-hint">Actor: memorise this, then hand the phone face-down to the Leader!</p>
                 </div>
-                <p class="reveal-hint">Memorize it, then hand the phone face-down to the Leader!</p>
-                <div class="reveal-buttons">
-                    <button class="btn btn-primary btn-full btn-lg" id="next-round-btn">🎲 Next Roll</button>
-                    <a href="../index.html" class="btn btn-ghost btn-full"
-                        style="margin-top:var(--s3);text-align:center;">🏠 Back to Home</a>
-                </div>
+
+                <!-- Buttons -->
+                <button class="btn btn-primary btn-full btn-lg" id="roll-btn">Roll Action!</button>
+                <button class="btn btn-outline btn-full hidden" id="next-round-btn" style="margin-top:var(--s3);">Next
+                    Roll</button>
+                <button class="btn btn-ghost btn-full" id="end-game-btn" style="margin-top:var(--s4);color:#888;">End
+                    Game</button>
             </div>
         </div>
 

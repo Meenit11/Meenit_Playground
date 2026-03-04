@@ -3,64 +3,55 @@
 // ================================
 // CONSTANTS
 // ================================
-const ITEM_HEIGHT = 56; // px — must match CSS .roller-item height
-const VISIBLE_ITEMS = 5;  // items visible in viewfinder at once
+const ITEM_HEIGHT = 56;   // px - must match CSS .roller-item height
 const COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 hours
 
 let allActions = [];
 let chosenAction = null;
 let isRolling = false;
-let playerCount = 4;
 
 // ================================
 // INIT
 // ================================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Load actions JSON
+    // Load actions from JSON
     try {
         const res = await fetch('../actions.json');
         const data = await res.json();
         allActions = data.actions_list || [];
     } catch (e) {
-        allActions = ['Driving an auto-rickshaw', 'Flipping a pancake', 'Rock climbing', 'Riding a bumpy camel'];
+        allActions = [
+            'Driving an auto-rickshaw', 'Flipping a pancake', 'Rock climbing',
+            'Riding a very bumpy camel', 'Threading a needle', 'Directing traffic'
+        ];
         console.error('Failed to load actions.json', e);
     }
 
-    // Player counter
-    document.getElementById('decrease-players').addEventListener('click', () => {
-        if (playerCount > 2) { playerCount--; updatePlayerDisplay(); }
-    });
-    document.getElementById('increase-players').addEventListener('click', () => {
-        playerCount++;
-        updatePlayerDisplay();
-    });
-
-    // Navigation
-    document.getElementById('start-btn').addEventListener('click', () => showScreen('screen-roller'));
-    document.getElementById('back-to-setup-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        showScreen('screen-setup');
-    });
-    document.getElementById('roll-btn').addEventListener('click', rollAction);
-    document.getElementById('reveal-btn').addEventListener('click', () => {
-        document.getElementById('reveal-action-text').textContent = chosenAction;
-        showScreen('screen-reveal');
-    });
-    document.getElementById('next-round-btn').addEventListener('click', () => {
-        // Reset roller for next spin
-        chosenAction = null;
-        document.getElementById('roller-result-banner').classList.add('hidden');
-        document.getElementById('reveal-btn').classList.add('hidden');
-        document.getElementById('roll-btn').classList.remove('hidden');
-        document.getElementById('roll-btn').textContent = '🎲 Roll Action!';
+    // Button listeners
+    document.getElementById('start-btn').addEventListener('click', () => {
         buildIdleRoller();
         showScreen('screen-roller');
     });
-});
 
-function updatePlayerDisplay() {
-    document.getElementById('player-count-display').textContent = playerCount;
-}
+    document.getElementById('roll-btn').addEventListener('click', rollAction);
+
+    document.getElementById('next-round-btn').addEventListener('click', () => {
+        // Reset for another spin
+        chosenAction = null;
+        document.getElementById('reveal-box').classList.add('hidden');
+        document.getElementById('next-round-btn').classList.add('hidden');
+        document.getElementById('roll-btn').classList.remove('hidden');
+        document.getElementById('roll-btn').textContent = 'Roll Action!';
+        document.getElementById('roller-title').textContent = 'Roll the Action';
+        document.getElementById('roller-subtitle').textContent = 'Two players step up and roll!';
+        document.getElementById('roller-outer').classList.remove('hidden');
+        buildIdleRoller();
+    });
+
+    document.getElementById('end-game-btn').addEventListener('click', () => {
+        window.location.href = '../index.html';
+    });
+});
 
 // ================================
 // SCREEN MANAGEMENT
@@ -69,12 +60,10 @@ function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
     const el = document.getElementById(id);
     if (el) el.classList.remove('hidden');
-
-    if (id === 'screen-roller') buildIdleRoller();
 }
 
 // ================================
-// COOLDOWN LOGIC (same as words.json rotation)
+// COOLDOWN LOGIC
 // ================================
 function loadUsedActions() {
     try {
@@ -91,27 +80,22 @@ function saveUsedActions(used) {
 }
 
 function pickActions(count) {
-    // Get recently used action texts
     const used = loadUsedActions();
     const usedSet = new Set(used.map(e => e.action));
 
-    // Available pool excludes recently used
     let pool = allActions.filter(a => !usedSet.has(a));
-    if (pool.length < count) pool = allActions; // reset if pool too small
+    if (pool.length < count) pool = [...allActions]; // reset if pool too small
 
-    // Fisher-Yates shuffle pool
+    // Fisher-Yates shuffle
     for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
     const chosen = pool.slice(0, count);
-
-    // Mark chosen as used
     const now = Date.now();
     used.push(...chosen.map(action => ({ action, ts: now })));
     saveUsedActions(used);
-
     return chosen;
 }
 
@@ -120,33 +104,33 @@ function pickActions(count) {
 // ================================
 function buildIdleRoller() {
     const track = document.getElementById('roller-track');
-    // Show a slow-drifting placeholder list
-    const demo = [...allActions].sort(() => Math.random() - 0.5).slice(0, 8);
+    // Pick a fresh display list for idle
+    let demo = [...allActions].sort(() => Math.random() - 0.5).slice(0, 8);
     track.style.transition = 'none';
-    track.style.transform = `translateY(0px)`;
+    track.style.transform = 'translateY(0px)';
     buildTrackItems(track, demo);
 }
 
 function buildTrackItems(track, items) {
     track.innerHTML = '';
-    // Add padding items top + bottom so center item is visible
-    const pad = Math.floor(VISIBLE_ITEMS / 2); // 2
-    for (let i = 0; i < pad; i++) {
-        const spacer = document.createElement('div');
-        spacer.className = 'roller-item';
-        track.appendChild(spacer);
+    // 2 blank padding items top and bottom so center is visible
+    const PAD = 2;
+    for (let i = 0; i < PAD; i++) {
+        track.appendChild(makeDivItem(''));
     }
     items.forEach(text => {
-        const el = document.createElement('div');
-        el.className = 'roller-item';
-        el.textContent = text;
-        track.appendChild(el);
+        track.appendChild(makeDivItem(text));
     });
-    for (let i = 0; i < pad; i++) {
-        const spacer = document.createElement('div');
-        spacer.className = 'roller-item';
-        track.appendChild(spacer);
+    for (let i = 0; i < PAD; i++) {
+        track.appendChild(makeDivItem(''));
     }
+}
+
+function makeDivItem(text) {
+    const el = document.createElement('div');
+    el.className = 'roller-item';
+    el.textContent = text;
+    return el;
 }
 
 // ================================
@@ -157,81 +141,90 @@ async function rollAction() {
     isRolling = true;
 
     const rollBtn = document.getElementById('roll-btn');
-    const revealBtn = document.getElementById('reveal-btn');
-    const resultBanner = document.getElementById('roller-result-banner');
+    const revealBox = document.getElementById('reveal-box');
+    const nextRoundBtn = document.getElementById('next-round-btn');
     const track = document.getElementById('roller-track');
 
     rollBtn.disabled = true;
-    rollBtn.textContent = '🌀 Rolling...';
-    resultBanner.classList.add('hidden');
-    revealBtn.classList.add('hidden');
+    rollBtn.textContent = 'Rolling...';
+    revealBox.classList.add('hidden');
 
-    // Pick 6 – 10 actions for this spin
+    // Pick 6-10 actions for this spin
     const spinCount = 6 + Math.floor(Math.random() * 5); // 6..10
     const spinList = pickActions(spinCount);
+    // Winner = last item in spinList
+    const winner = spinList[spinList.length - 1];
 
-    // The winner is the last item
-    const winnerIndex = spinList.length - 1;
-    // How many full rotations before slow-down (extra padding at start)
-    const extraScrollItems = 10; // scroll through 10 extra items before slowing
-
-    // Build track: [extras (repeated from spinList)] + spinList
-    const extraItems = [];
-    for (let i = 0; i < extraScrollItems; i++) {
-        extraItems.push(spinList[i % spinList.length]);
+    // Build a LOOPING track:
+    // We repeat spinList 4 times + partial last to create the illusion of endless loop
+    const REPEATS = 5;
+    const loopList = [];
+    for (let r = 0; r < REPEATS; r++) {
+        spinList.forEach(a => loopList.push(a));
     }
-    const fullList = [...extraItems, ...spinList];
-    buildTrackItems(track, fullList);
+    // The "winner" position = (REPEATS-1)*spinList.length + winnerIndex in last batch
+    const winnerIndexInLoop = (REPEATS - 1) * spinList.length + (spinList.length - 1);
 
-    // Wait one tick so DOM settles
+    buildTrackItems(track, loopList);
     await tick();
 
-    // Start at top (translateY = 0 means first padding item is centred)
+    // Reset to top
     track.style.transition = 'none';
     track.style.transform = 'translateY(0px)';
     await tick();
 
-    // Phase 1: fast scroll to the beginning of spinList (past extraItems)
-    const fastTarget = -(extraScrollItems * ITEM_HEIGHT);
-    const fastDuration = 1200; // ms
-    await animateTrack(track, 0, fastTarget, fastDuration, 'cubic-bezier(0.1, 0, 0.9, 1)');
+    const PAD = 2;
 
-    // Phase 2: slow scroll to the winner item inside spinList
-    const totalOffset = -((extraScrollItems + winnerIndex) * ITEM_HEIGHT);
-    const slowDuration = 1800;
-    await animateTrack(track, fastTarget, totalOffset, slowDuration, 'cubic-bezier(0.25, 0.46, 0.45, 0.94)');
+    // Phase 1: fast scroll past first (REPEATS-2)*spinList items quickly
+    const fastScrollItems = (REPEATS - 2) * spinList.length;
+    const fastTarget = -(fastScrollItems * ITEM_HEIGHT);
+    await animateTrack(track, 0, fastTarget, 1400, 'cubic-bezier(0.25, 0, 0.8, 1)');
 
-    // Mark winner item
+    // Phase 2: slow scroll to winner
+    const totalItems = winnerIndexInLoop + PAD;
+    const slowTarget = -(winnerIndexInLoop * ITEM_HEIGHT);
+    await animateTrack(track, fastTarget, slowTarget, 1600, 'cubic-bezier(0.25, 0.46, 0.45, 0.94)');
+
+    // Highlight winner item in track
     const allItems = track.querySelectorAll('.roller-item');
-    // The winner item index in track (with top padding)
-    const padCount = Math.floor(VISIBLE_ITEMS / 2);
-    const winnerEl = allItems[padCount + extraScrollItems + winnerIndex];
+    const winnerEl = allItems[PAD + winnerIndexInLoop];
     if (winnerEl) {
         winnerEl.classList.add('roller-winner');
-        // Small delay then glow
-        await delay(200);
+        await delay(250);
         winnerEl.classList.add('roller-glow');
     }
 
-    chosenAction = spinList[winnerIndex];
+    chosenAction = winner;
 
-    // Show result
-    const banner = document.getElementById('roller-result-banner');
-    document.getElementById('roller-result-text').textContent = `✨ "${chosenAction}"`;
-    banner.classList.remove('hidden');
+    // Short pause then reveal below the roller
+    await delay(600);
+
+    // Update reveal box
+    document.getElementById('reveal-action-text').textContent = chosenAction;
+    revealBox.classList.remove('hidden');
+
+    // Update title/subtitle
+    document.getElementById('roller-title').textContent = 'Your Action!';
+    document.getElementById('roller-subtitle').textContent = "Actor: memorise, then hand phone face-down to the Leader!";
+
+    // Hide roller animation, show result more prominently
+    document.getElementById('roller-outer').classList.add('hidden');
 
     rollBtn.classList.add('hidden');
-    revealBtn.classList.remove('hidden');
+    nextRoundBtn.classList.remove('hidden');
 
     isRolling = false;
+    rollBtn.disabled = false;
 }
 
-// Animate track from `from` to `to` translateY over `duration` ms with `easing`
+// ================================
+// ANIMATION HELPERS
+// ================================
 function animateTrack(track, from, to, duration, easing) {
     return new Promise(resolve => {
         track.style.transition = `transform ${duration}ms ${easing}`;
         track.style.transform = `translateY(${to}px)`;
-        setTimeout(resolve, duration + 50);
+        setTimeout(resolve, duration + 60);
     });
 }
 
