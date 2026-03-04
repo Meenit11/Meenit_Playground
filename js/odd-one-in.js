@@ -633,8 +633,8 @@ function pickRoundTheme(rd) {
 // ================================
 function startPolling() {
   stopPolling();
-  // Faster poll to reduce perceived latency for joins, pauses, and state changes.
-  localState.pollTimer = setInterval(pollRoom, 900);
+  // Poll every 2s – balances responsiveness vs. network load on free API
+  localState.pollTimer = setInterval(pollRoom, 2000);
   pollRoom(); // immediate first poll
 }
 
@@ -775,8 +775,12 @@ function renderQuestion(rd) {
     const submitBtn = document.getElementById('submit-answer-btn');
     if (inputEl) {
       inputEl.disabled = false;
-      // Clear any previous round answer text when a new question starts.
-      if (!hasAnswered) inputEl.value = '';
+      // DO NOT clear the input — user may be typing right now.
+      // Only reset if this is a brand new round (tracked via localState).
+      if (localState._lastRenderedRound !== rd.currentRound) {
+        localState._lastRenderedRound = rd.currentRound;
+        inputEl.value = '';
+      }
     }
     if (submitBtn) {
       submitBtn.disabled = false;
