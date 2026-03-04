@@ -1,104 +1,405 @@
 {
   "game_title": "Undercover",
   "word_pairs": [
-    ["Chulbul Pandey", "Bajirao Singham"],
-    ["Escalator", "Elevator"],
-    ["Sofa", "Couch"],
-    ["Biscuit", "Cookie"],
-    ["Pepsi", "Coca Cola"],
-    ["Dove", "Pigeon"],
-    ["Turtle", "Tortoise"],
-    ["Jam", "Jelly"],
-    ["Muffin", "Cupcake"],
-    ["Noodles", "Spaghetti"],
-    ["Mother Dairy", "Amul"],
-    ["Ketchup", "Tomato Sauce"],
-    ["Sweater", "Jacket"],
-    ["Sneakers", "Sports Shoes"],
-    ["Backpack", "Rucksack(Jolla)"],
-    ["Mobile", "Cell Phone"],
-    ["Petrol Pump", "Gas Station"],
-    ["Lift", "Elevator"],
-    ["Flat", "Apartment"],
-    ["Biscuit", "Rusk"],
-    ["Tiffin", "Lunch Box"],
-    ["Chappals", "Slippers"],
-    ["Cooler", "Air Conditioner"],
-    ["Duster", "Chalk Eraser"],
-    ["Pencil Box", "Pencil Case"],
-    ["School Bag", "Backpack"],
-    ["Notebook", "Copy"],
-    ["Rasgulla", "Gulab Jamun"],
-    ["Paneer", "Cottage Cheese"],
-    ["Curd", "Yogurt"],
-    ["Roti", "Chapati"],
-    ["Papad", "Papadum"],
-    ["Lassi", "Buttermilk"],
-    ["Pakora", "Bhajiya"],
-    ["Chaat", "Street Food"],
-    ["Mithai", "Sweet"],
-    ["Namkeen", "Salty Snacks"],
-    ["Aachar", "Pickle"],
-    ["Chutney", "Sauce"],
-    ["Tandoor", "Clay Oven"],
-    ["Tawa", "Griddle"],
-    ["Kadhai", "Wok"],
-    ["Chimta", "Tongs"],
-    ["Belan", "Rolling Pin"],
-    ["Chakla", "Rolling Board"],
-    ["Patila", "Large Pot"],
-    ["Dabba", "Container"],
-    ["Lota", "Water Vessel"],
-    ["Bucket", "Balti"],
-    ["Jhadoo", "Broom"],
-    ["Pocha", "Mop"],
-    ["Ghamela", "Large Basin"],
-    ["Almirah", "Wardrobe"],
-    ["Diwan", "Day Bed"],
-    ["Charpai", "Cot"],
-    ["Palang", "Bed"],
-    ["Gadda", "Mattress"],
-    ["Takiya", "Pillow"],
-    ["Razai", "Quilt"],
-    ["Chadar", "Bed Sheet"],
-    ["Pankha", "Fan"],
-    ["Bulb", "Light"],
-    ["Tube Light", "Fluorescent Light"],
-    ["Switch", "Button"],
-    ["Socket", "Plug Point"],
-    ["Bijli", "Electricity"],
-    ["Current", "Power"],
-    ["Meter", "Electric Meter"],
-    ["Fuse", "Circuit Breaker"],
-    ["Wire", "Cable"],
-    ["Main Switch", "Circuit Board"],
-    ["Inverter", "UPS"],
-    ["Battery", "Cell"],
-    ["Torch", "Flashlight"],
-    ["Candle", "Diya"],
-    ["Matchbox", "Lighter"],
-    ["Agarbatti", "Incense Stick"],
-    ["Dhoop", "Incense Cone"],
-    ["Pooja Thali", "Prayer Plate"],
-    ["Mandir", "Temple"],
-    ["Aarti", "Prayer Ritual"],
-    ["Prasad", "Holy Offering"],
-    ["Chunri", "Sacred Cloth"],
-    ["Rudraksh", "Sacred Bead"],
-    ["Kalash", "Sacred Pot"],
-    ["Shankh", "Conch Shell"],
-    ["Ghanti", "Bell"],
-    ["Thali", "Plate"],
-    ["Katori", "Small Bowl"],
-    ["Chamach", "Spoon"],
-    ["Kaanta", "Fork"],
-    ["Chaku", "Knife"],
-    ["Glass", "Tumbler"],
-    ["Jug", "Pitcher"],
-    ["Bottle", "Flask"],
-    ["Thermos", "Insulated Bottle"],
-    ["Tray", "Serving Platter"],
-    ["Nariyal", "Coconut"],
-    ["Supari", "Betel Nut"]
+    [
+      "Chulbul Pandey",
+      "Bajirao Singham"
+    ],
+    [
+      "Escalator",
+      "Elevator"
+    ],
+    [
+      "Munna Bhai",
+      "Circuit"
+    ],
+    [
+      "Baburao Ganpatrao Apte",
+      "Jethalal Gada"
+    ],
+    [
+      "Anjali (Kuch Kuch Hota Hai)",
+      "Anjali (Kabhi Khushi Kabhie Gham)"
+    ],
+    [
+      "Crime Master Gogo",
+      "Mogambo"
+    ],
+    [
+      "Gol Gappa",
+      "Dahi Vada"
+    ],
+    [
+      "Maggi (2 Minutes)",
+      "Patanjali Noodles"
+    ],
+    [
+      "WhatsApp University",
+      "LinkedIn Influencer"
+    ],
+    [
+      "JCB Ki Khudayi",
+      "Binod"
+    ],
+    [
+      "Kabir Singh",
+      "Animal (Ranvijay Singh)"
+    ],
+    [
+      "Gangs of Wasseypur",
+      "Mirzapur"
+    ],
+    [
+      "Old Monk",
+      "Magic Moments"
+    ],
+    [
+      "Autographed Cricket Ball",
+      "Signed Bat"
+    ],
+    [
+      "Rickshaw Wale Bhaiya",
+      "Uber Driver"
+    ],
+    [
+      "Sarojini Nagar Market",
+      "Palika Bazaar"
+    ],
+    [
+      "Dolly Chaiwala",
+      "MBA Chaiwala"
+    ],
+    [
+      "Babu Bhaiya",
+      "Majnu Bhai"
+    ],
+    [
+      "Daya (CID)",
+      "Abhijeet (CID)"
+    ],
+    [
+      "Vada Pav",
+      "Samosa Pav"
+    ],
+    [
+      "Rocky Bhai",
+      "Pushpa Raj"
+    ],
+    [
+      "Shaktiman",
+      "Flying Jatt"
+    ],
+    [
+      "IIT Aspirant",
+      "UPSC Aspirant"
+    ],
+    [
+      "Mummy ki Maar",
+      "Papa ki Daant"
+    ],
+    [
+      "Daler Mehndi",
+      "Badshah"
+    ],
+    [
+      "Goa Trip (Planned)",
+      "Goa Trip (Cancelled)"
+    ],
+    [
+      "Middle Class",
+      "Upper Middle Class"
+    ],
+    [
+      "Gym Membership",
+      "Netflix Subscription"
+    ],
+    [
+      "Tinder",
+      "Shaadi.com"
+    ],
+    [
+      "Mrunal Thakur",
+      "Rashmika Mandanna"
+    ],
+    [
+      "CarryMinati",
+      "Technical Guruji"
+    ],
+    [
+      "Gopi Bahu",
+      "Kokila Ben"
+    ],
+    [
+      "Laptop Charger",
+      "Phone Powerbank"
+    ],
+    [
+      "Cousin’s Wedding",
+      "Best Friend’s Wedding"
+    ],
+    [
+      "Dhinchak Pooja",
+      "Taher Shah"
+    ],
+    [
+      "Local Train",
+      "Metro Rail"
+    ],
+    [
+      "Haldiram’s",
+      "Bikanervala"
+    ],
+    [
+      "Karan Johar",
+      "Sanjay Leela Bhansali"
+    ],
+    [
+      "Monday Morning",
+      "Sunday Evening"
+    ],
+    [
+      "Arijit Singh (Sad)",
+      "Arijit Singh (Romantic)"
+    ],
+    [
+      "Biryani",
+      "Pulao"
+    ],
+    [
+      "Engineering",
+      "B.Com"
+    ],
+    [
+      "Shubman Gill",
+      "Virat Kohli"
+    ],
+    [
+      "Jhumka",
+      "Nathni"
+    ],
+    [
+      "Panchayat",
+      "Gullak"
+    ],
+    [
+      "Butter Chicken",
+      "Paneer Tikka Masala"
+    ],
+    [
+      "Starbucks",
+      "Tapri ki Chai"
+    ],
+    [
+      "iPhone 15",
+      "Android Flagship"
+    ],
+    [
+      "Papad",
+      "Fryums"
+    ],
+    [
+      "Deepika Padukone",
+      "Katrina Kaif"
+    ],
+    [
+      "Shark Tank India",
+      "MasterChef India"
+    ],
+    [
+      "Remote Control",
+      "Mobile Phone"
+    ],
+    [
+      "Old Delhi",
+      "South Delhi"
+    ],
+    [
+      "Thala (Dhoni)",
+      "King (Kohli)"
+    ],
+    [
+      "Rakhi Sawant",
+      "Urfi Javed"
+    ],
+    [
+      "Zomato Delivery",
+      "Swiggy Delivery"
+    ],
+    [
+      "Basmati Rice",
+      "Kolam Rice"
+    ],
+    [
+      "Royal Enfield",
+      "KTM Duke"
+    ],
+    [
+      "Gully Boy",
+      "8 Mile"
+    ],
+    [
+      "Sarkari Naukri",
+      "Remote Job"
+    ],
+    [
+      "Fairness Cream",
+      "Sunscreen"
+    ],
+    [
+      "Parantha",
+      "Kulcha"
+    ],
+    [
+      "Kancha Cheena",
+      "Gabbar Singh"
+    ],
+    [
+      "Poo (K3G)",
+      "Shanaya (SOTY)"
+    ],
+    [
+      "Credit Card Bill",
+      "House Rent"
+    ],
+    [
+      "Instagram Reel",
+      "YouTube Short"
+    ],
+    [
+      "Chai-Sutta",
+      "Coffee-Cookie"
+    ],
+    [
+      "Masala Oats",
+      "Corn Flakes"
+    ],
+    [
+      "Bandra-Worli Sea Link",
+      "Howrah Bridge"
+    ],
+    [
+      "Rajma Chawal",
+      "Kadhi Chawal"
+    ],
+    [
+      "Baahubali",
+      "RRR"
+    ],
+    [
+      "Tarak Mehta Ka Ooltah Chashmah",
+      "Sarabhai vs Sarabhai"
+    ],
+    [
+      "Washing Powder Nirma",
+      "Ujala Neel"
+    ],
+    [
+      "Sanskari Beta",
+      "Bigrel Nawab"
+    ],
+    [
+      "Flying Chappal",
+      "Belan"
+    ],
+    [
+      "Laddu",
+      "Gulab Jamun"
+    ],
+    [
+      "Dharmesh Sir",
+      "Raghav Juyal"
+    ],
+    [
+      "Kachori",
+      "Samosa"
+    ],
+    [
+      "Goa",
+      "Pondicherry"
+    ],
+    [
+      "Pani Puri",
+      "Puchka"
+    ],
+    [
+      "Ludo King",
+      "PUBG Mobile"
+    ],
+    [
+      "Kumbh Mela",
+      "Sunburn Festival"
+    ],
+    [
+      "Salman Khan (90s)",
+      "Salman Khan (Current)"
+    ],
+    [
+      "Manali",
+      "Kasol"
+    ],
+    [
+      "Shadi ka Buffet",
+      "Office Potluck"
+    ],
+    [
+      "Kala Khatta",
+      "Orange Bar"
+    ],
+    [
+      "Aam Panna",
+      "Jaljeera"
+    ],
+    [
+      "Bhajan",
+      "Ghazal"
+    ],
+    [
+      "Salwar Kameez",
+      "Saree"
+    ],
+    [
+      "Bull Market",
+      "Bear Market"
+    ],
+    [
+      "Auto Meter",
+      "Income Tax"
+    ],
+    [
+      "Boroline",
+      "Vaseline"
+    ],
+    [
+      "Bhangra",
+      "Garba"
+    ],
+    [
+      "Maniac Boss",
+      "Lazy Intern"
+    ],
+    [
+      "Gold Loan",
+      "Home Loan"
+    ],
+    [
+      "Kaju Katli",
+      "Soan Papdi"
+    ],
+    [
+      "Lassi",
+      "Chaas"
+    ],
+    [
+      "Dangal",
+      "Chak De India"
+    ],
+    [
+      "Hrithik Roshan",
+      "Tiger Shroff"
+    ],
+    [
+      "Passport Photo",
+      "Instagram DP"
+    ]
   ]
 }

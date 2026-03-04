@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Undercover - Social deduction party game">
     <meta name="theme-color" content="#0c0c14">
-    <title>Undercover — Meenit's Playground</title>
+    <title>Undercover â€” Meenit's Playground</title>
 
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/undercover.css">
@@ -19,7 +19,6 @@
         <div id="screen-setup" class="screen">
             <!-- Header: Logo, Name, Tagline -->
             <div class="screen-header">
-                <img src="../images/Undercover Logo.png" alt="Undercover" class="game-logo">
                 <h1 class="game-title">Undercover</h1>
                 <p class="game-tagline">Describe. Deceive. Survive.</p>
             </div>
@@ -31,7 +30,7 @@
                 <div class="setup-box">
                     <label><span class="step-badge">1</span> Total Players</label>
                     <div class="counter-control">
-                        <button class="counter-btn" id="decrease-players">−</button>
+                        <button class="counter-btn" id="decrease-players">âˆ’</button>
                         <span class="counter-value" id="player-count-display">4</span>
                         <button class="counter-btn" id="increase-players">+</button>
                     </div>
@@ -40,7 +39,7 @@
                 <!-- Step 2: Player Names -->
                 <div class="setup-box">
                     <label><span class="step-badge">2</span> Player names</label>
-                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 4 players — add names
+                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 4 players â€” add names
                         below</p>
                     <input type="text" id="player-name-input" class="name-input"
                         placeholder="Type name and press Enter">
@@ -60,7 +59,7 @@
                     <div class="counter-control-vertical">
                         <button class="counter-btn-small" id="increase-mrwhite">+</button>
                         <span class="counter-value-small" id="mrwhite-count">1</span>
-                        <button class="counter-btn-small" id="decrease-mrwhite">−</button>
+                        <button class="counter-btn-small" id="decrease-mrwhite">âˆ’</button>
                     </div>
                 </div>
 
@@ -74,7 +73,7 @@
                     <div class="counter-control-vertical">
                         <button class="counter-btn-small" id="increase-spies">+</button>
                         <span class="counter-value-small" id="spies-count">0</span>
-                        <button class="counter-btn-small" id="decrease-spies">−</button>
+                        <button class="counter-btn-small" id="decrease-spies">âˆ’</button>
                     </div>
                 </div>
 
@@ -100,48 +99,48 @@
         <div id="rules-modal" class="modal hidden">
             <div class="modal-overlay" id="modal-overlay"></div>
             <div class="modal-content">
-                <button class="modal-close" id="close-rules">×</button>
+                <button class="modal-close" id="close-rules">Ã—</button>
                 <h2>How to Play</h2>
 
                 <div class="rules-scroll">
                     <div class="rule-section">
-                        <h3>🎯 Game Flow</h3>
+                        <h3>ðŸŽ¯ Game Flow</h3>
                         <ol>
-                            <li>📱 One phone, pass it around!</li>
-                            <li>👁️ <strong>View Role</strong> — Everyone sees their secret role one by one</li>
-                            <li>💬 <strong>Describe</strong> — Describe your word in 1-2 words (or fake it!)</li>
-                            <li>🗳️ <strong>Vote</strong> — Eliminate ONE suspicious player</li>
-                            <li>🎭 <strong>Reveal</strong> — See their role (word stays secret!)</li>
-                            <li>🔁 <strong>Repeat</strong> — Keep going until someone wins!</li>
+                            <li>ðŸ“± One phone, pass it around!</li>
+                            <li>ðŸ‘ï¸ <strong>View Role</strong> â€” Everyone sees their secret role one by one</li>
+                            <li>ðŸ’¬ <strong>Describe</strong> â€” Describe your word in 1-2 words (or fake it!)</li>
+                            <li>ðŸ—³ï¸ <strong>Vote</strong> â€” Eliminate ONE suspicious player</li>
+                            <li>ðŸŽ­ <strong>Reveal</strong> â€” See their role (word stays secret!)</li>
+                            <li>ðŸ” <strong>Repeat</strong> â€” Keep going until someone wins!</li>
                         </ol>
                     </div>
 
                     <div class="rule-section">
-                        <h3>👥 The Roles</h3>
+                        <h3>ðŸ‘¥ The Roles</h3>
                         <ul>
-                            <li><strong>🕵️ Agents</strong> — You have the main word. Find the fakes!</li>
-                            <li><strong>🎭 Spies</strong> — You have a similar word. Blend in!</li>
-                            <li><strong>⚪ Mr. White</strong> — You have NO word. Listen and guess!</li>
+                            <li><strong>ðŸ•µï¸ Agents</strong> â€” You have the main word. Find the fakes!</li>
+                            <li><strong>ðŸŽ­ Spies</strong> â€” You have a similar word. Blend in!</li>
+                            <li><strong>âšª Mr. White</strong> â€” You have NO word. Listen and guess!</li>
                         </ul>
-                        <p>Agents & Spies both see "Agent / Spy" — you won't know which you are!</p>
+                        <p>Agents & Spies both see "Agent / Spy" â€” you won't know which you are!</p>
                     </div>
 
                     <div class="rule-section">
-                        <h3>🏆 How to Win</h3>
+                        <h3>ðŸ† How to Win</h3>
                         <ul>
-                            <li><strong>🕵️ Agents Win:</strong> Eliminate all Spies + all Mr. Whites</li>
-                            <li><strong>🎭 Spies Win:</strong> Outnumber or equal Agents (after Mr. White dies)</li>
-                            <li><strong>⚪ Mr. White Wins:</strong> Get eliminated → Guess the word correctly = WIN! Or
+                            <li><strong>ðŸ•µï¸ Agents Win:</strong> Eliminate all Spies + all Mr. Whites</li>
+                            <li><strong>ðŸŽ­ Spies Win:</strong> Outnumber or equal Agents (after Mr. White dies)</li>
+                            <li><strong>âšª Mr. White Wins:</strong> Get eliminated â†’ Guess the word correctly = WIN! Or
                                 Outnumber or equal Agents and Spies</li>
                         </ul>
                     </div>
 
                     <div class="rule-section">
-                        <h3>💡 Strategy Tips</h3>
+                        <h3>ðŸ’¡ Strategy Tips</h3>
                         <ul>
-                            <li><strong>🕵️ Agents/Spies:</strong> Be vague but believable!</li>
-                            <li><strong>⚪ Mr. White:</strong> Listen carefully, guess smart!</li>
-                            <li><strong>🎯 Everyone:</strong> Trust no one!</li>
+                            <li><strong>ðŸ•µï¸ Agents/Spies:</strong> Be vague but believable!</li>
+                            <li><strong>âšª Mr. White:</strong> Listen carefully, guess smart!</li>
+                            <li><strong>ðŸŽ¯ Everyone:</strong> Trust no one!</li>
                         </ul>
                     </div>
                 </div>
@@ -182,7 +181,7 @@
         <div id="screen-game-start" class="screen hidden">
             <div class="game-start-center">
                 <p class="round-badge" id="game-round-badge">Round 1</p>
-                <h1 class="game-start-title">🎮 Game Begins!</h1>
+                <h1 class="game-start-title">ðŸŽ® Game Begins!</h1>
 
                 <div class="speaker-box">
                     <p class="speaker-label">Current Speaker:</p>
