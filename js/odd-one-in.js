@@ -89,9 +89,11 @@ function setupEventListeners() {
   // Question
   document.getElementById('submit-answer-btn').addEventListener('click', submitAnswer);
   document.getElementById('answer-input').addEventListener('keypress', e => e.key === 'Enter' && submitAnswer());
+  document.getElementById('gm-edit-btn').addEventListener('click', gmEditQuestion);
   document.getElementById('gm-pause-btn').addEventListener('click', gmPause);
   document.getElementById('gm-reset-btn').addEventListener('click', gmReset);
   document.getElementById('gm-skip-btn').addEventListener('click', gmSkip);
+  document.getElementById('gm-end-game-btn').addEventListener('click', gmEndGame);
 
   // Review
   document.getElementById('eliminate-selected-btn').addEventListener('click', eliminateSelected);
@@ -133,6 +135,34 @@ function setupEventListeners() {
   if (params.get('blob')) {
     document.getElementById('room-code-input').value = params.get('blob');
     showScreen('screen-join');
+  }
+}
+
+// ================================
+// ================================
+// ROOM REGISTRY
+// ================================
+// A single hardcoded JSONBlob ID is used as the master index mapping 4-digit codes to their specific blob IDs.
+const MASTER_REGISTRY_BLOB_ID = '019cb953-bde3-74a5-8bdd-a32027866669';
+
+async function registerRoom(code, blobId) {
+  try {
+    const registry = await readBlob(MASTER_REGISTRY_BLOB_ID);
+    registry.rooms = registry.rooms || {};
+    registry.rooms[code] = blobId;
+    await updateBlob(MASTER_REGISTRY_BLOB_ID, registry);
+  } catch (e) {
+    console.error('Failed to register room index', e);
+  }
+}
+
+async function lookupRoom(code) {
+  try {
+    const registry = await readBlob(MASTER_REGISTRY_BLOB_ID);
+    return registry.rooms?.[code] || null;
+  } catch (e) {
+    console.error('Failed to lookup room code', e);
+    return null;
   }
 }
 
@@ -292,6 +322,8 @@ async function createRoom() {
     const roomData = buildFreshRoom(localState.roomCode, localState.myId, name);
     localState.blobId = await createBlob(roomData);
 
+    await registerRoom(localState.roomCode, localState.blobId);
+
     saveSession();
     enterLobby(roomData);
   } catch (e) {
@@ -324,20 +356,30 @@ function buildFreshRoom(code, gmId, gmName) {
 }
 
 async function joinRoom() {
-  const blobOrCode = document.getElementById('room-code-input').value.trim();
+  const code = document.getElementById('room-code-input').value.trim();
   const name = document.getElementById('join-name-input').value.trim();
 
-  if (!blobOrCode) { showError('join-error', 'Enter the room ID from the share link'); return; }
+  // Support both 4-digit codes and the full blob ID from share links
+  let blobId = code;
+  let isDirectBlobId = code.length > 10; // Blob IDs are very long
+
+  if (!code) { showError('join-error', 'Enter the 4-digit room code'); return; }
+  if (!isDirectBlobId && code.length !== 4) { showError('join-error', 'Enter a valid 4-digit room code'); return; }
   if (name.length < 2) { showError('join-error', 'Name must be at least 2 characters'); return; }
 
   const btn = document.getElementById('do-join-btn');
   btn.disabled = true;
   btn.textContent = 'Joining...';
 
-  // The room-code-input now accepts the blob ID directly
-  const blobId = blobOrCode;
-
   try {
+    if (!isDirectBlobId) {
+      blobId = await lookupRoom(code);
+      if (!blobId) {
+        showError('join-error', 'Room not found! Check the code.');
+        btn.disabled = false; btn.textContent = 'Join Room'; return;
+      }
+    }
+
     const roomData = await readBlob(blobId);
     if (!roomData.roomActive) {
       showError('join-error', 'Room is closed');
@@ -859,6 +901,7 @@ async function gmPause() {
     if (rd.timerPaused) { clearInterval(localState.timerInterval); localState.timerInterval = null; }
     rd.lastUpdate = Date.now();
     await updateBlob(localState.blobId, rd);
+    pollRoom(); // Immediate UI feedback
   } catch (e) { console.error(e); }
 }
 
@@ -872,6 +915,7 @@ async function gmReset() {
     clearInterval(localState.timerInterval); localState.timerInterval = null;
     rd.lastUpdate = Date.now();
     await updateBlob(localState.blobId, rd);
+    pollRoom(); // Immediate update
   } catch (e) { console.error(e); }
 }
 
@@ -887,7 +931,33 @@ async function gmSkip() {
     clearInterval(localState.timerInterval); localState.timerInterval = null;
     rd.lastUpdate = Date.now();
     await updateBlob(localState.blobId, rd);
+    pollRoom();
   } catch (e) { console.error(e); }
+}
+
+async function gmEditQuestion() {
+  const newQ = prompt("Enter a new question:");
+  if (newQ && newQ.trim().length > 0) {
+    try {
+      const rd = await readBlob(localState.blobId);
+      rd.currentQuestion = newQ.trim();
+      rd.lastUpdate = Date.now();
+      await updateBlob(localState.blobId, rd);
+      pollRoom();
+    } catch (e) { console.error(e); }
+  }
+}
+
+async function gmEndGame() {
+  if (confirm("End the game and send everyone back to the home screen?")) {
+    try {
+      const rd = await readBlob(localState.blobId);
+      rd.roomActive = false; // This triggers 'pollRoom' to kill the session and kick everyone
+      rd.lastUpdate = Date.now();
+      await updateBlob(localState.blobId, rd);
+      pollRoom();
+    } catch (e) { console.error(e); }
+  }
 }
 
 // ================================

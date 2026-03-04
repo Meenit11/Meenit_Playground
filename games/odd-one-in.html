@@ -55,9 +55,9 @@
                 <p class="subtitle">Join via share link or paste room ID</p>
             </div>
             <div class="content-card card-landing">
-                <label for="room-code-input">Room ID</label>
-                <input type="text" id="room-code-input" placeholder="Paste room ID from share link" autocomplete="off"
-                    style="font-size:0.9rem;">
+                <label for="room-code-input">Room Code</label>
+                <input type="text" id="room-code-input" placeholder="4-digit code" maxlength="4" inputmode="numeric"
+                    autocomplete="off" style="text-align:center;font-size:1.5rem;letter-spacing:0.5rem;">
                 <label for="join-name-input">Your Name</label>
                 <input type="text" id="join-name-input" placeholder="Enter your name" maxlength="20" autocomplete="off">
                 <p id="join-error" class="error-text hidden"></p>
@@ -97,9 +97,11 @@
         <div id="screen-question" class="screen hidden">
             <div class="screen-header">
                 <p class="round-badge">Round <span id="round-num">1</span></p>
-                <h1 id="question-text" class="question-text">Loading question…</h1>
             </div>
             <div class="content-card">
+                <h1 id="question-text" class="question-text"
+                    style="font-size: clamp(1.4rem, 5vw, 1.8rem); margin-bottom: var(--s2); color: var(--ooi-accent); border-bottom: 2px solid rgba(124, 58, 237, 0.2); padding-bottom: var(--s4);">
+                    Loading question…</h1>
                 <!-- Get Ready phase -->
                 <div id="get-ready-phase" class="get-ready-phase">
                     <h2 class="get-ready-text">Get Ready!</h2>
@@ -133,9 +135,12 @@
                 <div id="gm-controls" class="gm-controls hidden">
                     <h3>👑 Game Master Controls</h3>
                     <div class="gm-buttons">
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-edit-btn">✏️ Edit Que</button>
                         <button type="button" class="btn btn-sm btn-secondary" id="gm-pause-btn">⏸️ Pause</button>
                         <button type="button" class="btn btn-sm btn-secondary" id="gm-reset-btn">🔄 Reset</button>
                         <button type="button" class="btn btn-sm btn-secondary" id="gm-skip-btn">⏭️ Skip</button>
+                        <button type="button" class="btn btn-sm btn-danger" id="gm-end-game-btn" style="width: 100%;">🛑
+                            End Game</button>
                     </div>
                 </div>
 
@@ -185,7 +190,8 @@
                 <div class="rules-scroll">
                     <div class="rule-section">
                         <h3>🎯 Objective</h3>
-                        <p>Stay unique! Everyone answers the same prompt. Common / duplicate answers are risky – the most
+                        <p>Stay unique! Everyone answers the same prompt. Common / duplicate answers are risky – the
+                            most
                             "odd one in" survives.</p>
                     </div>
                     <div class="rule-section">

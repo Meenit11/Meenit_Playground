@@ -1,15 +1,15 @@
-/* ============================================
-   ODD ONE IN – Arcade Theme
+﻿/* ============================================
+   ODD ONE IN â€“ Arcade Theme
    Multi-device game. Purple & amber palette.
    ============================================ */
 
 :root {
-  --ooi-bg: #070816;
-  --ooi-surface: #14142a;
-  --ooi-accent: #7c3aed;
-  --ooi-accent-dim: #5b21b6;
-  --ooi-text: #e8e6f8;
-  --ooi-muted: #9ca3c7;
+  --ooi-bg: #022c22;
+  --ooi-surface: #064e3b;
+  --ooi-accent: #fbbf24;
+  --ooi-accent-dim: #f59e0b;
+  --ooi-text: #ecfdf5;
+  --ooi-muted: #a7f3d0;
   --ooi-danger: #ef4444;
 }
 
@@ -81,7 +81,7 @@ body.oddonein-game *:focus-visible {
 /* Content card */
 .content-card {
   background: linear-gradient(165deg, rgba(20, 20, 42, 0.98) 0%, rgba(10, 10, 18, 0.98) 100%);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   border-radius: var(--radius-xl);
   padding: var(--s6);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -101,7 +101,7 @@ body.oddonein-game *:focus-visible {
   width: 100%;
   padding: var(--s4);
   font-size: 1rem;
-  border: 2px solid rgba(124, 58, 237, 0.25);
+  border: 2px solid rgba(16, 185, 129, 0.25);
   border-radius: var(--radius-md);
   margin-bottom: var(--s4);
   background: rgba(10, 10, 18, 0.6);
@@ -112,7 +112,7 @@ body.oddonein-game *:focus-visible {
 .content-card textarea:focus {
   outline: none;
   border-color: var(--ooi-accent);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
 }
 
 .content-card input::placeholder {
@@ -139,7 +139,7 @@ body.oddonein-game *:focus-visible {
 
 /* Landing */
 .card-landing {
-  border-color: rgba(124, 58, 237, 0.3);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 /* ================================
@@ -197,8 +197,8 @@ body.oddonein-game *:focus-visible {
   align-items: center;
   justify-content: space-between;
   padding: var(--s3) var(--s4);
-  background: rgba(124, 58, 237, 0.06);
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.15);
   border-radius: var(--radius-md);
 }
 
@@ -292,34 +292,16 @@ body.oddonein-game *:focus-visible {
 
 .timer-display.timer-urgent {
   color: var(--ooi-danger) !important;
-  animation: ooiTimerShake 0.4s ease-in-out infinite;
 }
 
 .timer-display.timer-done {
   color: var(--ooi-muted);
-  animation: none;
 }
 
 .timer-label {
   font-size: var(--text-sm);
   color: var(--ooi-muted);
   margin: var(--s2) 0 0;
-}
-
-@keyframes ooiTimerShake {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  25% {
-    transform: translateX(-3px);
-  }
-
-  75% {
-    transform: translateX(3px);
-  }
 }
 
 /* Answer states */
@@ -360,7 +342,7 @@ body.oddonein-game *:focus-visible {
 .gm-controls {
   margin-top: var(--s6);
   padding-top: var(--s6);
-  border-top: 1px solid rgba(124, 58, 237, 0.15);
+  border-top: 1px solid rgba(16, 185, 129, 0.15);
 }
 
 .gm-controls.hidden {
@@ -381,14 +363,14 @@ body.oddonein-game *:focus-visible {
 
 .btn-secondary,
 .gm-controls .btn {
-  background: rgba(124, 58, 237, 0.12) !important;
-  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+  background: rgba(16, 185, 129, 0.12) !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
   color: var(--ooi-text) !important;
 }
 
 .btn-secondary:active,
 .gm-controls .btn:active {
-  background: rgba(124, 58, 237, 0.25) !important;
+  background: rgba(16, 185, 129, 0.25) !important;
 }
 
 .gm-status-msg {
@@ -398,7 +380,7 @@ body.oddonein-game *:focus-visible {
   font-weight: 600;
   margin-top: var(--s4);
   padding: var(--s3);
-  background: rgba(124, 58, 237, 0.08);
+  background: rgba(16, 185, 129, 0.08);
   border-radius: var(--radius-md);
 }
 
@@ -421,7 +403,7 @@ body.oddonein-game *:focus-visible {
   align-items: center;
   gap: var(--s3);
   padding: var(--s4);
-  background: rgba(124, 58, 237, 0.06);
+  background: rgba(16, 185, 129, 0.06);
   border-radius: var(--radius-md);
   border: 2px solid transparent;
   transition: border-color 0.2s, background 0.2s;
@@ -439,8 +421,8 @@ body.oddonein-game *:focus-visible {
 
 .answer-item.answer-selected {
   border-color: var(--ooi-accent) !important;
-  background: rgba(124, 58, 237, 0.15) !important;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+  background: rgba(16, 185, 129, 0.15) !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
 .ans-content {
@@ -474,7 +456,7 @@ body.oddonein-game *:focus-visible {
    ================================ */
 .winner-card {
   text-align: center;
-  border-color: rgba(124, 58, 237, 0.4);
+  border-color: rgba(16, 185, 129, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -540,26 +522,26 @@ body.oddonein-game *:focus-visible {
 /* Modal */
 .modal .modal-content {
   background: var(--ooi-surface) !important;
-  border: 1px solid rgba(124, 58, 237, 0.25) !important;
+  border: 1px solid rgba(16, 185, 129, 0.25) !important;
   color: var(--ooi-text) !important;
 }
 
 /* ================================
-   ODD ONE IN – THEMES
+   ODD ONE IN â€“ THEMES
    ================================ */
 
 /* Setup / Lobby theme */
 body.oddonein-game.ooi-theme-setup {
-  --ooi-bg: #0b0b12;
-  --ooi-surface: #18112a;
-  --ooi-accent: #f97316;
-  --ooi-accent-dim: #ea580c;
-  --ooi-text: #fffbeb;
-  --ooi-muted: #fed7aa;
-  background: radial-gradient(circle at 0% 0%, #7c2d12 0%, #0b0b12 40%, #020617 100%);
+  --ooi-bg: #022c22;
+  --ooi-surface: #064e3b;
+  --ooi-accent: #fbbf24;
+  --ooi-accent-dim: #f59e0b;
+  --ooi-text: #ecfdf5;
+  --ooi-muted: #a7f3d0;
+  background: radial-gradient(circle at 0% 0%, #065f46 0%, #022c22 40%, #020617 100%);
 }
 
-/* Round themes – 10 distinctive gradients */
+/* Round themes â€“ 10 distinctive gradients */
 body.oddonein-game.ooi-theme-round-1 {
   --ooi-bg: #020617;
   --ooi-surface: #0f172a;
@@ -660,7 +642,7 @@ body.oddonein-game.ooi-theme-round-10 {
   background: radial-gradient(circle at 50% 100%, #14b8a6 0%, #020617 60%, #020617 100%);
 }
 
-/* Review phase – intense red */
+/* Review phase â€“ intense red */
 body.oddonein-game.ooi-theme-review {
   --ooi-bg: #1a0508;
   --ooi-surface: #24040a;
@@ -672,18 +654,18 @@ body.oddonein-game.ooi-theme-review {
   background: radial-gradient(circle at 50% 0%, #7f1d1d 0%, #1a0508 45%, #020617 100%);
 }
 
-/* Winner phase – celebratory gold */
+/* Winner phase â€“ celebratory emerald and gold */
 body.oddonein-game.ooi-theme-winner {
-  --ooi-bg: #120b04;
-  --ooi-surface: #1e1307;
-  --ooi-accent: #facc15;
-  --ooi-accent-dim: #eab308;
-  --ooi-text: #fefce8;
-  --ooi-muted: #fef9c3;
-  background: radial-gradient(circle at 50% 0%, #f59e0b 0%, #120b04 45%, #020617 100%);
+  --ooi-bg: #022c22;
+  --ooi-surface: #064e3b;
+  --ooi-accent: #fbbf24;
+  --ooi-accent-dim: #f59e0b;
+  --ooi-text: #ecfdf5;
+  --ooi-muted: #a7f3d0;
+  background: radial-gradient(circle at 50% 0%, #047857 0%, #022c22 45%, #020617 100%);
 }
 
-/* Eliminated players – desaturated spectator view */
+/* Eliminated players â€“ desaturated spectator view */
 body.oddonein-game.ooi-eliminated-view {
   filter: grayscale(0.6) brightness(0.95);
 }
