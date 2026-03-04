@@ -1,0 +1,99 @@
+/* Charcoal black & gold theme – Act‑O‑Matic */
+:root {
+    --primary: #ffd700;
+    /* gold */
+    --primary-dark: #b8860b;
+    --focus: #ffea00;
+    --bg: #1a1a1a;
+    /* charcoal black */
+    --surface: #2b2b2b;
+    --text: #f5f5f5;
+}
+
+/* Basic layout */
+body.act-o-matic-game {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    max-width: 420px;
+    width: 100%;
+    padding: 1rem;
+}
+
+.screen-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.action-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: .75rem;
+    text-align: center;
+}
+
+.action-text {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+#next-action-btn {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    padding: .75rem 1.5rem;
+    border-radius: .5rem;
+    cursor: pointer;
+}
+
+#next-action-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* Roller viewfinder */
+#roller-view {
+    height: 3rem;
+    overflow: hidden;
+    position: relative;
+    margin: 1rem auto;
+    width: 100%;
+}
+
+#roller-list {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+.roller-item {
+    height: 3rem;
+    line-height: 3rem;
+    font-size: 1rem;
+    color: var(--text);
+}
+
+.roller-item.final {
+    animation: glow 1s ease-in-out forwards;
+}
+
+@keyframes glow {
+    0% {
+        color: var(--primary);
+    }
+
+    50% {
+        color: var(--focus);
+    }
+
+    100% {
+        color: var(--primary);
+    }
+}

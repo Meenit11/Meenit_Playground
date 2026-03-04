@@ -2,20 +2,15 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="description"
-    content="Meenit's Playground - Mobile party games including Odd One In, Undercover, and Mafia">
-  <meta name="theme-color" content="#1a1520">
+    content="Meenit's Playground - Mobile party games including Odd One In, Undercover, Mafia, and Act-O-Matic" />
+  <meta name="theme-color" content="#1a1520" />
   <title>Meenit's Playground — Party Games</title>
-
   <!-- Styles -->
-  <link rel="stylesheet" href="css/global.css">
-  <link rel="stylesheet" href="css/home.css">
-
-  <!-- Preload fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/home.css" />
 </head>
 
 <body>
@@ -23,7 +18,7 @@
     <!-- Hero Section -->
     <div class="hero">
       <div class="logo-container">
-        <img src="images/Meenit's Playground.png" alt="Logo" class="main-logo">
+        <img src="images/Meenit's Playground.png" alt="Logo" class="main-logo" />
       </div>
       <h2 class="section-title">Pick Your Game</h2>
       <p class="hero-hint">Endless chaos.</p>
@@ -32,6 +27,28 @@
     <!-- Game Selection -->
     <main class="games-section">
       <div class="games-grid">
+        <!-- Act-O-Matic Card -->
+        <a href="games/act-o-matic.html" class="game-card" data-game="act-o-matic">
+          <div class="game-card-content">
+            <h2 class="game-name">Act-O-Matic</h2>
+            <p class="game-tagline">Actions speak louder than words and look much dumber.</p>
+            <div class="game-card-footer game-card-footer-act-o-matic">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">🤹‍♂️</span>
+                  <span class="meta-text">2 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">⚡</span>
+                  <span class="meta-text">Fast</span>
+                </div>
+              </div>
+            </div>
+            <br />
+            <span class="play-link play-link-next-line">Play Now <span class="arrow">→</span></span>
+          </div>
+        </a>
+
         <!-- Odd One In Card -->
         <a href="games/odd-one-in.html" class="game-card" data-game="odd-one-in">
           <div class="game-card-content">
@@ -48,9 +65,7 @@
                   <span class="meta-text">Quick</span>
                 </div>
               </div>
-              <span class="play-link play-link-next-line">
-                Play Now <span class="arrow">→</span>
-              </span>
+              <span class="play-link play-link-next-line">Play Now <span class="arrow">→</span></span>
             </div>
           </div>
         </a>
@@ -71,9 +86,7 @@
                   <span class="meta-text">Deception</span>
                 </div>
               </div>
-              <span class="play-link play-link-next-line">
-                Play Now <span class="arrow">→</span>
-              </span>
+              <span class="play-link play-link-next-line">Play Now <span class="arrow">→</span></span>
             </div>
           </div>
         </a>
@@ -94,29 +107,6 @@
                   <span class="meta-text">Strategy</span>
                 </div>
               </div>
-              <span class="play-link play-link-next-line">
-                Play Now <span class="arrow">→</span>
-              </span>
-            </div>
-          </div>
-        </a>
-
-        <!-- Act-O-Matic Card -->
-        <a href="games/act-o-matic.html" class="game-card" data-game="act-o-matic">
-          <div class="game-card-content">
-            <h2 class="game-name">Act-O-Matic</h2>
-            <p class="game-tagline">Actions speak louder than words—and look much dumber.</p>
-            <div class="game-card-footer game-card-footer-act-o-matic">
-              <div class="game-meta">
-                <div class="meta-box">
-                  <span class="meta-icon">🤹‍♂️</span>
-                  <span class="meta-text">2 — ∞</span>
-                </div>
-                <div class="meta-box">
-                  <span class="meta-icon">⚡</span>
-                  <span class="meta-text">Fast</span>
-                </div>
-              </div>
               <span class="play-link play-link-next-line">Play Now <span class="arrow">→</span></span>
             </div>
           </div>
@@ -130,10 +120,6 @@
       <p class="footer-heart">Made with <span class="heart-pump">❤️</span></p>
     </footer>
   </div>
-  <script>
-    // Staggered card entrance handled by CSS (cardReveal keyframes)
-  </script>
-
   <!-- Scripts -->
   <script src="js/utils.js"></script>
 </body>
