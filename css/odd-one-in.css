@@ -81,7 +81,7 @@ body.oddonein-game *:focus-visible {
 /* Content card */
 .content-card {
   background: linear-gradient(165deg, rgba(20, 20, 42, 0.98) 0%, rgba(10, 10, 18, 0.98) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 20%, transparent);
   border-radius: var(--radius-xl);
   padding: var(--s6);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -101,7 +101,7 @@ body.oddonein-game *:focus-visible {
   width: 100%;
   padding: var(--s4);
   font-size: 1rem;
-  border: 2px solid rgba(16, 185, 129, 0.25);
+  border: 2px solid color-mix(in srgb, var(--ooi-accent) 25%, transparent);
   border-radius: var(--radius-md);
   margin-bottom: var(--s4);
   background: rgba(10, 10, 18, 0.6);
@@ -112,7 +112,7 @@ body.oddonein-game *:focus-visible {
 .content-card textarea:focus {
   outline: none;
   border-color: var(--ooi-accent);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ooi-accent) 15%, transparent);
 }
 
 .content-card input::placeholder {
@@ -139,7 +139,7 @@ body.oddonein-game *:focus-visible {
 
 /* Landing */
 .card-landing {
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: color-mix(in srgb, var(--ooi-accent) 30%, transparent);
 }
 
 /* ================================
@@ -197,8 +197,8 @@ body.oddonein-game *:focus-visible {
   align-items: center;
   justify-content: space-between;
   padding: var(--s3) var(--s4);
-  background: rgba(16, 185, 129, 0.06);
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  background: color-mix(in srgb, var(--ooi-accent) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 15%, transparent);
   border-radius: var(--radius-md);
 }
 
@@ -342,7 +342,7 @@ body.oddonein-game *:focus-visible {
 .gm-controls {
   margin-top: var(--s6);
   padding-top: var(--s6);
-  border-top: 1px solid rgba(16, 185, 129, 0.15);
+  border-top: 1px solid color-mix(in srgb, var(--ooi-accent) 15%, transparent);
 }
 
 .gm-controls.hidden {
@@ -363,14 +363,14 @@ body.oddonein-game *:focus-visible {
 
 .btn-secondary,
 .gm-controls .btn {
-  background: rgba(16, 185, 129, 0.12) !important;
-  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  background: color-mix(in srgb, var(--ooi-accent) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 30%, transparent) !important;
   color: var(--ooi-text) !important;
 }
 
 .btn-secondary:active,
 .gm-controls .btn:active {
-  background: rgba(16, 185, 129, 0.25) !important;
+  background: color-mix(in srgb, var(--ooi-accent) 25%, transparent) !important;
 }
 
 .gm-status-msg {
@@ -380,7 +380,7 @@ body.oddonein-game *:focus-visible {
   font-weight: 600;
   margin-top: var(--s4);
   padding: var(--s3);
-  background: rgba(16, 185, 129, 0.08);
+  background: color-mix(in srgb, var(--ooi-accent) 8%, transparent);
   border-radius: var(--radius-md);
 }
 
@@ -403,7 +403,7 @@ body.oddonein-game *:focus-visible {
   align-items: center;
   gap: var(--s3);
   padding: var(--s4);
-  background: rgba(16, 185, 129, 0.06);
+  background: color-mix(in srgb, var(--ooi-accent) 6%, transparent);
   border-radius: var(--radius-md);
   border: 2px solid transparent;
   transition: border-color 0.2s, background 0.2s;
@@ -421,8 +421,8 @@ body.oddonein-game *:focus-visible {
 
 .answer-item.answer-selected {
   border-color: var(--ooi-accent) !important;
-  background: rgba(16, 185, 129, 0.15) !important;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  background: color-mix(in srgb, var(--ooi-accent) 15%, transparent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ooi-accent) 20%, transparent);
 }
 
 .ans-content {
@@ -522,8 +522,19 @@ body.oddonein-game *:focus-visible {
 /* Modal */
 .modal .modal-content {
   background: var(--ooi-surface) !important;
-  border: 1px solid rgba(16, 185, 129, 0.25) !important;
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 25%, transparent) !important;
   color: var(--ooi-text) !important;
+}
+
+#rules-modal .modal-close {
+  background: transparent !important;
+  color: #fbbf24 !important;
+}
+
+#rules-modal .modal-close:hover,
+#rules-modal .modal-close:focus {
+  background: transparent !important;
+  color: #f59e0b !important;
 }
 
 /* ================================
@@ -644,6 +655,9 @@ body.oddonein-game.ooi-theme-round-10 {
 
 /* Review phase â€“ intense red */
 body.oddonein-game.ooi-theme-review {
+  --primary: #f97373;
+  --primary-dark: #b91c1c;
+  --focus: #f97373;
   --ooi-bg: #1a0508;
   --ooi-surface: #24040a;
   --ooi-accent: #f97373;
@@ -656,6 +670,9 @@ body.oddonein-game.ooi-theme-review {
 
 /* Winner phase â€“ celebratory emerald and gold */
 body.oddonein-game.ooi-theme-winner {
+  --primary: #fbbf24;
+  --primary-dark: #f59e0b;
+  --focus: #fbbf24;
   --ooi-bg: #022c22;
   --ooi-surface: #064e3b;
   --ooi-accent: #fbbf24;

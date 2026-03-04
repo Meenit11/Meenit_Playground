@@ -739,7 +739,9 @@ function renderQuestion(rd) {
 
   const me = rd.players.find(p => p.id === localState.myId);
   const isEliminated = me?.isEliminated;
-  const hasAnswered = rd.answers.hasOwnProperty(localState.myId);
+  const serverHasAnswered = rd.answers.hasOwnProperty(localState.myId);
+  // Optimistically assume we've answered if we just clicked submit for this exact round
+  const hasAnswered = serverHasAnswered || (localState.optimisticSubmitRound === rd.currentRound);
 
   const getReadyEl = document.getElementById('get-ready-phase');
   const answerPhaseEl = document.getElementById('answer-phase');
@@ -880,6 +882,17 @@ async function submitAnswer() {
   document.getElementById('submit-answer-btn').disabled = true;
   document.getElementById('submit-answer-btn').textContent = 'Submitted ✓';
 
+  // Optimistically set the state to hide the input immediately
+  localState.optimisticSubmitRound = localState._lastRenderedRound;
+  // Trigger a fast DOM update so they don't see any weirdness before the poll
+  const answerSection = document.getElementById('answer-section');
+  const submittedMsg = document.getElementById('answer-submitted-msg');
+  if (answerSection && submittedMsg) {
+    answerSection.classList.add('hidden');
+    submittedMsg.classList.remove('hidden');
+    submittedMsg.querySelector('p').textContent = '✓ Answer Submitted';
+  }
+
   try {
     const rd = await readBlob(localState.blobId);
     rd.answers[localState.myId] = answer;
@@ -887,9 +900,18 @@ async function submitAnswer() {
     await updateBlob(localState.blobId, rd);
   } catch (e) {
     console.error(e);
+    localState.optimisticSubmitRound = null;
     input.disabled = false;
     document.getElementById('submit-answer-btn').disabled = false;
     document.getElementById('submit-answer-btn').textContent = 'Submit Answer';
+
+    // Reverse the DOM update
+    const answerSection = document.getElementById('answer-section');
+    const submittedMsg = document.getElementById('answer-submitted-msg');
+    if (answerSection && submittedMsg) {
+      answerSection.classList.remove('hidden');
+      submittedMsg.classList.add('hidden');
+    }
   }
 }
 

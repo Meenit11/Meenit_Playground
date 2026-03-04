@@ -1372,13 +1372,14 @@ body.winner-civilians .mafia-back-to-games-link {
 }
 
 #rules-modal .modal-close {
-  background: rgba(139, 58, 74, 0.3) !important;
-  color: #e8c8c8 !important;
+  background: transparent !important;
+  color: #fbbf24 !important;
 }
 
 #rules-modal .modal-close:hover,
 #rules-modal .modal-close:focus {
-  background: rgba(139, 58, 74, 0.5) !important;
+  background: transparent !important;
+  color: #f59e0b !important;
 }
 
 .rule-section {
