@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a12">
+    <title>Odd One In — Meenit's Playground</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/odd-one-in.css">
+</head>
+
+<body class="oddonein-game">
+    <div class="game-container">
+
+        <!-- SCREEN 1: Game Selection -->
+        <div id="screen-mode-select" class="screen">
+            <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo">
+                <h1 class="game-title">Odd One In</h1>
+                <p class="subtitle">Think fast. Answer weird. Matching is for socks, not you.</p>
+            </div>
+            <div class="content-card card-landing">
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="create-room-btn">Create Room</button>
+                <button type="button" class="btn btn-outline btn-full btn-lg" id="join-room-btn"
+                    style="margin-top:var(--s3);">Join Room</button>
+                <button type="button" class="btn btn-ghost btn-full" id="reset-ooi-storage-btn"
+                    style="margin-top:var(--s3);">Reset Saved Data</button>
+                <a href="../index.html" class="back-link">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- SCREEN 2A: Create Room -->
+        <div id="screen-create" class="screen hidden">
+            <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo">
+                <h1 class="game-title">Create Room</h1>
+                <p class="subtitle">You'll be the Game Master 👑</p>
+            </div>
+            <div class="content-card card-landing">
+                <label for="create-name-input">Your Name</label>
+                <input type="text" id="create-name-input" placeholder="Enter your name" maxlength="20"
+                    autocomplete="off">
+                <p id="create-error" class="error-text hidden"></p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="do-create-btn">Create Room</button>
+                <button type="button" class="btn btn-ghost btn-full" id="back-from-create-btn">Back</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2B: Join Room -->
+        <div id="screen-join" class="screen hidden">
+            <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo">
+                <h1 class="game-title">Join Room</h1>
+                <p class="subtitle">Join via share link or paste room ID</p>
+            </div>
+            <div class="content-card card-landing">
+                <label for="room-code-input">Room ID</label>
+                <input type="text" id="room-code-input" placeholder="Paste room ID from share link" autocomplete="off"
+                    style="font-size:0.9rem;">
+                <label for="join-name-input">Your Name</label>
+                <input type="text" id="join-name-input" placeholder="Enter your name" maxlength="20" autocomplete="off">
+                <p id="join-error" class="error-text hidden"></p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="do-join-btn">Join Room</button>
+                <button type="button" class="btn btn-ghost btn-full" id="back-from-join-btn">Back</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Game Lobby -->
+        <div id="screen-lobby" class="screen hidden">
+            <div class="screen-header">
+                <img src="../images/Odd One In Logo.png" alt="Odd One In" class="game-logo">
+                <p class="subtitle">Room Code</p>
+                <h1 class="room-code-display" id="lobby-room-code">----</h1>
+            </div>
+            <div class="content-card card-landing">
+                <button type="button" class="btn btn-outline btn-full" id="rules-btn" style="margin-bottom:var(--s3);">
+                    Rules
+                </button>
+                <div class="share-buttons">
+                    <button type="button" class="btn btn-outline btn-sm" id="share-whatsapp-btn">📱 WhatsApp</button>
+                    <button type="button" class="btn btn-outline btn-sm" id="share-copy-btn">📋 Copy Link</button>
+                </div>
+                <p id="copy-feedback" class="copy-feedback hidden">Copied! 📋</p>
+                <p class="players-count" id="lobby-player-count">0 players in lobby</p>
+                <div id="lobby-player-list" class="lobby-player-list"></div>
+                <p id="lobby-waiting" class="lobby-waiting hidden">Waiting for Game Master to start...</p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="start-game-btn" disabled
+                    style="margin-top:var(--s4);">Start Game</button>
+                <p id="start-game-hint" class="hint" style="text-align:center;">Need at least 3 players</p>
+                <button type="button" class="btn btn-ghost btn-full" id="leave-lobby-btn"
+                    style="margin-top:var(--s2);">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: Question Round -->
+        <div id="screen-question" class="screen hidden">
+            <div class="screen-header">
+                <p class="round-badge">Round <span id="round-num">1</span></p>
+                <h1 id="question-text" class="question-text">Loading question…</h1>
+            </div>
+            <div class="content-card">
+                <!-- Get Ready phase -->
+                <div id="get-ready-phase" class="get-ready-phase">
+                    <h2 class="get-ready-text">Get Ready!</h2>
+                    <div class="get-ready-countdown" id="get-ready-countdown">3</div>
+                </div>
+
+                <!-- Answer phase -->
+                <div id="answer-phase" class="hidden">
+                    <div class="timer-container">
+                        <div class="timer-display" id="timer-display">10</div>
+                        <p class="timer-label">seconds</p>
+                    </div>
+                    <div id="answer-section">
+                        <label for="answer-input">Your answer</label>
+                        <input type="text" id="answer-input" placeholder="Type your answer…" maxlength="50"
+                            autocomplete="off">
+                        <button type="button" class="btn btn-primary btn-full" id="submit-answer-btn">Submit
+                            Answer</button>
+                    </div>
+                    <div id="answer-submitted-msg" class="answer-submitted-msg hidden">
+                        <p>✓ Answer Submitted</p>
+                        <p class="small-text">Waiting for timer to end...</p>
+                    </div>
+                    <div id="eliminated-msg" class="eliminated-message hidden">
+                        <p>👻 You've been eliminated</p>
+                        <p class="small-text">Spectating this round</p>
+                    </div>
+                </div>
+
+                <!-- GM Controls -->
+                <div id="gm-controls" class="gm-controls hidden">
+                    <h3>👑 Game Master Controls</h3>
+                    <div class="gm-buttons">
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-pause-btn">⏸️ Pause</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-reset-btn">🔄 Reset</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-skip-btn">⏭️ Skip</button>
+                    </div>
+                </div>
+
+                <p id="gm-status-msg" class="gm-status-msg hidden"></p>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Answer Review -->
+        <div id="screen-review" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title">Round <span id="review-round-num">1</span> Results</h1>
+                <p class="subtitle" id="review-subtitle">Game Master is deciding...</p>
+            </div>
+            <div class="content-card">
+                <div id="answers-container" class="answers-container"></div>
+                <div id="elimination-controls" class="elimination-controls hidden">
+                    <button type="button" class="btn btn-danger btn-full" id="eliminate-selected-btn">Eliminate
+                        Selected</button>
+                    <button type="button" class="btn btn-outline btn-full" id="next-round-no-elim-btn"
+                        style="margin-top:var(--s2);">Next Round (No Elimination)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: Winner -->
+        <div id="screen-winner" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title">🏆 Winner!</h1>
+            </div>
+            <div class="content-card winner-card">
+                <div id="confetti-container" class="confetti-container"></div>
+                <p class="winner-label">🎉 Congratulations! 🎉</p>
+                <h2 id="winner-name" class="winner-name">—</h2>
+                <p class="winner-subtitle">Odd One In Champion</p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="play-again-btn"
+                    style="margin-top:var(--s6);">Play Again</button>
+                <a href="../index.html" class="back-link">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- RULES MODAL -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-overlay" id="ooi-rules-overlay"></div>
+            <div class="modal-content">
+                <button type="button" class="modal-close" id="close-rules">×</button>
+                <h2>How to Play – Odd One In</h2>
+                <div class="rules-scroll">
+                    <div class="rule-section">
+                        <h3>🎯 Objective</h3>
+                        <p>Stay unique! Everyone answers the same prompt. Common / duplicate answers are risky – the most
+                            "odd one in" survives.</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>📱 Setup</h3>
+                        <ul>
+                            <li>One player creates a room and becomes Game Master.</li>
+                            <li>Everyone else joins using the shared link or room ID.</li>
+                            <li>Each player uses their own phone – no screen sharing needed.</li>
+                        </ul>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🔄 Round Flow</h3>
+                        <ol>
+                            <li>Game Master taps <strong>Start Game</strong>.</li>
+                            <li>All players see the same question and a short "Get Ready" countdown.</li>
+                            <li>Timer starts (10s). Everyone types a single answer and submits.</li>
+                            <li>When time ends, all answers (including blanks) are locked in.</li>
+                            <li>Everyone moves to the review screen where the Game Master decides eliminations.</li>
+                        </ol>
+                    </div>
+                    <div class="rule-section">
+                        <h3>👑 Game Master Tools</h3>
+                        <ul>
+                            <li><strong>Pause</strong> – Freeze the timer for all players.</li>
+                            <li><strong>Reset</strong> – Clear answers and restart the 10s timer.</li>
+                            <li><strong>Skip</strong> – Jump immediately to answer review.</li>
+                        </ul>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🏆 Winning</h3>
+                        <p>The game continues until only 1–2 players remain. Those surviving players are crowned
+                            Odd One In champions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/odd-one-in.js"></script>
+</body>
+
+</html>

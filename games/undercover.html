@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Undercover - Social deduction party game">
+    <meta name="theme-color" content="#0c0c14">
+    <title>Undercover — Meenit's Playground</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/undercover.css">
+</head>
+
+<body class="undercover-game">
+    <div class="game-container">
+
+        <!-- SCREEN 1: Setup -->
+        <div id="screen-setup" class="screen">
+            <!-- Header: Logo, Name, Tagline -->
+            <div class="screen-header">
+                <img src="../images/Undercover Logo.png" alt="Undercover" class="game-logo">
+                <h1 class="game-title">Undercover</h1>
+                <p class="game-tagline">Describe. Deceive. Survive.</p>
+            </div>
+
+            <div class="content-card">
+                <h2>Game Setup</h2>
+
+                <!-- Step 1: Total Players -->
+                <div class="setup-box">
+                    <label><span class="step-badge">1</span> Total Players</label>
+                    <div class="counter-control">
+                        <button class="counter-btn" id="decrease-players">−</button>
+                        <span class="counter-value" id="player-count-display">4</span>
+                        <button class="counter-btn" id="increase-players">+</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Player Names -->
+                <div class="setup-box">
+                    <label><span class="step-badge">2</span> Player names</label>
+                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 4 players — add names
+                        below</p>
+                    <input type="text" id="player-name-input" class="name-input"
+                        placeholder="Type name and press Enter">
+                    <div id="player-list" class="player-chips"></div>
+                </div>
+
+                <!-- Step 3: Role Selection -->
+                <h3 class="section-title"><span class="step-badge">3</span> Role Selection</h3>
+
+                <!-- Mr. White Role -->
+                <div class="role-card-horizontal">
+                    <img src="../images/Mr. White.png" alt="Mr. White" class="role-img">
+                    <div class="role-details">
+                        <h4>Mr. White</h4>
+                        <p>Doesn't know the word</p>
+                    </div>
+                    <div class="counter-control-vertical">
+                        <button class="counter-btn-small" id="increase-mrwhite">+</button>
+                        <span class="counter-value-small" id="mrwhite-count">1</span>
+                        <button class="counter-btn-small" id="decrease-mrwhite">−</button>
+                    </div>
+                </div>
+
+                <!-- Spy Role -->
+                <div class="role-card-horizontal">
+                    <img src="../images/Spy.png" alt="Spy" class="role-img">
+                    <div class="role-details">
+                        <h4>Spy</h4>
+                        <p>Gets different word</p>
+                    </div>
+                    <div class="counter-control-vertical">
+                        <button class="counter-btn-small" id="increase-spies">+</button>
+                        <span class="counter-value-small" id="spies-count">0</span>
+                        <button class="counter-btn-small" id="decrease-spies">−</button>
+                    </div>
+                </div>
+
+                <!-- Agents (Auto-calculated) -->
+                <div class="role-card-horizontal agents-card">
+                    <img src="../images/Agent.png" alt="Agent" class="role-img">
+                    <div class="role-details">
+                        <h4>Agents</h4>
+                        <p>Majority with main word</p>
+                    </div>
+                    <span class="counter-value-small agents-value" id="agents-count">3</span>
+                </div>
+
+                <!-- Action Buttons -->
+                <button class="btn btn-primary btn-full" id="start-game-btn">Start Game</button>
+                <button class="btn btn-outline btn-full uc-btn-spacing" id="rules-btn">Rules</button>
+                <button class="btn btn-ghost btn-full uc-btn-spacing" id="reset-uc-storage-btn">Reset Saved Data</button>
+                <a href="../index.html" class="uc-back-to-home-link uc-back-link">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- Rules Modal -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-overlay" id="modal-overlay"></div>
+            <div class="modal-content">
+                <button class="modal-close" id="close-rules">×</button>
+                <h2>How to Play</h2>
+
+                <div class="rules-scroll">
+                    <div class="rule-section">
+                        <h3>🎯 Game Flow</h3>
+                        <ol>
+                            <li>📱 One phone, pass it around!</li>
+                            <li>👁️ <strong>View Role</strong> — Everyone sees their secret role one by one</li>
+                            <li>💬 <strong>Describe</strong> — Describe your word in 1-2 words (or fake it!)</li>
+                            <li>🗳️ <strong>Vote</strong> — Eliminate ONE suspicious player</li>
+                            <li>🎭 <strong>Reveal</strong> — See their role (word stays secret!)</li>
+                            <li>🔁 <strong>Repeat</strong> — Keep going until someone wins!</li>
+                        </ol>
+                    </div>
+
+                    <div class="rule-section">
+                        <h3>👥 The Roles</h3>
+                        <ul>
+                            <li><strong>🕵️ Agents</strong> — You have the main word. Find the fakes!</li>
+                            <li><strong>🎭 Spies</strong> — You have a similar word. Blend in!</li>
+                            <li><strong>⚪ Mr. White</strong> — You have NO word. Listen and guess!</li>
+                        </ul>
+                        <p>Agents & Spies both see "Agent / Spy" — you won't know which you are!</p>
+                    </div>
+
+                    <div class="rule-section">
+                        <h3>🏆 How to Win</h3>
+                        <ul>
+                            <li><strong>🕵️ Agents Win:</strong> Eliminate all Spies + all Mr. Whites</li>
+                            <li><strong>🎭 Spies Win:</strong> Outnumber or equal Agents (after Mr. White dies)</li>
+                            <li><strong>⚪ Mr. White Wins:</strong> Get eliminated → Guess the word correctly = WIN! Or
+                                Outnumber or equal Agents and Spies</li>
+                        </ul>
+                    </div>
+
+                    <div class="rule-section">
+                        <h3>💡 Strategy Tips</h3>
+                        <ul>
+                            <li><strong>🕵️ Agents/Spies:</strong> Be vague but believable!</li>
+                            <li><strong>⚪ Mr. White:</strong> Listen carefully, guess smart!</li>
+                            <li><strong>🎯 Everyone:</strong> Trust no one!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: Role Viewing -->
+        <div id="screen-role-viewing" class="screen hidden">
+            <div class="role-viewing-center">
+                <h1 class="centered-title">Role Assignment</h1>
+
+                <div class="pass-phone-box">
+                    <p class="player-name-large" id="next-viewer-name">Player Name</p>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">Reveal My Role</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Role Display -->
+        <div id="screen-role-display" class="screen hidden">
+            <div class="role-display-center">
+                <div class="role-card-large">
+                    <img id="role-image" src="" alt="Role" class="role-image-large">
+                    <h2 id="role-name-display" class="role-name-large"></h2>
+                    <p id="role-description" class="role-description"></p>
+                    <div id="word-display" class="word-box">
+                        <h1 id="player-word" class="word-large"></h1>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="next-player-btn">Pass Phone to&nbsp;<span
+                        id="next-player-name">Next Player</span></button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: Game Start -->
+        <div id="screen-game-start" class="screen hidden">
+            <div class="game-start-center">
+                <p class="round-badge" id="game-round-badge">Round 1</p>
+                <h1 class="game-start-title">🎮 Game Begins!</h1>
+
+                <div class="speaker-box">
+                    <p class="speaker-label">Current Speaker:</p>
+                    <h2 id="current-speaker-name" class="speaker-name"></h2>
+                </div>
+
+                <div class="instructions-box">
+                    <p>Describe your word in 1-2 words.</p>
+                    <p>After everyone speaks, vote to eliminate ONE suspicious player.</p>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="eliminate-btn">Eliminate Player</button>
+                <button class="btn btn-outline btn-full" id="end-game-btn">End Game</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Elimination Voting -->
+        <div id="screen-elimination" class="screen hidden">
+            <div class="elimination-center">
+                <h1 class="centered-title">Eliminate Player</h1>
+                <p class="elimination-instruction">Game Master: Select ONE player to eliminate</p>
+
+                <div id="player-elimination-list" class="elimination-list"></div>
+
+                <button class="btn btn-danger btn-full btn-lg" id="confirm-eliminate-btn" disabled>Eliminate Selected
+                    Player</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: Role Reveal (After Elimination) -->
+        <div id="screen-role-reveal" class="screen hidden">
+            <div class="role-reveal-center">
+                <h1 class="reveal-title">Player Eliminated</h1>
+
+                <div class="reveal-card">
+                    <h2 id="eliminated-player-name" class="eliminated-name"></h2>
+                    <img id="eliminated-role-image" src="" alt="Role" class="role-image-large">
+                    <h3 id="eliminated-role-name" class="eliminated-role"></h3>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="continue-after-elimination-btn">Continue
+                    Game</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: Mr. White Guess -->
+        <div id="screen-mrwhite-guess" class="screen hidden">
+            <div class="guess-center">
+                <h1 class="centered-title">Mr. White's Last Chance!</h1>
+                <p class="guess-instruction">Mr. White: Guess the Agent's word to win!</p>
+
+                <input type="text" id="mrwhite-guess-input" class="guess-input" placeholder="Type your guess">
+                <button class="btn btn-primary btn-full btn-lg" id="submit-guess-btn">Submit Guess</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 8: Game Over -->
+        <div id="screen-game-over" class="screen hidden">
+            <div class="game-over-center">
+                <div class="confetti-container" id="confetti-container"></div>
+
+                <h1 id="winner-title" class="winner-title"></h1>
+                <div class="winner-card">
+                    <div id="winner-players-list" class="winner-players-grid"></div>
+                </div>
+
+                <div class="reveal-words">
+                    <div class="word-reveal-box agent-word-box">
+                        <p class="word-reveal-label">Agent Word:</p>
+                        <h2 id="reveal-agent-word" class="word-reveal"></h2>
+                    </div>
+                    <div class="word-reveal-box spy-word-box">
+                        <p class="word-reveal-label">Spy Word:</p>
+                        <h2 id="reveal-spy-word" class="word-reveal"></h2>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="play-again-btn">Play Again</button>
+                <a href="../index.html" class="uc-back-to-home-link">Back to Home</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/undercover.js"></script>
+</body>
+
+</html>

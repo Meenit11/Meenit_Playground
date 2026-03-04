@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description"
+    content="Meenit's Playground - Mobile party games including Odd One In, Undercover, and Mafia">
+  <meta name="theme-color" content="#1a1520">
+  <title>Meenit's Playground — Party Games</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/home.css">
+
+  <!-- Preload fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="hero">
+      <div class="logo-container">
+        <img src="images/Meenit's Playground.png" alt="Logo" class="main-logo">
+      </div>
+      <h2 class="section-title">Pick Your Game</h2>
+      <p class="hero-hint">Endless chaos.</p>
+    </div>
+
+    <!-- Game Selection -->
+    <main class="games-section">
+      <div class="games-grid">
+        <!-- Odd One In Card -->
+        <a href="games/odd-one-in.html" class="game-card" data-game="odd-one-in">
+          <div class="game-card-content">
+            <h2 class="game-name">Odd One In</h2>
+            <p class="game-tagline">Think fast. Answer weird. Matching is for socks, not you.</p>
+            <div class="game-card-footer game-card-footer-odd-one-in">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">3 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">⏱️</span>
+                  <span class="meta-text">Quick</span>
+                </div>
+              </div>
+              <span class="play-link play-link-next-line">
+                Play Now <span class="arrow">→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Undercover Card -->
+        <a href="games/undercover.html" class="game-card" data-game="undercover">
+          <div class="game-card-content">
+            <h2 class="game-name">Undercover</h2>
+            <p class="game-tagline">Describe. Deceive. Survive.</p>
+            <div class="game-card-footer game-card-footer-odd-one-in">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">4 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">🎭</span>
+                  <span class="meta-text">Deception</span>
+                </div>
+              </div>
+              <span class="play-link play-link-next-line">
+                Play Now <span class="arrow">→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Mafia Card -->
+        <a href="games/mafia.html" class="game-card" data-game="mafia">
+          <div class="game-card-content">
+            <h2 class="game-name">Mafia</h2>
+            <p class="game-tagline">Surviving the night is easy. Convincing others you're innocent is hard.</p>
+            <div class="game-card-footer game-card-footer-odd-one-in">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">5 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">🧠</span>
+                  <span class="meta-text">Strategy</span>
+                </div>
+              </div>
+              <span class="play-link play-link-next-line">
+                Play Now <span class="arrow">→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p class="footer-text">Bored. Overreacted. Build this game!</p>
+      <p class="footer-heart">Made with <span class="heart-pump">❤️</span></p>
+    </footer>
+  </div>
+  <script>
+    // Staggered card entrance handled by CSS (cardReveal keyframes)
+  </script>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+</body>
+
+</html>
