@@ -170,8 +170,10 @@ async function lookupRoom(code) {
 // SCREEN MANAGEMENT + THEMES
 // ================================
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   const el = document.getElementById(id);
+  if (el && !el.classList.contains('hidden')) return; // Prevent focus loss and DOM bounce
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   if (el) el.classList.remove('hidden');
 }
 

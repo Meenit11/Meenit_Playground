@@ -691,6 +691,13 @@ body.oddonein-game.ooi-eliminated-view {
 #rules-modal .rules-scroll {
   max-height: 60vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+#rules-modal .rules-scroll::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
 }
 
 #rules-modal .rule-section {
