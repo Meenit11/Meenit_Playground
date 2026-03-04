@@ -193,6 +193,90 @@ body::after {
   animation-delay: 0.3s;
 }
 
+.game-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+/* Act-O-Matic: Charcoal Black & Gold */
+[data-game="act-o-matic"] {
+  background: linear-gradient(145deg, rgba(28, 22, 8, 0.98) 0%, rgba(20, 16, 4, 0.95) 100%);
+  border-color: rgba(212, 160, 23, 0.35);
+}
+
+[data-game="act-o-matic"]:active {
+  border-color: rgba(212, 160, 23, 0.6);
+}
+
+[data-game="act-o-matic"] .game-name {
+  color: #f0c040;
+}
+
+[data-game="act-o-matic"] .meta-box {
+  background: rgba(212, 160, 23, 0.12);
+  color: #d4a017;
+}
+
+[data-game="act-o-matic"] .play-link {
+  color: #d4a017;
+}
+
+/* Odd One In: Emerald Green */
+[data-game="odd-one-in"] {
+  background: linear-gradient(145deg, rgba(4, 30, 18, 0.98) 0%, rgba(2, 20, 12, 0.95) 100%);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-game="odd-one-in"] .game-name {
+  color: #34d399;
+}
+
+[data-game="odd-one-in"] .meta-box {
+  background: rgba(16, 185, 129, 0.1);
+  color: #6ee7b7;
+}
+
+[data-game="odd-one-in"] .play-link {
+  color: #10b981;
+}
+
+/* Undercover: Purple */
+[data-game="undercover"] {
+  background: linear-gradient(145deg, rgba(20, 8, 38, 0.98) 0%, rgba(14, 5, 26, 0.95) 100%);
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+[data-game="undercover"] .game-name {
+  color: #a78bfa;
+}
+
+[data-game="undercover"] .meta-box {
+  background: rgba(139, 92, 246, 0.12);
+  color: #c4b5fd;
+}
+
+[data-game="undercover"] .play-link {
+  color: #8b5cf6;
+}
+
+/* Mafia: Deep Red */
+[data-game="mafia"] {
+  background: linear-gradient(145deg, rgba(28, 4, 8, 0.98) 0%, rgba(20, 2, 6, 0.95) 100%);
+  border-color: rgba(185, 28, 28, 0.35);
+}
+
+[data-game="mafia"] .game-name {
+  color: #f87171;
+}
+
+[data-game="mafia"] .meta-box {
+  background: rgba(185, 28, 28, 0.12);
+  color: #fca5a5;
+}
+
+[data-game="mafia"] .play-link {
+  color: #ef4444;
+}
+
 @keyframes homeCardMorph {
   0% {
     opacity: 0;
