@@ -15,7 +15,7 @@
 <body class="actomatic-game">
     <div class="game-container">
 
-        <!-- SCREEN 1: Setup / Rules -->
+        <!-- SCREEN 1: Setup -->
         <div id="screen-setup" class="screen">
             <div class="screen-header">
                 <h1 class="game-title">Act-O-Matic</h1>
@@ -23,33 +23,28 @@
             </div>
             <div class="content-card">
                 <div class="setup-box">
-                    <label><span class="step-badge">How to Play</span></label>
-                    <p class="how-it-works-text">
-                        <strong>Two Players Step Up</strong><br>
-                        Game Master picks 2 players.<br><br>
-                        <strong>Roll for Action</strong><br>
-                        Each pair gets a secret action (e.g., "Riding a rickshaw", "Brushing teeth").<br><br>
-                        <strong>Act It Out</strong><br>
-                        Perform your secret action. No talking, no sounds! Use gestures only. Other player
-                        watches.<br><br>
-                        <strong>Guess!</strong><br>
-                        After acting, you must guess: "What action did I just do?"<br><br>
-                        <strong>Results</strong><br>
-                        Correct guess &rarr; You WIN! &nbsp; Wrong guess &rarr; Other player WINS!<br><br>
-                        <strong>Next Round</strong><br>
-                        Pick 2 new players and repeat!
-                    </p>
+                    <label>How to Play</label>
+                    <div class="how-it-works-text">
+                        <p><strong>Two Players Step Up</strong><br>Game Master picks 2 players</p>
+                        <p><strong>Roll for Action</strong><br>Roll! Each player gets a secret action<br><em>(e.g.,
+                                "Riding a rickshaw", "Brushing teeth", "Flying a kite")</em></p>
+                        <p><strong>Act It Out</strong><br>Perform your secret action<br>No talking, no sounds!<br>Use
+                            gestures, movements, expressions<br>Other player watches</p>
+                        <p><strong>Guess!</strong><br>After acting, you must guess:<br>"What action did I just do?"</p>
+                        <p><strong>Results</strong><br>Correct guess - You WIN!<br>Wrong guess - Other player WINS!</p>
+                        <p><strong>Next Round</strong><br>Pick 2 new players and repeat!</p>
+                    </div>
                 </div>
                 <button class="btn btn-primary btn-full btn-lg" id="start-btn">Let's Play!</button>
                 <a href="../index.html" class="back-link">Back to Home</a>
             </div>
         </div>
 
-        <!-- SCREEN 2: Roll + Reveal (combined, loops) -->
+        <!-- SCREEN 2: Roll + Reveal (combined) -->
         <div id="screen-roller" class="screen hidden">
             <div class="screen-header">
-                <h1 class="game-title" id="roller-title">Roll the Action</h1>
-                <p class="tagline" id="roller-subtitle">Two players step up and roll!</p>
+                <h1 class="game-title" id="roller-title">Act-O-Matic</h1>
+                <p class="tagline" id="roller-subtitle">Actions speak louder than words and look much dumber.</p>
             </div>
             <div class="content-card roller-card">
 
@@ -62,7 +57,7 @@
                     <div class="roller-fade-bottom"></div>
                 </div>
 
-                <!-- Action Reveal Box (shown after roll, replaces roller) -->
+                <!-- Action Reveal Box (shown after roll) -->
                 <div id="reveal-box" class="reveal-box hidden">
                     <p class="reveal-action-text" id="reveal-action-text">-</p>
                 </div>

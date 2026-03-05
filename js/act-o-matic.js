@@ -3,10 +3,9 @@
 // ================================
 // CONSTANTS
 // ================================
-const ITEM_HEIGHT = 56;    // px — must match CSS .roller-item height
-const VIEWFINDER_H = 260;   // px — must match CSS .roller-outer height
-const PAD = 2;     // blank items top/bottom
-const CENTER_OFFSET = (VIEWFINDER_H / 2) - (ITEM_HEIGHT / 2); // = 102px
+const ITEM_H = 56;    // px — must match CSS .roller-item height
+const VIEWER_H = 260;   // px — .roller-outer height
+const VIEWER_CENTER = VIEWER_H / 2; // 130px
 const COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 hours
 
 let allActions = [];
@@ -25,20 +24,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         allActions = [
             'Driving an auto-rickshaw', 'Flipping a pancake', 'Rock climbing',
             'Riding a very bumpy camel', 'Threading a needle', 'Directing traffic',
-            'Ironing a shirt', 'Kicking a ball', 'Swimming underwater'
+            'Sumo wrestling', 'Building a sandcastle', 'Ice skating for the first time'
         ];
-        console.error('Failed to load actions.json', e);
     }
 
     document.getElementById('start-btn').addEventListener('click', () => {
-        resetRollerScreen();
+        prepareRoller();
         showScreen('screen-roller');
     });
 
     document.getElementById('roll-btn').addEventListener('click', rollAction);
 
     document.getElementById('next-round-btn').addEventListener('click', () => {
-        resetRollerScreen();
+        resetForNextRoll();
     });
 
     document.getElementById('end-game-btn').addEventListener('click', () => {
@@ -55,33 +53,24 @@ function showScreen(id) {
     if (el) el.classList.remove('hidden');
 }
 
-function resetRollerScreen() {
+function resetForNextRoll() {
     chosenAction = null;
-
-    // Show roller, hide reveal
-    document.getElementById('roller-outer').classList.remove('hidden');
+    // Hide reveal, show roller
     document.getElementById('reveal-box').classList.add('hidden');
-
-    // Show roll btn, hide next-round
+    document.getElementById('next-round-btn').classList.add('hidden');
     document.getElementById('roll-btn').classList.remove('hidden');
     document.getElementById('roll-btn').disabled = false;
     document.getElementById('roll-btn').textContent = 'Roll Action!';
-    document.getElementById('next-round-btn').classList.add('hidden');
-
-    // Reset header
-    document.getElementById('roller-title').textContent = 'Roll the Action';
-    document.getElementById('roller-subtitle').textContent = 'Two players step up and roll!';
-
-    // Build idle roller showing random items
-    buildIdleRoller();
-
-    showScreen('screen-roller');
+    document.getElementById('roller-title').textContent = 'Act-O-Matic';
+    document.getElementById('roller-subtitle').textContent = 'Actions speak louder than words and look much dumber.';
+    document.getElementById('roller-outer').classList.remove('hidden');
+    prepareRoller();
 }
 
 // ================================
 // COOLDOWN LOGIC
 // ================================
-function loadUsedActions() {
+function loadUsed() {
     try {
         const raw = localStorage.getItem('aom_used_actions');
         if (!raw) return [];
@@ -89,153 +78,156 @@ function loadUsedActions() {
     } catch (_) { return []; }
 }
 
-function saveUsedActions(used) {
+function saveUsed(used) {
     try { localStorage.setItem('aom_used_actions', JSON.stringify(used)); } catch (_) { }
 }
 
-function pickActions(count) {
-    const used = loadUsedActions();
+function pickBatch(count) {
+    const used = loadUsed();
     const usedSet = new Set(used.map(e => e.action));
-
     let pool = allActions.filter(a => !usedSet.has(a));
-    if (pool.length < count) pool = [...allActions]; // reset when exhausted
-
+    if (pool.length < count) pool = [...allActions];
     // Fisher-Yates shuffle
     for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
     }
-
-    const chosen = pool.slice(0, count);
+    const batch = pool.slice(0, count);
     const now = Date.now();
-    used.push(...chosen.map(action => ({ action, ts: now })));
-    saveUsedActions(used);
-    return chosen;
+    used.push(...batch.map(action => ({ action, ts: now })));
+    saveUsed(used);
+    return batch;
 }
 
 // ================================
-// ROLLER: IDLE
+// ROLLER: PREPARE IDLE STATE
 // ================================
-function buildIdleRoller() {
-    // Pick 8 random items to show — no cooldown marking for idle
-    const shuffled = [...allActions].sort(() => Math.random() - 0.5).slice(0, 8);
+function prepareRoller() {
     const track = document.getElementById('roller-track');
-    buildTrackItems(track, shuffled);
-
-    // Position so first real item is centered in viewfinder
+    const demo = [...allActions].sort(() => Math.random() - 0.5).slice(0, 8);
+    // Show middle of the list initially so center slot is filled
     track.style.transition = 'none';
-    track.style.transform = `translateY(${translateForIndex(0)}px)`;
+
+    const fullList = buildInfiniteList(demo, 20); // 20 repeats
+    buildTrackDOM(track, fullList);
+
+    // Start showing the middle so items are visible
+    const startIdx = Math.floor(fullList.length / 2);
+    const startY = centeredTranslateY(startIdx);
+    track.style.transform = `translateY(${startY}px)`;
 }
 
 // ================================
-// TRACK HELPERS
+// BUILD AN "INFINITE" LIST
 // ================================
-function buildTrackItems(track, items) {
+function buildInfiniteList(batch, repeats) {
+    const result = [];
+    for (let r = 0; r < repeats; r++) {
+        batch.forEach(a => result.push(a));
+    }
+    return result;
+}
+
+function buildTrackDOM(track, items) {
     track.innerHTML = '';
-    for (let i = 0; i < PAD; i++) track.appendChild(makeItem(''));
-    items.forEach(text => track.appendChild(makeItem(text)));
-    for (let i = 0; i < PAD; i++) track.appendChild(makeItem(''));
+    items.forEach(text => {
+        const el = document.createElement('div');
+        el.className = 'roller-item';
+        el.textContent = text;
+        track.appendChild(el);
+    });
 }
 
-function makeItem(text) {
-    const el = document.createElement('div');
-    el.className = 'roller-item';
-    el.textContent = text;
-    return el;
-}
-
-/**
- * Compute translateY so that loopList item at `loopIndex` is centred
- * in the viewfinder's gold highlight band.
- * DOM index = PAD + loopIndex
- */
-function translateForIndex(loopIndex) {
-    return CENTER_OFFSET - ((PAD + loopIndex) * ITEM_HEIGHT);
+// translateY to center item at absolute index `idx` in viewfinder
+function centeredTranslateY(idx) {
+    // Center of item idx = idx * ITEM_H + ITEM_H/2
+    // We need that to equal VIEWER_CENTER
+    // So translateY = -(idx * ITEM_H + ITEM_H/2 - VIEWER_CENTER)
+    return -(idx * ITEM_H + ITEM_H / 2 - VIEWER_CENTER);
 }
 
 // ================================
-// ROLLER: SPIN
+// ROLLER: SPIN ANIMATION
 // ================================
 async function rollAction() {
     if (isRolling) return;
     isRolling = true;
 
     const rollBtn = document.getElementById('roll-btn');
-    const nextRoundBtn = document.getElementById('next-round-btn');
     const revealBox = document.getElementById('reveal-box');
+    const nextBtn = document.getElementById('next-round-btn');
     const track = document.getElementById('roller-track');
-    const rollerOuter = document.getElementById('roller-outer');
 
     rollBtn.disabled = true;
     rollBtn.textContent = 'Rolling...';
+    revealBox.classList.add('hidden');
 
-    // --- Build looping list ---
-    // Pick 6-10 actions for this spin
-    const spinCount = 6 + Math.floor(Math.random() * 5); // 6..10
-    const spinList = pickActions(spinCount);
-    // Repeat 6 times to create an endless-loop illusion
-    const REPS = 6;
-    const loopList = [];
-    for (let r = 0; r < REPS; r++) spinList.forEach(a => loopList.push(a));
+    // Pick 6-10 unique actions for this spin
+    const batchSize = 6 + Math.floor(Math.random() * 5); // 6..10
+    const batch = pickBatch(batchSize);
+    const winner = batch[batch.length - 1];
 
-    // Winner is the last item of the second-to-last full repetition
-    // = index (REPS-1)*spinCount - 1 (well into the list, guaranteed visible)
-    const winnerLoopIdx = (REPS - 1) * spinCount + (spinCount - 1);
-
-    buildTrackItems(track, loopList);
+    // Build a very long list: 30 repeats of batch = 180-300 items
+    const REPEATS = 30;
+    const fullList = buildInfiniteList(batch, REPEATS);
+    buildTrackDOM(track, fullList);
     await tick();
 
-    // Start: first item centred (translateY = CENTER_OFFSET - PAD*ITEM_HEIGHT)
-    const startY = translateForIndex(0);
+    // --- START POSITION: show items from the beginning (index 3 visible) ---
+    const startIdx = 3;
+    const startY = centeredTranslateY(startIdx);
     track.style.transition = 'none';
     track.style.transform = `translateY(${startY}px)`;
     await tick();
 
-    // Phase 1: fast scroll — stop 2 full reps before winner
-    const fastEndIdx = Math.max(0, winnerLoopIdx - 2 * spinCount);
-    const fastEndY = translateForIndex(fastEndIdx);
-    await animateTrack(track, fastEndY, 1400, 'cubic-bezier(0.15, 0, 0.85, 1)');
+    // --- WINNER INDEX: pick from batch 20-25 range (deep inside, safe) ---
+    const winnerBatch = 22; // which repeat of the batch contains winner
+    const winnerPosInLoop = winnerBatch * batchSize + (batchSize - 1); // last item of batch 22
+    const fastStopIdx = winnerPosInLoop - 2 * batchSize; // stop fast phase here (2 batches before winner)
 
-    // Phase 2: slow decelerate into winner
-    const slowEndY = translateForIndex(winnerLoopIdx);
-    await animateTrack(track, slowEndY, 1800, 'cubic-bezier(0.25, 0.46, 0.45, 0.94)');
+    // Phase 1: FAST scroll to fastStopIdx
+    const fastY = centeredTranslateY(fastStopIdx);
+    await animateTrack(track, startY, fastY, 1300, 'cubic-bezier(0.12, 0, 0.6, 1)');
 
-    // Highlight the winner DOM element
+    // Phase 2: SLOW scroll to winner
+    const winnerY = centeredTranslateY(winnerPosInLoop);
+    await animateTrack(track, fastY, winnerY, 1800, 'cubic-bezier(0.22, 0.61, 0.36, 1)');
+
+    // Highlight the winner element
     const allItems = track.querySelectorAll('.roller-item');
-    const winnerEl = allItems[PAD + winnerLoopIdx];
-    if (winnerEl) {
-        winnerEl.classList.add('roller-winner');
+    const winEl = allItems[winnerPosInLoop];
+    if (winEl) {
+        winEl.classList.add('roller-winner');
         await delay(200);
-        winnerEl.classList.add('roller-glow');
+        winEl.classList.add('roller-glow');
     }
 
-    chosenAction = spinList[spinList.length - 1]; // last of original spinList
+    chosenAction = winner;
+    await delay(500);
 
-    // Short pause, then reveal
-    await delay(700);
-
-    // Show reveal, hide roller
+    // Show reveal box, hide roller
     document.getElementById('reveal-action-text').textContent = chosenAction;
-    rollerOuter.classList.add('hidden');
+    document.getElementById('roller-outer').classList.add('hidden');
     revealBox.classList.remove('hidden');
 
-    // Update header to game identity
+    // Update header to show game identity
     document.getElementById('roller-title').textContent = 'Act-O-Matic';
     document.getElementById('roller-subtitle').textContent = 'Actions speak louder than words and look much dumber.';
 
     rollBtn.classList.add('hidden');
-    nextRoundBtn.classList.remove('hidden');
+    nextBtn.classList.remove('hidden');
 
     isRolling = false;
+    rollBtn.disabled = false;
 }
 
 // ================================
-// HELPERS
+// ANIMATION HELPERS
 // ================================
-function animateTrack(track, toY, duration, easing) {
+function animateTrack(track, from, to, duration, easing) {
     return new Promise(resolve => {
         track.style.transition = `transform ${duration}ms ${easing}`;
-        track.style.transform = `translateY(${toY}px)`;
+        track.style.transform = `translateY(${to}px)`;
         setTimeout(resolve, duration + 60);
     });
 }
