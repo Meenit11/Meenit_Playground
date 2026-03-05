@@ -15,7 +15,7 @@
 <body class="actomatic-game">
     <div class="game-container">
 
-        <!-- SCREEN 1: Setup -->
+        <!-- SCREEN 1: Setup / Rules -->
         <div id="screen-setup" class="screen">
             <div class="screen-header">
                 <h1 class="game-title">Act-O-Matic</h1>
@@ -25,12 +25,19 @@
                 <div class="setup-box">
                     <label><span class="step-badge">How to Play</span></label>
                     <p class="how-it-works-text">
-                        Two players step forward.<br>
-                        Roll to get a secret action.<br>
-                        Leader <strong>directs</strong> the Actor (say "raise arms", etc.) without naming the
-                        action.<br>
-                        Actor <strong>does the moves</strong> and tries to <strong>guess</strong> what it is!<br>
-                        Correct guess = safe. Wrong = eliminated!
+                        <strong>Two Players Step Up</strong><br>
+                        Game Master picks 2 players.<br><br>
+                        <strong>Roll for Action</strong><br>
+                        Each pair gets a secret action (e.g., "Riding a rickshaw", "Brushing teeth").<br><br>
+                        <strong>Act It Out</strong><br>
+                        Perform your secret action. No talking, no sounds! Use gestures only. Other player
+                        watches.<br><br>
+                        <strong>Guess!</strong><br>
+                        After acting, you must guess: "What action did I just do?"<br><br>
+                        <strong>Results</strong><br>
+                        Correct guess &rarr; You WIN! &nbsp; Wrong guess &rarr; Other player WINS!<br><br>
+                        <strong>Next Round</strong><br>
+                        Pick 2 new players and repeat!
                     </p>
                 </div>
                 <button class="btn btn-primary btn-full btn-lg" id="start-btn">Let's Play!</button>
@@ -38,7 +45,7 @@
             </div>
         </div>
 
-        <!-- SCREEN 2: Roll + Reveal (combined) -->
+        <!-- SCREEN 2: Roll + Reveal (combined, loops) -->
         <div id="screen-roller" class="screen hidden">
             <div class="screen-header">
                 <h1 class="game-title" id="roller-title">Roll the Action</h1>
@@ -55,11 +62,9 @@
                     <div class="roller-fade-bottom"></div>
                 </div>
 
-                <!-- Action Reveal Box (shown after roll) -->
+                <!-- Action Reveal Box (shown after roll, replaces roller) -->
                 <div id="reveal-box" class="reveal-box hidden">
-                    <p class="reveal-label">Your Action:</p>
                     <p class="reveal-action-text" id="reveal-action-text">-</p>
-                    <p class="reveal-hint">Actor: memorise this, then hand the phone face-down to the Leader!</p>
                 </div>
 
                 <!-- Buttons -->
