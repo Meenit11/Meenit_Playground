@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -73,10 +73,10 @@
                     Rules
                 </button>
                 <div class="share-buttons">
-                    <button type="button" class="btn btn-outline btn-sm" id="share-whatsapp-btn">ðŸ"± WhatsApp</button>
-                    <button type="button" class="btn btn-outline btn-sm" id="share-copy-btn">ðŸ"‹ Copy Link</button>
+                    <button type="button" class="btn btn-outline btn-sm" id="share-whatsapp-btn">📱 WhatsApp</button>
+                    <button type="button" class="btn btn-outline btn-sm" id="share-copy-btn">📋 Copy Link</button>
                 </div>
-                <p id="copy-feedback" class="copy-feedback hidden">Copied! 📋"‹</p>
+                <p id="copy-feedback" class="copy-feedback hidden">Copied! 📋</p>
                 <p class="players-count" id="lobby-player-count">0 players in lobby</p>
                 <div id="lobby-player-list" class="lobby-player-list"></div>
                 <p id="lobby-waiting" class="lobby-waiting hidden">Waiting for Game Master to start...</p>
@@ -96,7 +96,7 @@
             <div class="content-card">
                 <h1 id="question-text" class="question-text"
                     style="font-size: clamp(1.4rem, 5vw, 1.8rem); margin-bottom: var(--s2); color: var(--ooi-accent); border-bottom: 2px solid rgba(124, 58, 237, 0.2); padding-bottom: var(--s4);">
-                    Loading questionâ€¦</h1>
+                    Loading question...</h1>
                 <!-- Get Ready phase -->
                 <div id="get-ready-phase" class="get-ready-phase">
                     <h2 class="get-ready-text">Get Ready!</h2>
@@ -111,31 +111,30 @@
                     </div>
                     <div id="answer-section">
                         <label for="answer-input">Your answer</label>
-                        <input type="text" id="answer-input" placeholder="Type your answerâ€¦" maxlength="50"
+                        <input type="text" id="answer-input" placeholder="Type your answer..." maxlength="50"
                             autocomplete="off">
                         <button type="button" class="btn btn-primary btn-full" id="submit-answer-btn">Submit
                             Answer</button>
                     </div>
                     <div id="answer-submitted-msg" class="answer-submitted-msg hidden">
-                        <p>âœ" Answer Submitted</p>
+                        <p>✓ Answer Submitted</p>
                         <p class="small-text">Waiting for timer to end...</p>
                     </div>
                     <div id="eliminated-msg" class="eliminated-message hidden">
-                        <p>ðŸ‘» You've been eliminated</p>
+                        <p>👻 You've been eliminated</p>
                         <p class="small-text">Spectating this round</p>
                     </div>
                 </div>
 
                 <!-- GM Controls -->
                 <div id="gm-controls" class="gm-controls hidden">
-                    <h3>ðŸ‘‘ Game Master Controls</h3>
+                    <h3>👑 Game Master Controls</h3>
                     <div class="gm-buttons">
-                        <button type="button" class="btn btn-sm btn-secondary" id="gm-edit-btn">âœï¸ Edit Que</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="gm-pause-btn">â¸ï¸ Pause</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="gm-reset-btn">ðŸ"„ Reset</button>
-                        <button type="button" class="btn btn-sm btn-secondary" id="gm-skip-btn">â­ï¸ Skip</button>
-                        <button type="button" class="btn btn-sm btn-danger" id="gm-end-game-btn"
-                            style="width: 100%;">ðŸ›‘
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-edit-btn">✏️ Edit Que</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-pause-btn">⏸️ Pause</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-reset-btn">🔄 Reset</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-skip-btn">⏭️ Skip</button>
+                        <button type="button" class="btn btn-sm btn-danger" id="gm-end-game-btn" style="width: 100%;">🛑
                             End Game</button>
                     </div>
                 </div>
@@ -164,12 +163,12 @@
         <!-- SCREEN 6: Winner -->
         <div id="screen-winner" class="screen hidden">
             <div class="screen-header">
-                <h1 class="game-title">ðŸ† Winner!</h1>
+                <h1 class="game-title">🏆 Winner!</h1>
             </div>
             <div class="content-card winner-card">
                 <div id="confetti-container" class="confetti-container"></div>
-                <p class="winner-label">ðŸŽ‰ Congratulations! ðŸŽ‰</p>
-                <h2 id="winner-name" class="winner-name">â€"</h2>
+                <p class="winner-label">🎉 Congratulations! 🎉</p>
+                <h2 id="winner-name" class="winner-name">-</h2>
                 <p class="winner-subtitle">Odd One In Champion</p>
                 <button type="button" class="btn btn-primary btn-full btn-lg" id="play-again-btn"
                     style="margin-top:var(--s6);">Play Again</button>
@@ -181,65 +180,65 @@
         <div id="rules-modal" class="modal hidden">
             <div class="modal-overlay" id="ooi-rules-overlay"></div>
             <div class="modal-content">
-                <button type="button" class="modal-close" id="close-rules">Ã—</button>
+                <button type="button" class="modal-close" id="close-rules">×</button>
                 <h2>How to Play</h2>
                 <div class="rules-scroll">
                     <div class="rule-section">
-                        <h3>ðŸŽ® What's the Game?</h3>
+                        <h3>🎮 What's the Game?</h3>
                         <p>Everyone answers the same question. Unique answers survive. Duplicates get eliminated!<br>
-                            Last 1-2 players standing win! ðŸ†</p>
+                            Last 1-2 players standing win! 🏆</p>
                     </div>
                     <div class="rule-section">
-                        <h3>ðŸ"± Setup</h3>
+                        <h3>📱 Setup</h3>
                         <ul>
-                            <li><strong>Create Room</strong> â†' Get a 4-digit code</li>
-                            <li><strong>Share Code</strong> â†' Friends join on their phones</li>
-                            <li><strong>Start Game</strong> â†' Need 3+ players</li>
-                            <li>One player becomes Game Master ðŸ‘‘ (controls the game)</li>
+                            <li><strong>Create Room</strong> → Get a 4-digit code</li>
+                            <li><strong>Share Code</strong> → Friends join on their phones</li>
+                            <li><strong>Start Game</strong> → Need 3+ players</li>
+                            <li>One player becomes Game Master 👑 (controls the game)</li>
                         </ul>
                     </div>
                     <div class="rule-section">
-                        <h3>ðŸŽ² How to Play</h3>
+                        <h3>🎲 How to Play</h3>
                         <p><strong>Each Round:</strong></p>
                         <ul>
-                            <li>ðŸ"‹ Question appears (e.g., "Name a fruit")</li>
-                            <li>â° Get ready â†' 3...2...1 countdown</li>
-                            <li>â±ï¸ Answer time â†' 10 seconds to type and submit</li>
-                            <li>âš ï¸ Once submitted, you can't change it!</li>
+                            <li>📋 Question appears (e.g., "Name a fruit")</li>
+                            <li>⏰ Get ready → 3...2...1 countdown</li>
+                            <li>⏱️ Answer time → 10 seconds to type and submit</li>
+                            <li>⚠️ Once submitted, you can't change it!</li>
                         </ul>
-                        <p><strong>ðŸ"Š Review:</strong> See everyone's answers:<br>
-                            âŒ Bob | (No Answer)<br>
-                            ðŸŸ¡ Alice | Apple â† Duplicate!<br>
-                            ðŸŸ¡ Charlie | Apple â† Duplicate!<br>
-                            âœ… Diana | Mango â† Unique!
+                        <p><strong>📊 Review:</strong> See everyone's answers:<br>
+                            ❌ Bob | (No Answer)<br>
+                            🟡 Alice | Apple ← Duplicate!<br>
+                            🟡 Charlie | Apple ← Duplicate!<br>
+                            ✅ Diana | Mango ← Unique!
                         </p>
-                        <p>ðŸ‘‘ <strong>Eliminate:</strong> Game Master picks who's out</p>
-                        <p>ðŸ" <strong>Repeat:</strong> Until only 1-2 players remain</p>
+                        <p>👑 <strong>Eliminate:</strong> Game Master picks who's out</p>
+                        <p>🔁 <strong>Repeat:</strong> Until only 1-2 players remain</p>
                     </div>
                     <div class="rule-section">
-                        <h3>ðŸ‘‘ Game Master Powers</h3>
+                        <h3>👑 Game Master Powers</h3>
                         <ul>
-                            <li>â¸ï¸ <strong>Pause</strong> â†' Stop timer</li>
-                            <li>ðŸ"„ <strong>Reset</strong> â†' Restart with 10 seconds</li>
-                            <li>â­ï¸ <strong>Skip</strong> â†' Jump to results</li>
-                            <li>âœï¸ <strong>Edit</strong> â†' Change question</li>
+                            <li>⏸️ <strong>Pause</strong> → Stop timer</li>
+                            <li>🔄 <strong>Reset</strong> → Restart with 10 seconds</li>
+                            <li>⏭️ <strong>Skip</strong> → Jump to results</li>
+                            <li>✏️ <strong>Edit</strong> → Change question</li>
                         </ul>
                     </div>
                     <div class="rule-section">
-                        <h3>ðŸ† Winning</h3>
+                        <h3>🏆 Winning</h3>
                         <p>1-2 players left = Winners!<br>
                             Then:<br>
-                            ðŸ"„ Play Again<br>
-                            ðŸ Go Home</p>
+                            🔄 Play Again<br>
+                            🏠 Go Home</p>
                     </div>
                     <div class="rule-section">
-                        <h3>ðŸ'¡ Strategy</h3>
-                        <p>âœ… Good answers: Unique, creative, unexpected<br>
-                            âŒ Bad answers: Common, blank, duplicates</p>
+                        <h3>💡 Strategy</h3>
+                        <p>✅ Good answers: Unique, creative, unexpected<br>
+                            ❌ Bad answers: Common, blank, duplicates</p>
                         <p><em>Example: "Name a fruit"</em><br>
-                            âŒ Apple (too common)<br>
-                            âœ… Dragonfruit (unique!)</p>
-                        <p><strong>Be weird or be gone! ðŸŽ®âœ¨</strong></p>
+                            ❌ Apple (too common)<br>
+                            ✅ Dragonfruit (unique!)</p>
+                        <p><strong>Be weird or be gone! 🎮✨</strong></p>
                     </div>
                 </div>
             </div>

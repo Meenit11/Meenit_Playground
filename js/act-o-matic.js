@@ -105,7 +105,7 @@ function pickActions(count) {
 function buildIdleRoller() {
     const track = document.getElementById('roller-track');
     // Pick a fresh display list for idle
-    let demo = [...allActions].sort(() => Math.random() - 0.5).slice(0, 8);
+    let demo = [...allActions].sort(() => Math.random() - 0.5);
     track.style.transition = 'none';
     track.style.transform = 'translateY(0px)';
     buildTrackItems(track, demo);
@@ -216,9 +216,8 @@ async function rollAction() {
     revealBox.classList.remove('hidden');
 
     // Update title/subtitle
-    document.getElementById('roller-title').textContent = 'Your Action!';
-    document.getElementById('roller-subtitle').textContent = "Actor: memorise, then hand phone face-down to the Leader!";
-
+    document.getElementById('roller-title').textContent = 'Act-O-Matic';
+    document.getElementById('roller-subtitle').textContent = "Actions speak louder than words and look much dumber";
     // Hide roller animation, show result more prominently
     document.getElementById('roller-outer').classList.add('hidden');
 

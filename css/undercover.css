@@ -1108,14 +1108,16 @@ body.uc-winner-spies .word-reveal-label {
 }
 
 #rules-modal .modal-close {
-  background: rgba(201, 168, 108, 0.25) !important;
-  color: var(--uc-golden) !important;
+  background: transparent !important;
+  border: none !important;
+  color: rgba(255, 255, 255, 0.6) !important;
 }
 
 #rules-modal .modal-close:hover,
 #rules-modal .modal-close:focus {
-  background: rgba(201, 168, 108, 0.45) !important;
+  background: transparent !important;
   color: #fff !important;
+  transform: scale(1.1);
 }
 
 .rules-scroll {

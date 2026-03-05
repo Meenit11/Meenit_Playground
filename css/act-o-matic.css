@@ -409,11 +409,11 @@ body.actomatic-game *:focus-visible {
 }
 
 .reveal-label {
-    font-size: 0.8rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: var(--aom-gold-dim);
+    color: var(--aom-muted);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     margin: 0 0 var(--s3);
 }
 
