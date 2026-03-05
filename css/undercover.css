@@ -1110,7 +1110,7 @@ body.uc-winner-spies .word-reveal-label {
 #rules-modal .modal-close {
   background: transparent !important;
   border: none !important;
-  color: rgba(255, 255, 255, 0.6) !important;
+  color: var(--uc-golden) !important;
 }
 
 #rules-modal .modal-close:hover,

@@ -162,6 +162,11 @@ async function rollAction() {
     const winnerArray = pickActions(1);
     const winner = winnerArray[0];
 
+    // IMPORTANT FIX: Mobile browsers stop rendering elements (go blank) if the layer 
+    // is taller than ~4000px. We take a subset of 15 random actions so the roller is full
+    // but safe to animate without disappearing.
+    spinList = spinList.slice(0, 15);
+
     // Put the winner at the very end of our spinList
     // Remove it from wherever it is currently, then push it
     spinList = spinList.filter(a => a !== winner);
