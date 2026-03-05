@@ -3,7 +3,6 @@
 // ================================
 // CONSTANTS
 // ================================
-const ITEM_HEIGHT = 56;   // px - must match CSS .roller-item height
 const COOLDOWN_MS = 2 * 60 * 60 * 1000; // 2 hours
 
 let allActions = [];
@@ -14,7 +13,6 @@ let isRolling = false;
 // INIT
 // ================================
 document.addEventListener('DOMContentLoaded', async () => {
-    // Load actions from JSON
     try {
         const res = await fetch('../actions.json');
         const data = await res.json();
@@ -27,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Failed to load actions.json', e);
     }
 
-    // Button listeners
     document.getElementById('start-btn').addEventListener('click', () => {
         buildIdleRoller();
         showScreen('screen-roller');
@@ -36,7 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('roll-btn').addEventListener('click', rollAction);
 
     document.getElementById('next-round-btn').addEventListener('click', () => {
-        // Reset for another spin
         chosenAction = null;
         document.getElementById('reveal-box').classList.add('hidden');
         document.getElementById('next-round-btn').classList.add('hidden');
@@ -79,23 +75,36 @@ function saveUsedActions(used) {
     try { localStorage.setItem('aom_used_actions', JSON.stringify(used)); } catch (_) { }
 }
 
-function pickActions(count) {
+// ================================
+// PICK ACTION — truly random from full list
+// ================================
+function pickAction() {
     const used = loadUsedActions();
     const usedSet = new Set(used.map(e => e.action));
 
+    // Always prefer unused actions first
     let pool = allActions.filter(a => !usedSet.has(a));
-    if (pool.length < count) pool = [...allActions]; // reset if pool too small
 
-    // Fisher-Yates shuffle
+    // If all actions have been used, reset the entire pool
+    if (pool.length === 0) {
+        localStorage.removeItem('aom_used_actions');
+        pool = [...allActions];
+    }
+
+    // Fisher-Yates shuffle the entire pool for true randomness
     for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
     }
 
-    const chosen = pool.slice(0, count);
-    const now = Date.now();
-    used.push(...chosen.map(action => ({ action, ts: now })));
-    saveUsedActions(used);
+    // Pick from a random position in the shuffled pool (not always index 0)
+    const randomPos = Math.floor(Math.random() * pool.length);
+    const chosen = pool[randomPos];
+
+    const updatedUsed = loadUsedActions();
+    updatedUsed.push({ action: chosen, ts: Date.now() });
+    saveUsedActions(updatedUsed);
+
     return chosen;
 }
 
@@ -103,34 +112,9 @@ function pickActions(count) {
 // ROLLER: IDLE STATE
 // ================================
 function buildIdleRoller() {
-    const track = document.getElementById('roller-track');
-    // Pick a fresh display list for idle
-    let demo = [...allActions].sort(() => Math.random() - 0.5);
-    track.style.transition = 'none';
-    track.style.transform = 'translateY(0px)';
-    buildTrackItems(track, demo);
-}
-
-function buildTrackItems(track, items) {
-    track.innerHTML = '';
-    // 2 blank padding items top and bottom so center is visible
-    const PAD = 2;
-    for (let i = 0; i < PAD; i++) {
-        track.appendChild(makeDivItem(''));
-    }
-    items.forEach(text => {
-        track.appendChild(makeDivItem(text));
-    });
-    for (let i = 0; i < PAD; i++) {
-        track.appendChild(makeDivItem(''));
-    }
-}
-
-function makeDivItem(text) {
-    const el = document.createElement('div');
-    el.className = 'roller-item';
-    el.textContent = text;
-    return el;
+    const flashText = document.getElementById('flash-text');
+    flashText.textContent = "Ready to Roll?";
+    flashText.className = 'flash-text';
 }
 
 // ================================
@@ -143,87 +127,65 @@ async function rollAction() {
     const rollBtn = document.getElementById('roll-btn');
     const revealBox = document.getElementById('reveal-box');
     const nextRoundBtn = document.getElementById('next-round-btn');
-    const track = document.getElementById('roller-track');
+    const flashText = document.getElementById('flash-text');
 
     rollBtn.disabled = true;
     rollBtn.textContent = 'Rolling...';
     revealBox.classList.add('hidden');
 
-    // Instead of picking 6-10 actions, we build a track from the entire allActions list
-    // Shuffle allActions to create the base spin list
-    let spinList = [...allActions];
-    for (let i = spinList.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [spinList[i], spinList[j]] = [spinList[j], spinList[i]];
+    const winner = pickAction();
+
+    // Build a spin sequence — shuffle the FULL list multiple times and chain them
+    // This ensures every item from the entire JSON gets a chance to flash by
+    function fullShuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
     }
 
-    // Pick the winner using the cooldown logic (so we don't repeat recent ones)
-    // We just want 1 winner
-    const winnerArray = pickActions(1);
-    const winner = winnerArray[0];
+    // Chain 3 full shuffles together so animation cycles through lots of variety
+    const spinSequence = [
+        ...fullShuffle(allActions),
+        ...fullShuffle(allActions),
+        ...fullShuffle(allActions)
+    ].filter(a => a !== winner); // keep winner out until the very end
 
-    // IMPORTANT FIX: Mobile browsers stop rendering elements (go blank) if the layer 
-    // is taller than ~4000px. We take a subset of 15 random actions so the roller is full
-    // but safe to animate without disappearing.
-    spinList = spinList.slice(0, 15);
+    const TOTAL_FLIPS = Math.min(spinSequence.length, 60); // show up to 60 items
+    let delayMs = 35; // start fast
 
-    // Put the winner at the very end of our spinList
-    // Remove it from wherever it is currently, then push it
-    spinList = spinList.filter(a => a !== winner);
-    spinList.push(winner);
+    flashText.className = 'flash-text';
 
-    // Build a LOOPING track:
-    // We repeat spinList 3 times to create the illusion of endless loop and high speed
-    const REPEATS = 3;
-    const loopList = [];
-    for (let r = 0; r < REPEATS; r++) {
-        spinList.forEach(a => loopList.push(a));
+    for (let i = 0; i < TOTAL_FLIPS; i++) {
+        flashText.textContent = spinSequence[i];
+
+        flashText.classList.remove('flash-active');
+        void flashText.offsetWidth; // reflow to restart animation
+        flashText.classList.add('flash-active');
+
+        await delay(delayMs);
+
+        // Start braking after halfway point
+        if (i > TOTAL_FLIPS * 0.5) {
+            delayMs += (i - TOTAL_FLIPS * 0.5) * 1.2;
+        }
     }
-    // The "winner" position = (REPEATS-1)*spinList.length + last index
-    const winnerIndexInLoop = (REPEATS - 1) * spinList.length + (spinList.length - 1);
 
-    buildTrackItems(track, loopList);
-    await tick();
-
-    // Reset to top
-    track.style.transition = 'none';
-    track.style.transform = 'translateY(0px)';
-    await tick();
-
-    const PAD = 2;
-
-    // Phase 1: fast scroll past first (REPEATS-2)*spinList items quickly
-    const fastScrollItems = (REPEATS - 2) * spinList.length;
-    const fastTarget = -(fastScrollItems * ITEM_HEIGHT);
-    await animateTrack(track, 0, fastTarget, 1400, 'cubic-bezier(0.25, 0, 0.8, 1)');
-
-    // Phase 2: slow scroll to winner
-    const totalItems = winnerIndexInLoop + PAD;
-    const slowTarget = -(winnerIndexInLoop * ITEM_HEIGHT);
-    await animateTrack(track, fastTarget, slowTarget, 1600, 'cubic-bezier(0.25, 0.46, 0.45, 0.94)');
-
-    // Highlight winner item in track
-    const allItems = track.querySelectorAll('.roller-item');
-    const winnerEl = allItems[PAD + winnerIndexInLoop];
-    if (winnerEl) {
-        winnerEl.classList.add('roller-winner');
-        await delay(250);
-        winnerEl.classList.add('roller-glow');
-    }
+    // Land on winner
+    flashText.textContent = winner;
+    flashText.className = 'flash-text flash-winner';
 
     chosenAction = winner;
 
-    // Short pause then reveal below the roller
-    await delay(600);
+    await delay(1500);
 
-    // Update reveal box
     document.getElementById('reveal-action-text').textContent = chosenAction;
     revealBox.classList.remove('hidden');
 
-    // Update title/subtitle
     document.getElementById('roller-title').textContent = 'Act-O-Matic';
     document.getElementById('roller-subtitle').textContent = "Actions speak louder than words and look much dumber";
-    // Hide roller animation, show result more prominently
     document.getElementById('roller-outer').classList.add('hidden');
 
     rollBtn.classList.add('hidden');
@@ -236,18 +198,6 @@ async function rollAction() {
 // ================================
 // ANIMATION HELPERS
 // ================================
-function animateTrack(track, from, to, duration, easing) {
-    return new Promise(resolve => {
-        track.style.transition = `transform ${duration}ms ${easing}`;
-        track.style.transform = `translateY(${to}px)`;
-        setTimeout(resolve, duration + 60);
-    });
-}
-
-function tick() {
-    return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-}
-
 function delay(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
