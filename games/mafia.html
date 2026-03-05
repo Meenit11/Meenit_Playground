@@ -1,12 +1,12 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8"><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="Mafia - Classic social deduction game">
     <meta name="theme-color" content="#0a080c">
-    <title>Mafia â€" Meenit's Playground</title>
+    <title>Mafia — Meenit's Playground</title>
 
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/mafia.css">
@@ -30,7 +30,7 @@
                 <div class="setup-box">
                     <label><span class="step-badge">1</span> Total Players</label>
                     <div class="counter-control">
-                        <button type="button" class="counter-btn" id="decrease-players">âˆ'</button>
+                        <button type="button" class="counter-btn" id="decrease-players">−</button>
                         <span class="counter-value" id="player-count-display">5</span>
                         <button type="button" class="counter-btn" id="increase-players">+</button>
                     </div>
@@ -39,7 +39,7 @@
                 <!-- Step 2: Player Names -->
                 <div class="setup-box">
                     <label><span class="step-badge">2</span> Player names</label>
-                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 5 players â€" add names
+                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 5 players — add names
                         below</p>
                     <input type="text" id="player-name-input" class="name-input"
                         placeholder="Type name and press Enter">
@@ -70,7 +70,7 @@
                         <div class="number-input-vertical">
                             <button class="number-btn-mini" id="increase-mafia">+</button>
                             <input type="number" id="mafia-count" value="1" min="0" max="5" readonly>
-                            <button class="number-btn-mini" id="decrease-mafia">âˆ'</button>
+                            <button class="number-btn-mini" id="decrease-mafia">−</button>
                         </div>
                     </div>
 
@@ -139,7 +139,6 @@
 
                 <button class="btn btn-primary btn-full" id="start-game-btn">Start Game</button>
                 <button class="btn btn-outline btn-full mafia-btn-spacing" id="rules-btn">Rules</button>
-
                 <a href="../index.html" class="back-to-home-link mafia-back-link">Back to Home</a>
             </div>
 
@@ -147,36 +146,35 @@
             <div id="rules-modal" class="modal hidden">
                 <div class="modal-overlay" id="rules-modal-overlay"></div>
                 <div class="modal-content">
-                    <button type="button" class="modal-close" id="close-rules">Ã—</button>
+                    <button type="button" class="modal-close" id="close-rules">×</button>
                     <h2>How to Play</h2>
                     <div class="rules-scroll">
                         <div class="rule-section">
-                            <h3>ðŸŽ¯ Game Flow</h3>
+                            <h3>🎯 Game Flow</h3>
                             <ol>
-                                <li>ðŸ‘ï¸ Each player secretly views their role</li>
-                                <li>ðŸŒ™ <strong>Night Phase:</strong> God narrates actions</li>
-                                <li>â˜€ï¸ <strong>Day Phase:</strong> Players discuss and vote</li>
-                                <li>ðŸ"„ Repeat until a team wins</li>
+                                <li>👁️ Each player secretly views their role</li>
+                                <li>🌙 <strong>Night Phase:</strong> God narrates actions</li>
+                                <li>☀️ <strong>Day Phase:</strong> Players discuss and vote</li>
+                                <li>🔄 Repeat until a team wins</li>
                             </ol>
                         </div>
                         <div class="rule-section">
-                            <h3>âš"ï¸ Special Role Rules</h3>
+                            <h3>⚔️ Special Role Rules</h3>
                             <ul>
-                                <li><strong>ðŸŽ­ Detective:</strong> Suspect any player each night to find out if they
-                                    are
+                                <li><strong>🎭 Detective:</strong> Suspect any player each night to find out if they are
                                     Mafia</li>
-                                <li><strong>ðŸ¤¡ Jester:</strong> Wins solo if voted out in Morning Phase</li>
-                                <li><strong>ðŸ'£ Bomber:</strong> If VOTED OUT, can take ANY player with them</li>
-                                <li><strong>ðŸ'• Lover:</strong> Picks protected target Night 1; if target dies, Lover
+                                <li><strong>🤡 Jester:</strong> Wins solo if voted out in Morning Phase</li>
+                                <li><strong>💣 Bomber:</strong> If VOTED OUT, can take ANY player with them</li>
+                                <li><strong>💕 Lover:</strong> Picks protected target Night 1; if target dies, Lover
                                     sacrifices self instead</li>
                             </ul>
                         </div>
                         <div class="rule-section">
-                            <h3>ðŸ† Win Conditions</h3>
+                            <h3>🏆 Win Conditions</h3>
                             <ul>
-                                <li>âœ… Civilians win: All Mafia eliminated</li>
-                                <li>âœ… Mafia wins: Mafia â‰¥ Civilians</li>
-                                <li>âœ… Jester win: Gets voted out in Morning Phase</li>
+                                <li>✅ Civilians win: All Mafia eliminated</li>
+                                <li>✅ Mafia wins: Mafia ≥ Civilians</li>
+                                <li>✅ Jester win: Gets voted out in Morning Phase</li>
                             </ul>
                         </div>
                     </div>
@@ -234,7 +232,7 @@
             <div class="content-card">
                 <div id="all-roles-list" class="roles-grid"></div>
 
-                <button class="btn btn-full btn-lg mt-xl mafia-start-night-btn" id="start-night-btn">ðŸŒ™ Start Night
+                <button class="btn btn-full btn-lg mt-xl mafia-start-night-btn" id="start-night-btn">🌙 Start Night
                     Phase</button>
             </div>
         </div>
@@ -257,7 +255,7 @@
                 </div>
 
                 <div id="lover-selection-container" class="hidden mt-lg p-md border-accent rounded-lg">
-                    <p class="subtitle text-accent mb-sm">ðŸ'- Who did the Lover kiss?</p>
+                    <p class="subtitle text-accent mb-sm">💖 Who did the Lover kiss?</p>
                     <div id="lover-target-list" class="grid-2-cols gap-sm"></div>
                 </div>
 
@@ -363,8 +361,8 @@
     <!-- Bomber Target Modal -->
     <div id="bomber-modal" class="modal hidden bomber-modal-opaque">
         <div class="modal-content">
-            <h3>ðŸ'£ Bomber Activated!</h3>
-            <p class="modal-text">The Bomber takes someone with them. Click the âŒ next to a target:</p>
+            <h3>💣 Bomber Activated!</h3>
+            <p class="modal-text">The Bomber takes someone with them. Click the ❌ next to a target:</p>
             <div id="bomber-target-list"></div>
         </div>
     </div>
@@ -372,7 +370,7 @@
     <!-- Lover Sacrifice Modal -->
     <div id="lover-modal" class="modal hidden lover-modal-opaque">
         <div class="modal-content lover-modal">
-            <h3>ðŸ'" Lover's Sacrifice</h3>
+            <h3>💔 Lover's Sacrifice</h3>
             <div class="lover-modal-body">
                 <div class="lover-avatars">
                     <img src="../images/Lover.png" alt="Lover" class="lover-img">
