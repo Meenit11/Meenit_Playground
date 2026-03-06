@@ -406,19 +406,56 @@ body::after {
   margin: 0;
 }
 
-.heart-pump {
+.heart-css {
   display: inline-block;
-  animation: homeHeartPump 1.2s ease-in-out infinite;
+  width: 10px;
+  height: 10px;
+  background: var(--home-accent);
+  position: relative;
+  transform: rotate(-45deg);
+  margin: 0 6px;
+  animation: homeHeartPump 1.4s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+.heart-css::before,
+.heart-css::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: var(--home-accent);
+  border-radius: 50%;
+  position: absolute;
+}
+
+.heart-css::before {
+  top: -5px;
+  left: 0;
+}
+
+.heart-css::after {
+  top: 0;
+  left: 5px;
 }
 
 @keyframes homeHeartPump {
-
-  0%,
-  100% {
-    transform: scale(1);
+  0% {
+    transform: rotate(-45deg) scale(1);
   }
 
-  50% {
-    transform: scale(1.15);
+  15% {
+    transform: rotate(-45deg) scale(1.18);
+  }
+
+  30% {
+    transform: rotate(-45deg) scale(1);
+  }
+
+  45% {
+    transform: rotate(-45deg) scale(1.12);
+  }
+
+  100% {
+    transform: rotate(-45deg) scale(1);
   }
 }

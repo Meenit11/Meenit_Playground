@@ -564,13 +564,13 @@ body.winner-mafia #screen-winner #winner-roles-label {
 }
 
 body.winner-mafia #screen-winner .final-role-img {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
 }
 
 body.winner-mafia #screen-winner .final-role-item-winner .player-name {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
 body.winner-jester {
@@ -594,13 +594,13 @@ body.winner-jester #screen-winner #winner-roles-label {
 }
 
 body.winner-jester #screen-winner .final-role-img {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
 }
 
 body.winner-jester #screen-winner .final-role-item-winner .player-name {
-  font-size: 1.35rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
 body.winner-civilians {

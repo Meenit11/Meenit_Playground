@@ -388,7 +388,8 @@ body.uc-winner-spies .winner-card {
 }
 
 body.uc-winner-spies .winner-title {
-  color: #d0d0d0 !important;
+  color: #f0f0f0 !important;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
 }
 
 body.uc-winner-spies .winner-player-name {
@@ -411,7 +412,8 @@ body.uc-winner-agents .winner-card {
 }
 
 body.uc-winner-agents .winner-title {
-  color: #c9a86c !important;
+  color: #ffd700 !important;
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
 }
 
 body.uc-winner-agents .winner-player-name {
@@ -436,6 +438,26 @@ body.uc-theme-gameover #screen-game-over .content-card {
 
 body.uc-theme-gameover .winner-title {
   color: #3a3a1a !important;
+}
+
+.winner-player-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.winner-role-img {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-lg);
+  object-fit: contain;
+}
+
+.winner-player-name {
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+  display: block;
 }
 
 /* Setup */
