@@ -134,9 +134,17 @@ function setupEventListeners() {
 
   // Auto-join from URL params (?blob=BLOBID)
   const params = new URLSearchParams(window.location.search);
-  if (params.get('blob')) {
-    document.getElementById('room-code-input').value = params.get('blob');
+  const blobParam = params.get('blob');
+  if (blobParam) {
+    const input = document.getElementById('room-code-input');
+    input.value = blobParam;
     showScreen('screen-join');
+    // Hide the long ID and show 4-digit code if available immediately
+    readBlob(blobParam).then(rd => {
+      if (rd && rd.roomCode) {
+        input.value = rd.roomCode;
+      }
+    }).catch(_ => { });
   }
 }
 
@@ -145,7 +153,7 @@ function setupEventListeners() {
 // ROOM REGISTRY
 // ================================
 // A single hardcoded JSONBlob ID is used as the master index mapping 4-digit codes to their specific blob IDs.
-const MASTER_REGISTRY_BLOB_ID = '019cb953-bde3-74a5-8bdd-a32027866669';
+const MASTER_REGISTRY_BLOB_ID = '019cc7eb-54cb-75f3-97ce-53619cc9b989';
 
 async function registerRoom(code, blobId) {
   try {
