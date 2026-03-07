@@ -35,6 +35,8 @@ let localState = {
   pollTimer: null,
   timerInterval: null,
   getReadyInterval: null,
+  myLastAnswer: '',   // Cache my last answer for current round
+  myLastAnswerRound: 0,
 };
 
 let allQuestions = { tier1: [], tier2: [], tier3: [] };
@@ -736,14 +738,15 @@ function routeToScreen(rd) {
 // QUESTION ROUND
 // ================================
 function renderQuestion(rd) {
-  document.getElementById('round-num').textContent = rd.currentRound;
   document.getElementById('question-text').textContent = rd.currentQuestion;
 
   const me = rd.players.find(p => p.id === localState.myId);
   const isEliminated = me?.isEliminated;
   const serverHasAnswered = rd.answers.hasOwnProperty(localState.myId);
-  // Optimistically assume we've answered if we just clicked submit for this exact round
-  const hasAnswered = serverHasAnswered || (localState.optimisticSubmitRound === rd.currentRound);
+
+  // Persistence fix: Check local cache if server hasn't updated yet
+  const hasLocalAnswer = localState.myLastAnswerRound === rd.currentRound && localState.myLastAnswer !== '';
+  const hasAnswered = serverHasAnswered || hasLocalAnswer || (localState.optimisticSubmitRound === rd.currentRound);
 
   const getReadyEl = document.getElementById('get-ready-phase');
   const answerPhaseEl = document.getElementById('answer-phase');
@@ -826,6 +829,11 @@ function renderQuestion(rd) {
       if (localState._lastRenderedRound !== rd.currentRound) {
         localState._lastRenderedRound = rd.currentRound;
         inputEl.value = '';
+        // Clear local cache for new round
+        if (localState.myLastAnswerRound !== rd.currentRound) {
+          localState.myLastAnswer = '';
+          localState.myLastAnswerRound = rd.currentRound;
+        }
       }
     }
     if (submitBtn) {
@@ -880,9 +888,15 @@ function renderQuestion(rd) {
 async function submitAnswer() {
   const input = document.getElementById('answer-input');
   const answer = input.value.trim();
+  if (!answer) return; // Don't submit empty if they just click
+
   input.disabled = true;
   document.getElementById('submit-answer-btn').disabled = true;
   document.getElementById('submit-answer-btn').textContent = 'Submitted ✓';
+
+  // Cache locally immediately
+  localState.myLastAnswer = answer;
+  localState.myLastAnswerRound = localState._lastRenderedRound;
 
   // Optimistically set the state to hide the input immediately
   localState.optimisticSubmitRound = localState._lastRenderedRound;
@@ -995,11 +1009,18 @@ function renderReview(rd) {
   container.innerHTML = '';
 
   const alive = rd.players.filter(p => !p.isEliminated);
-  const answerList = alive.map(p => ({
-    id: p.id,
-    name: p.name,
-    answer: (rd.answers[p.id] || '').trim() || '(No Answer)',
-  }));
+  const answerList = alive.map(p => {
+    let ansTxt = (rd.answers[p.id] || '').trim();
+    // Use local cache if it's me and server is empty
+    if (p.id === localState.myId && !ansTxt && localState.myLastAnswerRound === rd.currentRound) {
+      ansTxt = localState.myLastAnswer;
+    }
+    return {
+      id: p.id,
+      name: p.name,
+      answer: ansTxt || '(No Answer)',
+    };
+  });
 
   // Sort: blanks first, then by answer text
   answerList.sort((a, b) => {
@@ -1031,7 +1052,11 @@ function renderReview(rd) {
 
     if (localState.isGM) {
       item.style.cursor = 'pointer';
-      item.addEventListener('click', () => toggleSelection(ans.id));
+      item.addEventListener('click', () => {
+        // OPTIMISTIC UI: Toggle class immediately to remove lag feel
+        const currentlySelected = item.classList.toggle('answer-selected');
+        toggleSelection(ans.id, currentlySelected);
+      });
     }
     container.appendChild(item);
   });
@@ -1051,25 +1076,46 @@ function renderReview(rd) {
   }
 }
 
-async function toggleSelection(playerId) {
+async function toggleSelection(playerId, isSelectedOptimistic) {
   try {
+    // We don't need to read the whole blob just to toggle a selection.
+    // However, since we are using JSONBlob, we have to read-modify-write.
+    // To minimize "race conditions" where two rapid clicks overlap, 
+    // we should ideally debounce or handle them sequentially.
     const rd = await readBlob(localState.blobId);
     rd.selectedForElim = rd.selectedForElim || [];
     const idx = rd.selectedForElim.indexOf(playerId);
-    if (idx >= 0) rd.selectedForElim.splice(idx, 1);
-    else rd.selectedForElim.push(playerId);
+
+    if (idx >= 0) {
+      if (!isSelectedOptimistic) { /* already removed basically */ }
+      rd.selectedForElim.splice(idx, 1);
+    } else {
+      rd.selectedForElim.push(playerId);
+    }
+
     rd.lastUpdate = Date.now();
     await updateBlob(localState.blobId, rd);
-  } catch (e) { console.error(e); }
+    // Don't pollRoom() here as it would re-render and potentially jitter
+  } catch (e) {
+    console.error(e);
+    // On error, the next poll will revert the UI to the server state anyway
+  }
 }
 
 async function eliminateSelected() {
   try {
-    const rd = await readBlob(localState.blobId);
+    const rdCache = await readBlob(localState.blobId);
+    const rd = JSON.parse(JSON.stringify(rdCache)); // Work on a copy
+
     if (!rd.selectedForElim || rd.selectedForElim.length === 0) {
       alert('Select at least one player to eliminate');
       return;
     }
+
+    // OPTIMISTIC: Hide the controls and show a loading msg or just wait
+    const elimControls = document.getElementById('elimination-controls');
+    if (elimControls) elimControls.classList.add('hidden');
+    document.getElementById('review-subtitle').textContent = 'Eliminating...';
 
     rd.selectedForElim.forEach(pid => {
       const p = rd.players.find(pl => pl.id === pid);
@@ -1096,11 +1142,21 @@ async function eliminateSelected() {
     }
     rd.lastUpdate = Date.now();
     await updateBlob(localState.blobId, rd);
-  } catch (e) { console.error(e); }
+    pollRoom();
+  } catch (e) {
+    console.error(e);
+    pollRoom();
+  }
 }
+
 
 async function nextRoundNoElim() {
   try {
+    // OPTIMISTIC
+    const elimControls = document.getElementById('elimination-controls');
+    if (elimControls) elimControls.classList.add('hidden');
+    document.getElementById('review-subtitle').textContent = 'Starting next round...';
+
     const rd = await readBlob(localState.blobId);
     const alive = rd.players.filter(p => !p.isEliminated);
     rd.currentRound++;
@@ -1117,7 +1173,11 @@ async function nextRoundNoElim() {
     rd.getReadyCountdown = 3;
     rd.lastUpdate = Date.now();
     await updateBlob(localState.blobId, rd);
-  } catch (e) { console.error(e); }
+    pollRoom();
+  } catch (e) {
+    console.error(e);
+    pollRoom();
+  }
 }
 
 // ================================
