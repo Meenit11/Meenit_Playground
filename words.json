@@ -1,405 +1,119 @@
 {
   "game_title": "Undercover",
   "word_pairs": [
-    [
-      "Chulbul Pandey",
-      "Bajirao Singham"
-    ],
-    [
-      "Escalator",
-      "Elevator"
-    ],
-    [
-      "Munna Bhai",
-      "Circuit"
-    ],
-    [
-      "Baburao Ganpatrao Apte",
-      "Jethalal Gada"
-    ],
-    [
-      "Anjali (Kuch Kuch Hota Hai)",
-      "Anjali (Kabhi Khushi Kabhie Gham)"
-    ],
-    [
-      "Crime Master Gogo",
-      "Mogambo"
-    ],
-    [
-      "Gol Gappa",
-      "Dahi Vada"
-    ],
-    [
-      "Maggi (2 Minutes)",
-      "Patanjali Noodles"
-    ],
-    [
-      "WhatsApp University",
-      "LinkedIn Influencer"
-    ],
-    [
-      "JCB Ki Khudayi",
-      "Binod"
-    ],
-    [
-      "Kabir Singh",
-      "Animal (Ranvijay Singh)"
-    ],
-    [
-      "Gangs of Wasseypur",
-      "Mirzapur"
-    ],
-    [
-      "Old Monk",
-      "Magic Moments"
-    ],
-    [
-      "Autographed Cricket Ball",
-      "Signed Bat"
-    ],
-    [
-      "Rickshaw Wale Bhaiya",
-      "Uber Driver"
-    ],
-    [
-      "Sarojini Nagar Market",
-      "Palika Bazaar"
-    ],
-    [
-      "Dolly Chaiwala",
-      "MBA Chaiwala"
-    ],
-    [
-      "Babu Bhaiya",
-      "Majnu Bhai"
-    ],
-    [
-      "Daya (CID)",
-      "Abhijeet (CID)"
-    ],
-    [
-      "Vada Pav",
-      "Samosa Pav"
-    ],
-    [
-      "Rocky Bhai",
-      "Pushpa Raj"
-    ],
-    [
-      "Shaktiman",
-      "Flying Jatt"
-    ],
-    [
-      "IIT Aspirant",
-      "UPSC Aspirant"
-    ],
-    [
-      "Mummy ki Maar",
-      "Papa ki Daant"
-    ],
-    [
-      "Daler Mehndi",
-      "Badshah"
-    ],
-    [
-      "Goa Trip (Planned)",
-      "Goa Trip (Cancelled)"
-    ],
-    [
-      "Middle Class",
-      "Upper Middle Class"
-    ],
-    [
-      "Gym Membership",
-      "Netflix Subscription"
-    ],
-    [
-      "Tinder",
-      "Shaadi.com"
-    ],
-    [
-      "Mrunal Thakur",
-      "Rashmika Mandanna"
-    ],
-    [
-      "CarryMinati",
-      "Technical Guruji"
-    ],
-    [
-      "Gopi Bahu",
-      "Kokila Ben"
-    ],
-    [
-      "Laptop Charger",
-      "Phone Powerbank"
-    ],
-    [
-      "Cousin's Wedding",
-      "Best Friend's Wedding"
-    ],
-    [
-      "Dhinchak Pooja",
-      "Taher Shah"
-    ],
-    [
-      "Local Train",
-      "Metro Rail"
-    ],
-    [
-      "Haldiram's",
-      "Bikanervala"
-    ],
-    [
-      "Karan Johar",
-      "Sanjay Leela Bhansali"
-    ],
-    [
-      "Monday Morning",
-      "Sunday Evening"
-    ],
-    [
-      "Arijit Singh (Sad)",
-      "Arijit Singh (Romantic)"
-    ],
-    [
-      "Biryani",
-      "Pulao"
-    ],
-    [
-      "Engineering",
-      "B.Com"
-    ],
-    [
-      "Shubman Gill",
-      "Virat Kohli"
-    ],
-    [
-      "Jhumka",
-      "Nathni"
-    ],
-    [
-      "Panchayat",
-      "Gullak"
-    ],
-    [
-      "Butter Chicken",
-      "Paneer Tikka Masala"
-    ],
-    [
-      "Starbucks",
-      "Tapri ki Chai"
-    ],
-    [
-      "iPhone 15",
-      "Android Flagship"
-    ],
-    [
-      "Papad",
-      "Fryums"
-    ],
-    [
-      "Deepika Padukone",
-      "Katrina Kaif"
-    ],
-    [
-      "Shark Tank India",
-      "MasterChef India"
-    ],
-    [
-      "Remote Control",
-      "Mobile Phone"
-    ],
-    [
-      "Old Delhi",
-      "South Delhi"
-    ],
-    [
-      "Thala (Dhoni)",
-      "King (Kohli)"
-    ],
-    [
-      "Rakhi Sawant",
-      "Urfi Javed"
-    ],
-    [
-      "Zomato Delivery",
-      "Swiggy Delivery"
-    ],
-    [
-      "Basmati Rice",
-      "Kolam Rice"
-    ],
-    [
-      "Royal Enfield",
-      "KTM Duke"
-    ],
-    [
-      "Gully Boy",
-      "8 Mile"
-    ],
-    [
-      "Sarkari Naukri",
-      "Remote Job"
-    ],
-    [
-      "Fairness Cream",
-      "Sunscreen"
-    ],
-    [
-      "Parantha",
-      "Kulcha"
-    ],
-    [
-      "Kancha Cheena",
-      "Gabbar Singh"
-    ],
-    [
-      "Poo (K3G)",
-      "Shanaya (SOTY)"
-    ],
-    [
-      "Credit Card Bill",
-      "House Rent"
-    ],
-    [
-      "Instagram Reel",
-      "YouTube Short"
-    ],
-    [
-      "Chai-Sutta",
-      "Coffee-Cookie"
-    ],
-    [
-      "Masala Oats",
-      "Corn Flakes"
-    ],
-    [
-      "Bandra-Worli Sea Link",
-      "Howrah Bridge"
-    ],
-    [
-      "Rajma Chawal",
-      "Kadhi Chawal"
-    ],
-    [
-      "Baahubali",
-      "RRR"
-    ],
-    [
-      "Tarak Mehta Ka Ooltah Chashmah",
-      "Sarabhai vs Sarabhai"
-    ],
-    [
-      "Washing Powder Nirma",
-      "Ujala Neel"
-    ],
-    [
-      "Sanskari Beta",
-      "Bigrel Nawab"
-    ],
-    [
-      "Flying Chappal",
-      "Belan"
-    ],
-    [
-      "Laddu",
-      "Gulab Jamun"
-    ],
-    [
-      "Dharmesh Sir",
-      "Raghav Juyal"
-    ],
-    [
-      "Kachori",
-      "Samosa"
-    ],
-    [
-      "Goa",
-      "Pondicherry"
-    ],
-    [
-      "Pani Puri",
-      "Puchka"
-    ],
-    [
-      "Ludo King",
-      "PUBG Mobile"
-    ],
-    [
-      "Kumbh Mela",
-      "Sunburn Festival"
-    ],
-    [
-      "Salman Khan (90s)",
-      "Salman Khan (Current)"
-    ],
-    [
-      "Manali",
-      "Kasol"
-    ],
-    [
-      "Shadi ka Buffet",
-      "Office Potluck"
-    ],
-    [
-      "Kala Khatta",
-      "Orange Bar"
-    ],
-    [
-      "Aam Panna",
-      "Jaljeera"
-    ],
-    [
-      "Bhajan",
-      "Ghazal"
-    ],
-    [
-      "Salwar Kameez",
-      "Saree"
-    ],
-    [
-      "Bull Market",
-      "Bear Market"
-    ],
-    [
-      "Auto Meter",
-      "Income Tax"
-    ],
-    [
-      "Boroline",
-      "Vaseline"
-    ],
-    [
-      "Bhangra",
-      "Garba"
-    ],
-    [
-      "Maniac Boss",
-      "Lazy Intern"
-    ],
-    [
-      "Gold Loan",
-      "Home Loan"
-    ],
-    [
-      "Kaju Katli",
-      "Soan Papdi"
-    ],
-    [
-      "Lassi",
-      "Chaas"
-    ],
-    [
-      "Dangal",
-      "Chak De India"
-    ],
-    [
-      "Hrithik Roshan",
-      "Tiger Shroff"
-    ],
-    [
-      "Passport Photo",
-      "Instagram DP"
-    ]
+    ["Mogambo", "Gabbar Singh"],
+    ["Chulbul Pandey", "Singham"],
+    ["Thanos", "Joker"],
+    ["Shah Rukh Khan", "Salman Khan"],
+    ["Amitabh Bachchan", "Rajinikanth"],
+    ["Pushpa Raj", "Rocky Bhai"],
+    ["Dhoom (Jai)", "Dhoom (Ali)"],
+    ["Don", "Agneepath"],
+    ["Kancha Cheena", "Shakaal"],
+    ["Dhanush", "Vijay Sethupathi"],
+
+    ["Biryani", "Pulao"],
+    ["Vada Pav", "Samosa"],
+    ["Rajma", "Chole"],
+    ["Pani Puri", "Bhel Puri"],
+    ["Butter Chicken", "Chicken Tikka Masala"],
+    ["Dosa", "Idli"],
+    ["Kaju Katli", "Gulab Jamun"],
+    ["Lassi", "Chaas"],
+    ["Kulfi", "Ice Cream"],
+    ["Parantha", "Roti"],
+    ["Maggi", "Top Ramen"],
+    ["Haldiram's", "Bikanervala"],
+    ["Chai", "Coffee"],
+    ["Old Monk", "Royal Stag"],
+    ["Thums Up", "Limca"],
+    ["Coke", "Pepsi"],
+
+    ["WhatsApp Forward", "LinkedIn Post"],
+    ["CarryMinati", "BB Ki Vines"],
+    ["Binod", "Haila"],
+    ["JCB Ki Khudayi", "Yalgaar"],
+    ["Dolly Chaiwala", "MBA Chaiwala"],
+    ["Dhinchak Pooja", "Taher Shah"],
+    ["Rakhi Sawant", "Urfi Javed"],
+    ["Saiman Says", "Slayy Point"],
+    ["Triggered Insaan", "Ashish Chanchlani"],
+
+    ["Virat Kohli", "MS Dhoni"],
+    ["Rohit Sharma", "KL Rahul"],
+    ["Hardik Pandya", "Ravindra Jadeja"],
+    ["Jasprit Bumrah", "Mohammed Shami"],
+    ["Shubman Gill", "Yashasvi Jaiswal"],
+    ["Test Cricket", "T20 Cricket"],
+    ["IPL", "Champions Trophy"],
+    ["Eden Gardens", "Wankhede Stadium"],
+    ["Royal Enfield", "KTM Duke"],
+    ["Kabaddi", "Kho Kho"],
+
+    ["IIT", "IIM"],
+    ["Sarkari Naukri", "Startup Job"],
+    ["Engineering", "Medicine"],
+    ["CBSE", "ICSE"],
+    ["DU", "JNU"],
+    ["Coaching Centre", "Self Study"],
+    ["Internship", "Full-time Job"],
+    ["Narayana", "FIITJEE"],
+
+    ["Escalator", "Elevator"],
+    ["Metro", "Local Train"],
+    ["Zomato", "Swiggy"],
+    ["Ola", "Uber"],
+    ["Flipkart", "Amazon"],
+    ["Jio", "Airtel"],
+    ["iPhone", "Samsung Galaxy"],
+    ["Instagram", "Snapchat"],
+    ["Tinder", "Shaadi.com"],
+    ["Paytm", "PhonePe"],
+
+    ["Baahubali", "RRR"],
+    ["Dangal", "Sultan"],
+    ["3 Idiots", "Munna Bhai MBBS"],
+    ["Dil Chahta Hai", "Zindagi Na Milegi Dobara"],
+    ["Gangs of Wasseypur", "Mirzapur"],
+    ["KGF", "Pushpa"],
+    ["Panchayat", "Gullak"],
+    ["Taarak Mehta", "Sarabhai vs Sarabhai"],
+    ["CID", "Crime Patrol"],
+    ["Sacred Games", "Scam 1992"],
+
+    ["Goa", "Manali"],
+    ["Kashmiri Pandit", "Kashmiri Shawl Wala"],
+    ["Old Delhi", "South Delhi"],
+    ["Mumbai", "Delhi"],
+    ["Bandra", "Andheri"],
+    ["Sarojini Nagar", "Select Citywalk"],
+    ["Varanasi", "Rishikesh"],
+
+    ["Monday Morning", "Sunday Evening"],
+    ["Gym Membership", "Netflix Subscription"],
+    ["Middle Class Dad", "Rich Uncle"],
+    ["Mummy ki Maar", "Papa ki Daant"],
+    ["Flying Chappal", "Belan"],
+    ["Cousin's Wedding", "Best Friend's Wedding"],
+    ["Arranged Marriage", "Love Marriage"],
+    ["Gold Loan", "Home Loan"],
+    ["Credit Card", "UPI"],
+    ["Auto Meter", "Prepaid Auto"],
+
+    ["Deepika Padukone", "Priyanka Chopra"],
+    ["Karan Johar", "Sanjay Leela Bhansali"],
+    ["Arijit Singh", "Jubin Nautiyal"],
+    ["Daler Mehndi", "Badshah"],
+    ["Lata Mangeshkar", "Asha Bhosle"],
+    ["Hrithik Roshan", "Tiger Shroff"],
+    ["Alia Bhatt", "Anushka Sharma"],
+    ["Poo (K3G)", "Geet (Jab We Met)"],
+    ["Bhansali Heroine", "Farah Khan Heroine"],
+
+    ["Boroline", "Vaseline"],
+    ["Colgate", "Pepsodent"],
+    ["Lifebuoy", "Dettol"],
+    ["Fair & Lovely", "Nivea"],
+    ["Parachute Oil", "Dabur Amla"]
   ]
 }
