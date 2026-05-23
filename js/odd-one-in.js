@@ -11,7 +11,13 @@ const DEFAULT_BACKEND_URL = (window.location.hostname === 'localhost' || window.
   ? 'http://localhost:3001/api/rooms'
   : `http://${window.location.hostname}:3001/api/rooms`;
 
-const BACKEND_URL = localStorage.getItem('ooi_server_url') || DEFAULT_BACKEND_URL;
+let savedUrl = localStorage.getItem('ooi_server_url');
+if (savedUrl && !savedUrl.endsWith('/api/rooms')) {
+  // Automatically fix the URL if the user pasted the base tunnel link
+  savedUrl = savedUrl.replace(/\/$/, '') + '/api/rooms';
+}
+
+const BACKEND_URL = savedUrl || DEFAULT_BACKEND_URL;
 
 // Question cooldown window – prevent repeats for ~2 hours per device
 const OOI_QUESTION_COOLDOWN_MS = 2 * 60 * 60 * 1000;
