@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a12">
+    <title>Odd One In — Meenit's Playground</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/odd-one-in.css">
+</head>
+
+<body class="oddonein-game">
+    <div class="game-container">
+
+        <!-- SCREEN 1: Game Selection -->
+        <div id="screen-mode-select" class="screen">
+            <div class="screen-header">
+                <h1 class="game-title">Odd One In</h1>
+                <p class="subtitle">Think fast. Answer weird. Matching is for socks, not you.</p>
+            </div>
+            <div class="content-card card-landing">
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="create-room-btn">Create Room</button>
+                <button type="button" class="btn btn-outline btn-full btn-lg" id="join-room-btn"
+                    style="margin-top:var(--s3);">Join Room</button>
+                <button type="button" class="btn btn-ghost btn-full btn-sm" id="server-settings-btn"
+                    style="margin-top:var(--s4); opacity: 0.7;">⚙️ Server Settings</button>
+                <a href="../index.html" class="back-link"
+                    style="display:block;text-align:center;margin-top:var(--s4);">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- SERVER SETTINGS MODAL -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-overlay" id="ooi-settings-overlay"></div>
+            <div class="modal-content">
+                <button type="button" class="modal-close" id="close-settings">×</button>
+                <h2>Server Settings</h2>
+                <div class="rules-scroll">
+                    <div class="rule-section">
+                        <h3>🌐 Cross-Network Play</h3>
+                        <p>To play with friends on different networks (e.g., using mobile data), enter a public URL
+                            (ngrok/localtunnel).</p>
+                        <label for="server-url-input">Backend URL</label>
+                        <input type="text" id="server-url-input" placeholder="http://localhost:3001/api/rooms"
+                            style="font-size: 0.9rem;">
+                        <p class="small-text" style="margin-top: 5px; opacity: 0.7;">Default:
+                            http://[your-ip]:3001/api/rooms</p>
+                        <button type="button" class="btn btn-primary btn-full" id="save-settings-btn"
+                            style="margin-top: var(--s4);">Save & Reload</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2A: Create Room -->
+        <div id="screen-create" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title">Create Room</h1>
+                <p class="subtitle">You'll be the Game Master 👑</p>
+            </div>
+            <div class="content-card card-landing">
+                <label for="create-name-input">Your Name</label>
+                <input type="text" id="create-name-input" placeholder="Enter your name" maxlength="20"
+                    autocomplete="off">
+                <p id="create-error" class="error-text hidden"></p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="do-create-btn">Create Room</button>
+                <button type="button" class="btn btn-ghost btn-full" id="back-from-create-btn">Back</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 2B: Join Room -->
+        <div id="screen-join" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title">Join Room</h1>
+                <p class="subtitle">Join via share link or paste room ID</p>
+            </div>
+            <div class="content-card card-landing">
+                <label for="room-code-input">Room Code</label>
+                <input type="text" id="room-code-input" placeholder="4-digit code" maxlength="50" inputmode="numeric"
+                    autocomplete="off" style="text-align:center;font-size:1.5rem;letter-spacing:0.5rem;">
+                <label for="join-name-input">Your Name</label>
+                <input type="text" id="join-name-input" placeholder="Enter your name" maxlength="20" autocomplete="off">
+                <p id="join-error" class="error-text hidden"></p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="do-join-btn">Join Room</button>
+                <button type="button" class="btn btn-ghost btn-full" id="back-from-join-btn">Back</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Game Lobby -->
+        <div id="screen-lobby" class="screen hidden">
+            <div class="screen-header">
+                <p class="subtitle">Room Code</p>
+                <h1 class="room-code-display" id="lobby-room-code">----</h1>
+            </div>
+            <div class="content-card card-landing">
+                <button type="button" class="btn btn-outline btn-full" id="rules-btn" style="margin-bottom:var(--s3);">
+                    Rules
+                </button>
+                <div class="share-buttons">
+                    <button type="button" class="btn btn-outline btn-sm" id="share-whatsapp-btn">📱 WhatsApp</button>
+                    <button type="button" class="btn btn-outline btn-sm" id="share-copy-btn">📋 Copy Link</button>
+                </div>
+                <p id="copy-feedback" class="copy-feedback hidden">Copied! 📋</p>
+                <p class="players-count" id="lobby-player-count">0 players in lobby</p>
+                <div id="lobby-player-list" class="lobby-player-list"></div>
+                <p id="lobby-waiting" class="lobby-waiting hidden">Waiting for Game Master to start...</p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="start-game-btn" disabled
+                    style="margin-top:var(--s4);">Start Game</button>
+                <p id="start-game-hint" class="hint" style="text-align:center;">Need at least 3 players</p>
+                <button type="button" class="btn btn-ghost btn-full" id="leave-lobby-btn"
+                    style="margin-top:var(--s2);">Back to Home</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: Question Round -->
+        <div id="screen-question" class="screen hidden">
+            <div class="screen-header">
+                <p class="round-badge">Round <span id="round-num">1</span></p>
+            </div>
+            <div class="content-card">
+                <h1 id="question-text" class="question-text"
+                    style="font-size: clamp(1.4rem, 5vw, 1.8rem); margin-bottom: var(--s2); color: var(--ooi-accent); border-bottom: 2px solid rgba(124, 58, 237, 0.2); padding-bottom: var(--s4);">
+                    Loading question...</h1>
+                <!-- Get Ready phase -->
+                <div id="get-ready-phase" class="get-ready-phase">
+                    <h2 class="get-ready-text">Get Ready!</h2>
+                    <div class="get-ready-countdown" id="get-ready-countdown">3</div>
+                </div>
+
+                <!-- Answer phase -->
+                <div id="answer-phase" class="hidden">
+                    <div class="timer-container">
+                        <div class="timer-display" id="timer-display">10</div>
+                        <p class="timer-label">seconds</p>
+                    </div>
+                    <div id="answer-section">
+                        <label for="answer-input">Your answer</label>
+                        <input type="text" id="answer-input" placeholder="Type your answer..." maxlength="50"
+                            autocomplete="off">
+                        <button type="button" class="btn btn-primary btn-full" id="submit-answer-btn">Submit
+                            Answer</button>
+                    </div>
+                    <div id="answer-submitted-msg" class="answer-submitted-msg hidden">
+                        <p>✓ Answer Submitted</p>
+                        <p class="small-text">Waiting for timer to end...</p>
+                    </div>
+                    <div id="eliminated-msg" class="eliminated-message hidden">
+                        <p>👻 You've been eliminated</p>
+                        <p class="small-text">Spectating this round</p>
+                    </div>
+                </div>
+
+                <!-- GM Controls -->
+                <div id="gm-controls" class="gm-controls hidden">
+                    <h3>👑 Game Master Controls</h3>
+                    <div class="gm-buttons">
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-edit-btn">✏️ Edit Que</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-pause-btn">⏸️ Pause</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-reset-btn">🔄 Reset</button>
+                        <button type="button" class="btn btn-sm btn-secondary" id="gm-skip-btn">⏭️ Skip</button>
+                        <button type="button" class="btn btn-sm btn-danger" id="gm-end-game-btn" style="width: 100%;">🛑
+                            End Game</button>
+                    </div>
+                </div>
+
+                <p id="gm-status-msg" class="gm-status-msg hidden"></p>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Answer Review -->
+        <div id="screen-review" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title">Round <span id="review-round-num">1</span> Results</h1>
+                <p class="subtitle" id="review-subtitle">Game Master is deciding...</p>
+            </div>
+            <div class="content-card">
+                <div id="answers-container" class="answers-container"></div>
+                <div id="elimination-controls" class="elimination-controls hidden">
+                    <button type="button" class="btn btn-danger btn-full" id="eliminate-selected-btn">Eliminate
+                        Selected</button>
+                    <button type="button" class="btn btn-outline btn-full" id="next-round-no-elim-btn"
+                        style="margin-top:var(--s2);">Next Round (No Elimination)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: Winner -->
+        <div id="screen-winner" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title">🏆 Winner!</h1>
+            </div>
+            <div class="content-card winner-card">
+                <div id="confetti-container" class="confetti-container"></div>
+                <p class="winner-label">🎉 Congratulations! 🎉</p>
+                <h2 id="winner-name" class="winner-name">-</h2>
+                <p class="winner-subtitle">Odd One In Champion</p>
+                <button type="button" class="btn btn-primary btn-full btn-lg" id="play-again-btn"
+                    style="margin-top:var(--s6);">Play Again</button>
+                <a href="../index.html" class="back-link">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- RULES MODAL -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-overlay" id="ooi-rules-overlay"></div>
+            <div class="modal-content">
+                <button type="button" class="modal-close" id="close-rules">×</button>
+                <h2>How to Play</h2>
+                <div class="rules-scroll">
+                    <div class="rule-section">
+                        <h3>🎮 What's the Game?</h3>
+                        <p>Everyone answers the same question. Unique answers survive. Duplicates get eliminated!<br>
+                            Last 1-2 players standing win! 🏆</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>📱 Setup</h3>
+                        <ul>
+                            <li><strong>Create Room</strong> → Get a 4-digit code</li>
+                            <li><strong>Share Code</strong> → Friends join on their phones</li>
+                            <li><strong>Start Game</strong> → Need 3+ players</li>
+                            <li>One player becomes Game Master 👑 (controls the game)</li>
+                        </ul>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🎲 How to Play</h3>
+                        <p><strong>Each Round:</strong></p>
+                        <ul>
+                            <li>📋 Question appears (e.g., "Name a fruit")</li>
+                            <li>⏰ Get ready → 3...2...1 countdown</li>
+                            <li>⏱️ Answer time → 10 seconds to type and submit</li>
+                            <li>⚠️ Once submitted, you can't change it!</li>
+                        </ul>
+                        <p><strong>📊 Review:</strong> See everyone's answers:<br>
+                            ❌ Bob | (No Answer)<br>
+                            🟡 Alice | Apple ← Duplicate!<br>
+                            🟡 Charlie | Apple ← Duplicate!<br>
+                            ✅ Diana | Mango ← Unique!
+                        </p>
+                        <p>👑 <strong>Eliminate:</strong> Game Master picks who's out</p>
+                        <p>🔁 <strong>Repeat:</strong> Until only 1-2 players remain</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>👑 Game Master Powers</h3>
+                        <ul>
+                            <li>⏸️ <strong>Pause</strong> → Stop timer</li>
+                            <li>🔄 <strong>Reset</strong> → Restart with 10 seconds</li>
+                            <li>⏭️ <strong>Skip</strong> → Jump to results</li>
+                            <li>✏️ <strong>Edit</strong> → Change question</li>
+                        </ul>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🏆 Winning</h3>
+                        <p>1-2 players left = Winners!<br>
+                            Then:<br>
+                            🔄 Play Again<br>
+                            🏠 Go Home</p>
+                    </div>
+                    <div class="rule-section">
+                        <h3>💡 Strategy</h3>
+                        <p>✅ Good answers: Unique, creative, unexpected<br>
+                            ❌ Bad answers: Common, blank, duplicates</p>
+                        <p><em>Example: "Name a fruit"</em><br>
+                            ❌ Apple (too common)<br>
+                            ✅ Dragonfruit (unique!)</p>
+                        <p><strong>Be weird or be gone! 🎮✨</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/odd-one-in.js"></script>
+</body>
+
+</html>

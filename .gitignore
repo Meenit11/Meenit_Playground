@@ -1,0 +1,41 @@
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node modules (if added later)
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build outputs (if build process added later)
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Testing
+coverage/
+.nyc_output/
+
+# System files
+*.swp
+*.swo
+*~

@@ -1,0 +1,709 @@
+/* ============================================
+   ODD ONE IN â€“ Arcade Theme
+   Multi-device game. Purple & amber palette.
+   ============================================ */
+
+:root {
+  --ooi-bg: #022c22;
+  --ooi-surface: #064e3b;
+  --ooi-accent: #fbbf24;
+  --ooi-accent-dim: #f59e0b;
+  --ooi-text: #ecfdf5;
+  --ooi-muted: #a7f3d0;
+  --ooi-danger: #ef4444;
+}
+
+body.oddonein-game {
+  background: radial-gradient(circle at 0% 0%, #1d243f 0%, #070816 40%, #020617 100%);
+  min-height: 100vh;
+  color: var(--ooi-text);
+  position: relative;
+}
+
+body.oddonein-game *:focus-visible {
+  outline: 2px solid var(--ooi-accent);
+  outline-offset: 2px;
+}
+
+.game-container {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: var(--s6);
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.screen {
+  animation: ooiFadeIn 0.3s ease forwards;
+}
+
+.screen.hidden {
+  display: none !important;
+}
+
+@keyframes ooiFadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Header */
+.screen-header {
+  text-align: center;
+  margin-bottom: var(--s6);
+}
+
+.game-logo {
+  width: clamp(90px, 24vw, 120px);
+  height: auto;
+  display: block;
+  margin: 0 auto var(--s3);
+}
+
+.game-title {
+  font-size: clamp(1.4rem, 5vw, 1.75rem);
+  font-weight: 800;
+  color: var(--ooi-text);
+  margin: 0 0 var(--s2);
+}
+
+.subtitle {
+  font-size: clamp(0.85rem, 2.8vw, 0.95rem);
+  color: var(--ooi-muted);
+  margin: 0;
+}
+
+/* Content card */
+.content-card {
+  background: linear-gradient(165deg, rgba(20, 20, 42, 0.98) 0%, rgba(10, 10, 18, 0.98) 100%);
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 20%, transparent);
+  border-radius: var(--radius-xl);
+  padding: var(--s6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  margin-bottom: var(--s6);
+}
+
+.content-card label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ooi-text);
+  margin-bottom: var(--s2);
+}
+
+.content-card input,
+.content-card textarea {
+  width: 100%;
+  padding: var(--s4);
+  font-size: 1rem;
+  border: 2px solid color-mix(in srgb, var(--ooi-accent) 25%, transparent);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--s4);
+  background: rgba(10, 10, 18, 0.6);
+  color: var(--ooi-text);
+}
+
+.content-card input:focus,
+.content-card textarea:focus {
+  outline: none;
+  border-color: var(--ooi-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ooi-accent) 15%, transparent);
+}
+
+.content-card input::placeholder {
+  color: rgba(138, 136, 160, 0.6);
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--ooi-muted);
+  margin: 0 0 var(--s4);
+  line-height: 1.5;
+}
+
+.error-text {
+  font-size: 0.85rem;
+  color: var(--ooi-danger);
+  margin: 0 0 var(--s3);
+  font-weight: 600;
+}
+
+.error-text.hidden {
+  display: none;
+}
+
+/* Landing */
+.card-landing {
+  border-color: color-mix(in srgb, var(--ooi-accent) 30%, transparent);
+}
+
+/* ================================
+   ROOM CODE DISPLAY
+   ================================ */
+.room-code-display {
+  font-size: clamp(2.5rem, 12vw, 4rem);
+  font-weight: 800;
+  letter-spacing: 0.6rem;
+  color: var(--ooi-accent);
+  margin: var(--s2) 0 var(--s4);
+}
+
+/* ================================
+   SHARE BUTTONS
+   ================================ */
+.share-buttons {
+  display: flex;
+  gap: var(--s2);
+  justify-content: center;
+  margin-bottom: var(--s4);
+}
+
+.copy-feedback {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ooi-accent);
+  font-weight: 600;
+  margin: 0 0 var(--s3);
+}
+
+.copy-feedback.hidden {
+  display: none;
+}
+
+/* ================================
+   LOBBY
+   ================================ */
+.players-count {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ooi-muted);
+  text-align: center;
+  margin-bottom: var(--s3);
+}
+
+.lobby-player-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.lobby-player-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s3) var(--s4);
+  background: color-mix(in srgb, var(--ooi-accent) 6%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 15%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.lobby-player-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.lobby-kick-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.lobby-kick-btn:active {
+  background: rgba(255, 85, 85, 0.2);
+}
+
+.lobby-waiting {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--ooi-muted);
+  font-style: italic;
+  margin: var(--s4) 0;
+}
+
+.lobby-waiting.hidden {
+  display: none;
+}
+
+/* ================================
+   GET READY PHASE
+   ================================ */
+.get-ready-phase {
+  text-align: center;
+  padding: var(--s8) 0;
+}
+
+.get-ready-phase.hidden {
+  display: none;
+}
+
+.get-ready-text {
+  font-size: clamp(1.5rem, 6vw, 2.25rem);
+  font-weight: 800;
+  color: var(--ooi-accent);
+  margin-bottom: var(--s4);
+}
+
+.get-ready-countdown {
+  font-family: ui-monospace, monospace;
+  font-size: clamp(4rem, 18vw, 6rem);
+  font-weight: 900;
+  color: var(--ooi-accent);
+}
+
+/* ================================
+   QUESTION / TIMER
+   ================================ */
+.round-badge {
+  font-size: 0.85rem;
+  color: var(--ooi-muted);
+  margin: 0 0 var(--s2);
+}
+
+.question-text {
+  font-size: clamp(1.15rem, 4vw, 1.45rem);
+  font-weight: 700;
+  color: var(--ooi-text);
+  margin: 0 0 var(--s6);
+  line-height: 1.4;
+  text-align: center;
+}
+
+.timer-container {
+  text-align: center;
+  margin-bottom: var(--s6);
+}
+
+.timer-display {
+  font-family: ui-monospace, monospace;
+  font-size: clamp(3rem, 14vw, 5rem);
+  font-weight: 800;
+  color: var(--ooi-text);
+  line-height: 1.2;
+  transition: color 0.3s;
+}
+
+.timer-display.timer-urgent {
+  color: var(--ooi-danger) !important;
+}
+
+.timer-display.timer-done {
+  color: var(--ooi-muted);
+}
+
+.timer-label {
+  font-size: var(--text-sm);
+  color: var(--ooi-muted);
+  margin: var(--s2) 0 0;
+}
+
+/* Answer states */
+.answer-submitted-msg {
+  text-align: center;
+  padding: var(--s6) 0;
+  color: var(--ooi-accent);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.answer-submitted-msg.hidden {
+  display: none;
+}
+
+.answer-submitted-msg .small-text {
+  color: var(--ooi-muted);
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-top: var(--s2);
+}
+
+.eliminated-message {
+  text-align: center;
+  padding: var(--s6);
+  color: var(--ooi-muted);
+}
+
+.eliminated-message.hidden {
+  display: none;
+}
+
+.small-text {
+  font-size: 0.85rem;
+}
+
+/* GM Controls */
+.gm-controls {
+  margin-top: var(--s6);
+  padding-top: var(--s6);
+  border-top: 1px solid color-mix(in srgb, var(--ooi-accent) 15%, transparent);
+}
+
+.gm-controls.hidden {
+  display: none;
+}
+
+.gm-controls h3 {
+  font-size: 0.95rem;
+  color: var(--ooi-muted);
+  margin-bottom: var(--s3);
+}
+
+.gm-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.btn-secondary,
+.gm-controls .btn {
+  background: color-mix(in srgb, var(--ooi-accent) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 30%, transparent) !important;
+  color: var(--ooi-text) !important;
+}
+
+.btn-secondary:active,
+.gm-controls .btn:active {
+  background: color-mix(in srgb, var(--ooi-accent) 25%, transparent) !important;
+}
+
+.gm-status-msg {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--ooi-accent);
+  font-weight: 600;
+  margin-top: var(--s4);
+  padding: var(--s3);
+  background: color-mix(in srgb, var(--ooi-accent) 8%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.gm-status-msg.hidden {
+  display: none;
+}
+
+/* ================================
+   ANSWER REVIEW
+   ================================ */
+.answers-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  margin-bottom: var(--s6);
+}
+
+.answer-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s4);
+  background: color-mix(in srgb, var(--ooi-accent) 6%, transparent);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.answer-item.answer-duplicate {
+  background: rgba(255, 217, 61, 0.08);
+  border-color: rgba(255, 217, 61, 0.3);
+}
+
+.answer-item.answer-blank {
+  background: rgba(255, 85, 85, 0.06);
+  border-color: rgba(255, 85, 85, 0.2);
+}
+
+.answer-item.answer-selected {
+  border-color: var(--ooi-accent) !important;
+  background: color-mix(in srgb, var(--ooi-accent) 15%, transparent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ooi-accent) 20%, transparent);
+}
+
+.ans-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+  flex: 1;
+}
+
+.ans-text {
+  font-weight: 500;
+  color: var(--ooi-text);
+}
+
+.ans-author {
+  font-size: 0.85rem;
+  color: var(--ooi-muted);
+}
+
+.elimination-controls {
+  margin-top: var(--s4);
+}
+
+.elimination-controls.hidden {
+  display: none;
+}
+
+/* ================================
+   WINNER
+   ================================ */
+.winner-card {
+  text-align: center;
+  border-color: rgba(16, 185, 129, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.winner-label {
+  font-size: 1.1rem;
+  color: var(--ooi-muted);
+  margin-bottom: var(--s3);
+}
+
+.winner-name {
+  font-size: clamp(1.8rem, 7vw, 2.5rem);
+  font-weight: 800;
+  color: var(--ooi-accent);
+  margin-bottom: var(--s2);
+}
+
+.winner-subtitle {
+  font-size: 0.9rem;
+  color: var(--ooi-muted);
+  margin-bottom: var(--s6);
+}
+
+/* Confetti */
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: ooiConfettiFall 3s ease-in forwards;
+}
+
+@keyframes ooiConfettiFall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(500px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Back link */
+.back-link {
+  color: var(--ooi-muted);
+  display: inline-block;
+  margin-top: var(--s6);
+}
+
+/* Modal */
+.modal .modal-content {
+  background: var(--ooi-surface) !important;
+  border: 1px solid color-mix(in srgb, var(--ooi-accent) 25%, transparent) !important;
+  color: var(--ooi-text) !important;
+}
+
+#rules-modal .modal-close {
+  background: transparent !important;
+  color: #fbbf24 !important;
+}
+
+#rules-modal .modal-close:hover,
+#rules-modal .modal-close:focus {
+  background: transparent !important;
+  color: #f59e0b !important;
+}
+
+/* ================================
+   ODD ONE IN â€“ THEMES
+   ================================ */
+
+/* Setup / Lobby theme */
+body.oddonein-game.ooi-theme-setup {
+  --ooi-bg: #022c22;
+  --ooi-surface: #064e3b;
+  --ooi-accent: #fbbf24;
+  --ooi-accent-dim: #f59e0b;
+  --ooi-text: #ecfdf5;
+  --ooi-muted: #a7f3d0;
+  background: radial-gradient(circle at 0% 0%, #065f46 0%, #022c22 40%, #020617 100%);
+}
+
+/* Round themes â€“ 10 distinctive gradients */
+body.oddonein-game.ooi-theme-round-1 {
+  --ooi-bg: #020617;
+  --ooi-surface: #0f172a;
+  --ooi-accent: #38bdf8;
+  --ooi-accent-dim: #0ea5e9;
+  --ooi-text: #e0f2fe;
+  --ooi-muted: #94a3b8;
+  background: radial-gradient(circle at 10% 0%, #0ea5e9 0%, #020617 50%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-2 {
+  --ooi-bg: #0b1120;
+  --ooi-surface: #111827;
+  --ooi-accent: #22c55e;
+  --ooi-accent-dim: #16a34a;
+  --ooi-text: #dcfce7;
+  --ooi-muted: #9ca3af;
+  background: radial-gradient(circle at 100% 0%, #16a34a 0%, #0b1120 45%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-3 {
+  --ooi-bg: #111827;
+  --ooi-surface: #020617;
+  --ooi-accent: #f97316;
+  --ooi-accent-dim: #ea580c;
+  --ooi-text: #ffedd5;
+  --ooi-muted: #fed7aa;
+  background: radial-gradient(circle at 0% 100%, #ea580c 0%, #111827 45%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-4 {
+  --ooi-bg: #030712;
+  --ooi-surface: #111827;
+  --ooi-accent: #ec4899;
+  --ooi-accent-dim: #db2777;
+  --ooi-text: #fdf2f8;
+  --ooi-muted: #f9a8d4;
+  background: radial-gradient(circle at 100% 100%, #db2777 0%, #111827 45%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-5 {
+  --ooi-bg: #020617;
+  --ooi-surface: #111827;
+  --ooi-accent: #a78bfa;
+  --ooi-accent-dim: #7c3aed;
+  --ooi-text: #f5f3ff;
+  --ooi-muted: #c4b5fd;
+  background: radial-gradient(circle at 50% 0%, #7c3aed 0%, #020617 55%);
+}
+
+body.oddonein-game.ooi-theme-round-6 {
+  --ooi-bg: #020617;
+  --ooi-surface: #0f172a;
+  --ooi-accent: #facc15;
+  --ooi-accent-dim: #eab308;
+  --ooi-text: #fefce8;
+  --ooi-muted: #fef9c3;
+  background: radial-gradient(circle at 0% 50%, #eab308 0%, #0f172a 45%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-7 {
+  --ooi-bg: #022c22;
+  --ooi-surface: #022c22;
+  --ooi-accent: #4ade80;
+  --ooi-accent-dim: #22c55e;
+  --ooi-text: #dcfce7;
+  --ooi-muted: #a7f3d0;
+  background: radial-gradient(circle at 50% 0%, #22c55e 0%, #022c22 55%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-8 {
+  --ooi-bg: #0f172a;
+  --ooi-surface: #020617;
+  --ooi-accent: #fb923c;
+  --ooi-accent-dim: #ea580c;
+  --ooi-text: #ffedd5;
+  --ooi-muted: #fed7aa;
+  background: radial-gradient(circle at 100% 50%, #ea580c 0%, #0f172a 45%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-9 {
+  --ooi-bg: #111827;
+  --ooi-surface: #020617;
+  --ooi-accent: #c084fc;
+  --ooi-accent-dim: #a855f7;
+  --ooi-text: #f5f3ff;
+  --ooi-muted: #e9d5ff;
+  background: radial-gradient(circle at 50% 100%, #a855f7 0%, #111827 50%, #020617 100%);
+}
+
+body.oddonein-game.ooi-theme-round-10 {
+  --ooi-bg: #020617;
+  --ooi-surface: #020617;
+  --ooi-accent: #2dd4bf;
+  --ooi-accent-dim: #14b8a6;
+  --ooi-text: #ccfbf1;
+  --ooi-muted: #99f6e4;
+  background: radial-gradient(circle at 50% 100%, #14b8a6 0%, #020617 60%, #020617 100%);
+}
+
+/* Review phase â€“ intense red */
+body.oddonein-game.ooi-theme-review {
+  --primary: #f97373;
+  --primary-dark: #b91c1c;
+  --focus: #f97373;
+  --ooi-bg: #1a0508;
+  --ooi-surface: #24040a;
+  --ooi-accent: #f97373;
+  --ooi-accent-dim: #b91c1c;
+  --ooi-text: #fee2e2;
+  --ooi-muted: #fecaca;
+  --ooi-danger: #f97373;
+  background: radial-gradient(circle at 50% 0%, #7f1d1d 0%, #1a0508 45%, #020617 100%);
+}
+
+/* Winner phase â€“ celebratory emerald and gold */
+body.oddonein-game.ooi-theme-winner {
+  --primary: #fbbf24;
+  --primary-dark: #f59e0b;
+  --focus: #fbbf24;
+  --ooi-bg: #022c22;
+  --ooi-surface: #064e3b;
+  --ooi-accent: #fbbf24;
+  --ooi-accent-dim: #f59e0b;
+  --ooi-text: #ecfdf5;
+  --ooi-muted: #a7f3d0;
+  background: radial-gradient(circle at 50% 0%, #047857 0%, #022c22 45%, #020617 100%);
+}
+
+/* Eliminated players â€“ desaturated spectator view */
+body.oddonein-game.ooi-eliminated-view {
+  filter: grayscale(0.6) brightness(0.95);
+}
+
+/* Rules modal scroll area */
+#rules-modal .rules-scroll {
+  max-height: 60vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+#rules-modal .rules-scroll::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+#rules-modal .rule-section {
+  margin-bottom: var(--s4);
+}
+
+#rules-modal .rule-section h3 {
+  margin-bottom: var(--s2);
+}

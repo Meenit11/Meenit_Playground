@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Mafia - Classic social deduction game">
+    <meta name="theme-color" content="#0a080c">
+    <title>Mafia — Meenit's Playground</title>
+
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/mafia.css">
+</head>
+
+<body class="mafia-game mafia-gangster">
+    <div class="game-container">
+        <div id="notification-banner" class="notification-banner hidden"></div>
+
+        <!-- SCREEN 1: Setup -->
+        <div id="screen-setup" class="screen">
+            <div class="screen-header">
+                <h1 class="game-title-main">Mafia</h1>
+                <p class="game-tagline">Surviving the night is easy. Convincing others you're innocent is hard.</p>
+            </div>
+
+            <div class="content-card setup-card">
+                <h2>Game Setup</h2>
+
+                <!-- Step 1: Total Players -->
+                <div class="setup-box">
+                    <label><span class="step-badge">1</span> Total Players</label>
+                    <div class="counter-control">
+                        <button type="button" class="counter-btn" id="decrease-players">−</button>
+                        <span class="counter-value" id="player-count-display">5</span>
+                        <button type="button" class="counter-btn" id="increase-players">+</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Player Names -->
+                <div class="setup-box">
+                    <label><span class="step-badge">2</span> Player names</label>
+                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 5 players — add names
+                        below</p>
+                    <input type="text" id="player-name-input" class="name-input"
+                        placeholder="Type name and press Enter">
+                    <div id="player-list" class="player-chips"></div>
+                </div>
+
+                <!-- Step 3: Role Selection -->
+                <div class="role-distribution">
+                    <h3 class="section-title"><span class="step-badge">3</span> Role Selection</h3>
+
+                    <!-- Doctor (Fixed) -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Doctor.png" alt="Doctor" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Doctor</span>
+                            <p class="role-desc">Can save one player each night</p>
+                        </div>
+                        <span class="role-value">1</span>
+                    </div>
+
+                    <!-- Mafia -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Mafia.png" alt="Mafia" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Mafia</span>
+                            <p class="role-desc">Kill one player each night</p>
+                        </div>
+                        <div class="number-input-vertical">
+                            <button class="number-btn-mini" id="increase-mafia">+</button>
+                            <input type="number" id="mafia-count" value="1" min="0" max="5" readonly>
+                            <button class="number-btn-mini" id="decrease-mafia">−</button>
+                        </div>
+                    </div>
+
+                    <!-- Detective -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Detective.png" alt="Detective" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Detective</span>
+                            <p class="role-desc">Suspect if one player each night if they are Mafia</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="detective-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Jester -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Jester.png" alt="Jester" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Jester</span>
+                            <p class="role-desc">Try to get voted out for the win</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="jester-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Bomber -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Bomber.png" alt="Bomber" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Bomber</span>
+                            <p class="role-desc">If voted out, can take someone with them</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="bomber-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Lovers -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Lover.png" alt="Lover" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Lover</span>
+                            <p class="role-desc">Protects chosen player by sacrificing self</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="lover-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Civilians (Auto-calculated) -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Civilian.png" alt="Civilian" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Civilians</span>
+                            <p class="role-desc">Find and eliminate Mafia members</p>
+                        </div>
+                        <span class="role-value" id="civilian-count">2</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-full" id="start-game-btn">Start Game</button>
+                <button class="btn btn-outline btn-full mafia-btn-spacing" id="rules-btn">Rules</button>
+                <a href="../index.html" class="back-to-home-link mafia-back-link">Back to Home</a>
+            </div>
+
+            <!-- Rules Modal -->
+            <div id="rules-modal" class="modal hidden">
+                <div class="modal-overlay" id="rules-modal-overlay"></div>
+                <div class="modal-content">
+                    <button type="button" class="modal-close" id="close-rules">×</button>
+                    <h2>How to Play</h2>
+                    <div class="rules-scroll">
+                        <div class="rule-section">
+                            <h3>🎯 Game Flow</h3>
+                            <ol>
+                                <li>👁️ Each player secretly views their role</li>
+                                <li>🌙 <strong>Night Phase:</strong> God narrates actions</li>
+                                <li>☀️ <strong>Day Phase:</strong> Players discuss and vote</li>
+                                <li>🔄 Repeat until a team wins</li>
+                            </ol>
+                        </div>
+                        <div class="rule-section">
+                            <h3>⚔️ Special Role Rules</h3>
+                            <ul>
+                                <li><strong>🎭 Detective:</strong> Suspect any player each night to find out if they are
+                                    Mafia</li>
+                                <li><strong>🤡 Jester:</strong> Wins solo if voted out in Morning Phase</li>
+                                <li><strong>💣 Bomber:</strong> If VOTED OUT, can take ANY player with them</li>
+                                <li><strong>💕 Lover:</strong> Picks protected target Night 1; if target dies, Lover
+                                    sacrifices self instead</li>
+                            </ul>
+                        </div>
+                        <div class="rule-section">
+                            <h3>🏆 Win Conditions</h3>
+                            <ul>
+                                <li>✅ Civilians win: All Mafia eliminated</li>
+                                <li>✅ Mafia wins: Mafia ≥ Civilians</li>
+                                <li>✅ Jester win: Gets voted out in Morning Phase</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REST OF THE SCREENS STAY THE SAME -->
+
+        <!-- SCREEN 2: Pass-Phone Role Viewing -->
+        <div id="screen-role-viewing" class="screen hidden">
+            <div class="role-viewing-center">
+                <h1 class="centered-title">Role Assignment</h1>
+
+                <div class="pass-phone-box">
+                    <p class="player-name-large" id="next-viewer-name">Player Name</p>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">Reveal My Role</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Role Card Display -->
+        <div id="screen-role-card" class="screen hidden">
+            <div class="role-card-container">
+                <div class="role-card">
+                    <img src="../images/Civilian.png" alt="Role" class="role-image" id="role-image">
+                    <h2 class="role-name" id="role-name">Civilian</h2>
+                    <p class="role-description" id="role-description">Find the Mafia and eliminate them!</p>
+                </div>
+
+                <button class="btn btn-primary btn-full mt-2xl" id="done-viewing-btn">Pass Phone to&nbsp;<span
+                        id="next-player-name">Next Player</span></button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3.5: GM Reveal (Pass phone to Game Master) -->
+        <div id="screen-gm-reveal" class="screen hidden">
+            <div class="role-viewing-center">
+                <h1 class="centered-title">Role Assignment</h1>
+                <div class="pass-phone-box">
+                    <p class="player-name-large">Game Master</p>
+                </div>
+                <button class="btn btn-primary btn-full btn-lg" id="reveal-all-roles-btn">Reveal All Roles</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: GM Overview -->
+        <div id="screen-gm-overview" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title-main">Mafia</h1>
+                <p class="subtitle">Game Master Overview - All player roles</p>
+            </div>
+
+            <div class="content-card">
+                <div id="all-roles-list" class="roles-grid"></div>
+
+                <button class="btn btn-full btn-lg mt-xl mafia-start-night-btn" id="start-night-btn">🌙 Start Night
+                    Phase</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: Night Phase -->
+        <div id="screen-night" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="phase-title phase-night">Night Phase</h1>
+                <p class="subtitle">Round <span id="night-round-number">1</span> - Game Master speaks aloud</p>
+            </div>
+
+            <div class="content-card night-content-card">
+                <div class="night-card-decor" aria-hidden="true">
+                    <div class="moon"></div>
+                    <div class="stars"></div>
+                </div>
+                <div class="night-instructions">
+                    <h3>Game Master Instructions:</h3>
+                    <ol id="night-order-list"></ol>
+                </div>
+
+                <div id="lover-selection-container" class="hidden mt-lg p-md border-accent rounded-lg">
+                    <p class="subtitle text-accent mb-sm">💖 Who did the Lover kiss?</p>
+                    <div id="lover-target-list" class="grid-2-cols gap-sm"></div>
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="end-night-btn">Complete Night Phase</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 5.5: Morning Phase (Outcome Selection) -->
+        <div id="screen-morning-results" class="screen hidden">
+            <div class="morning-decor" aria-hidden="true">
+                <div class="blood-droplet blood-droplet-1"></div>
+                <div class="blood-droplet blood-droplet-2"></div>
+                <div class="blood-droplet blood-droplet-3"></div>
+                <div class="blood-droplet blood-droplet-4"></div>
+                <div class="blood-droplet blood-droplet-5"></div>
+            </div>
+            <div class="screen-header">
+                <h1 class="phase-title phase-morning">Last Night</h1>
+                <p id="morning-announcement" class="info-text"
+                    style="font-size: var(--text-xl); text-align: center; margin-bottom: var(--s6); min-height: 2em;">
+                </p>
+                <p class="subtitle">Who was found dead?</p>
+            </div>
+
+            <div class="content-card">
+                <div id="night-outcome-list" class="alive-players-list">
+                    <!-- Dynamic: "No one was found dead" button + Alive players list -->
+                </div>
+
+                <button class="btn btn-primary btn-full btn-lg mt-xl" id="start-discussion-btn" disabled>Start
+                    Discussion and Voting</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 6: Day Phase (Voting) -->
+        <div id="screen-day" class="screen hidden">
+            <div class="day-sky" aria-hidden="true">
+                <div class="sun"></div>
+            </div>
+            <div class="screen-header">
+                <h1 class="phase-title phase-day">Day Phase</h1>
+                <p class="subtitle">Round <span id="day-round-number">1</span> - Discussion & Voting</p>
+            </div>
+
+            <div class="content-card">
+
+                <div class="alive-players-list day-players-box">
+                    <div class="day-box-sun" aria-hidden="true"></div>
+                    <h3>Select 1 Player to Eliminate</h3>
+                    <p class="elimination-hint">Only one player can be eliminated per round. Or skip to continue.</p>
+                    <div id="alive-players-container"></div>
+                </div>
+
+                <div class="flex-col gap-md mt-xl">
+                    <button class="btn btn-danger btn-full btn-lg" id="confirm-elimination-btn" disabled>Eliminate
+                        Selected Player</button>
+                    <button class="btn btn-ghost btn-full" id="skip-elimination-btn">Skip Elimination</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 7: Winner Screen -->
+        <div id="screen-winner" class="screen hidden">
+            <div class="confetti-container" id="confetti-container"></div>
+
+            <div class="winner-content">
+                <h1 class="winner-title" id="winner-title">Civilians Win!</h1>
+
+                <div class="winner-details">
+                    <h3 id="winner-roles-label">Winners</h3>
+                    <div id="final-roles-list" class="winner-roles-grid"></div>
+                </div>
+
+                <button class="btn btn-lg mt-2xl mafia-play-again-btn" id="play-again-btn">Play Again</button>
+                <a href="../index.html" class="mafia-back-to-games-link">Back to Games</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Elimination Modal -->
+    <div id="elimination-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Select Player to Eliminate</h3>
+            <div id="elimination-player-list"></div>
+            <button class="btn btn-ghost btn-full mt-md" id="cancel-elimination-btn">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Role Reveal Modal -->
+    <div id="reveal-modal" class="modal hidden">
+        <div class="modal-content text-center">
+            <h2 id="reveal-player-name" class="mb-lg">Player Name</h2>
+            <div class="reveal-card p-xl bg-white rounded-2xl shadow-xl inline-block mb-xl">
+                <img id="reveal-role-img" src="../images/Civilian.png" alt="Role" class="role-image mx-auto mb-md">
+                <h3 id="reveal-role-name" class="role-name h2 mb-0">Role Name</h3>
+            </div>
+            <p class="text-gray-600 mb-xl">has been eliminated!</p>
+            <button class="btn btn-primary btn-full btn-lg" id="close-reveal-btn">Continue</button>
+        </div>
+    </div>
+
+    <!-- Bomber Target Modal -->
+    <div id="bomber-modal" class="modal hidden bomber-modal-opaque">
+        <div class="modal-content">
+            <h3>💣 Bomber Activated!</h3>
+            <p class="modal-text">The Bomber takes someone with them. Click the ❌ next to a target:</p>
+            <div id="bomber-target-list"></div>
+        </div>
+    </div>
+
+    <!-- Lover Sacrifice Modal -->
+    <div id="lover-modal" class="modal hidden lover-modal-opaque">
+        <div class="modal-content lover-modal">
+            <h3>💔 Lover's Sacrifice</h3>
+            <div class="lover-modal-body">
+                <div class="lover-avatars">
+                    <img src="../images/Lover.png" alt="Lover" class="lover-img">
+                    <div class="heart-break"></div>
+                    <img src="../images/Civilian.png" alt="Protected player" class="lover-target-img">
+                </div>
+                <p class="lover-text"><span id="lover-name"></span> died to protect <span
+                        id="lover-target-name"></span>.</p>
+            </div>
+            <button class="btn btn-primary btn-full mt-md" id="close-lover-modal-btn"
+                onclick="hideElement('lover-modal')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/mafia.js"></script>
+</body>
+
+</html>

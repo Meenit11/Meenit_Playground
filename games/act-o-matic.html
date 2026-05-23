@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Act-O-Matic - Actions speak louder than words and look much dumber.">
+    <meta name="theme-color" content="#111111">
+    <title>Act-O-Matic - Meenit's Playground</title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/act-o-matic.css">
+</head>
+
+<body class="actomatic-game">
+    <div class="game-container">
+
+        <!-- SCREEN 1: Setup -->
+        <div id="screen-setup" class="screen">
+            <div class="screen-header">
+                <h1 class="game-title">Act-O-Matic</h1>
+                <p class="tagline">Actions speak louder than words and look much dumber.</p>
+            </div>
+            <div class="content-card">
+                <div class="setup-box">
+                    <label><span class="step-badge">How to Play</span></label>
+                    <div class="how-it-works-text">
+                        <p><strong>🎯 Two Players Step Up</strong><br>
+                            Game Master picks 2 players</p>
+
+                        <p><strong>🎲 Roll for Actions</strong><br>
+                            Each player gets a secret action<br>
+                            <span style="opacity:0.8;font-size:0.85em;">(e.g., "Riding a rickshaw", "Brushing teeth",
+                                "Flying a kite")</span>
+                        </p>
+
+                        <p><strong>🎭 Act It Out</strong><br>
+                            Perform your secret action<br>
+                            No talking, no sounds!<br>
+                            Use gestures, movements, expressions<br>
+                            Other player watches</p>
+
+                        <p><strong>🤔 Guess!</strong><br>
+                            After acting, you must guess:<br>
+                            "What action did I just do?"</p>
+
+                        <p><strong>🏆 Results</strong><br>
+                            ✅ Correct guess &rarr; You WIN!<br>
+                            ❌ Wrong guess &rarr; Other player WINS!</p>
+
+                        <p><strong>🔁 Next Round</strong><br>
+                            Pick 2 new players and repeat!</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-full btn-lg" id="start-btn">Let's Play!</button>
+                <a href="../index.html" class="back-link">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: Roll + Reveal (combined) -->
+        <div id="screen-roller" class="screen hidden">
+            <div class="screen-header">
+                <h1 class="game-title" id="roller-title">Roll the Action</h1>
+                <p class="tagline" id="roller-subtitle">Two players step up and roll!</p>
+            </div>
+            <div class="content-card roller-card">
+
+                <!-- Flash Text Animation -->
+                <div class="roller-outer" id="roller-outer">
+                    <p class="flash-text" id="flash-text">Ready to Roll?</p>
+                </div>
+
+                <!-- Action Reveal Box (shown after roll) -->
+                <div id="reveal-box" class="reveal-box hidden">
+                    <h3 class="reveal-label">Your Action!</h3>
+                    <p class="reveal-action-text" id="reveal-action-text">-</p>
+                </div>
+
+                <!-- Buttons -->
+                <button class="btn btn-primary btn-full btn-lg" id="roll-btn">Roll Action!</button>
+                <button class="btn btn-outline btn-full hidden" id="next-round-btn" style="margin-top:var(--s3);">Next
+                    Roll</button>
+                <button class="btn btn-ghost btn-full" id="end-game-btn" style="margin-top:var(--s4);color:#888;">End
+                    Game</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../js/act-o-matic.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description"
+    content="Meenit's Playground - Mobile party games including Odd One In, Undercover, and Mafia">
+  <meta name="theme-color" content="#1a1520">
+  <title>Meenit's Playground — Party Games</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/home.css">
+
+  <!-- Preload fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Hero Section -->
+    <div class="hero">
+      <div class="logo-container">
+        <img src="images/Meenit's Playground.png" alt="Logo" class="main-logo">
+      </div>
+      <h2 class="section-title">Pick Your Game</h2>
+      <p class="hero-hint">Endless chaos.</p>
+    </div>
+
+    <!-- Game Selection -->
+    <main class="games-section">
+      <div class="games-grid">
+        <!-- Act-O-Matic Card -->
+        <a href="games/act-o-matic.html" class="game-card" data-game="act-o-matic">
+          <div class="game-card-content">
+            <h2 class="game-name">Act-O-Matic</h2>
+            <p class="game-tagline">Actions speak louder than words and look much dumber.</p>
+            <div class="game-card-footer game-card-footer-odd-one-in">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">2 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">🎬</span>
+                  <span class="meta-text">Action</span>
+                </div>
+              </div>
+              <span class="play-link play-link-next-line">
+                Play Now <span class="arrow">→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Odd One In Card -->
+        <a href="games/odd-one-in.html" class="game-card" data-game="odd-one-in">
+          <div class="game-card-content">
+            <h2 class="game-name">Odd One In</h2>
+            <p class="game-tagline">Think fast. Answer weird. Matching is for socks, not you.</p>
+            <div class="game-card-footer game-card-footer-odd-one-in">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">3 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">⏱️</span>
+                  <span class="meta-text">Quick</span>
+                </div>
+              </div>
+              <span class="play-link play-link-next-line">
+                Play Now <span class="arrow">→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Undercover Card -->
+        <a href="games/undercover.html" class="game-card" data-game="undercover">
+          <div class="game-card-content">
+            <h2 class="game-name">Undercover</h2>
+            <p class="game-tagline">Describe. Deceive. Survive. One word changes everything.</p>
+            <div class="game-card-footer game-card-footer-odd-one-in">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">4 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">🎭</span>
+                  <span class="meta-text">Deception</span>
+                </div>
+              </div>
+              <span class="play-link play-link-next-line">
+                Play Now <span class="arrow">→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Mafia Card -->
+        <a href="games/mafia.html" class="game-card" data-game="mafia">
+          <div class="game-card-content">
+            <h2 class="game-name">Mafia</h2>
+            <p class="game-tagline">Surviving the night is easy. Convincing others you're innocent is hard.</p>
+            <div class="game-card-footer game-card-footer-odd-one-in">
+              <div class="game-meta">
+                <div class="meta-box">
+                  <span class="meta-icon">👥</span>
+                  <span class="meta-text">5 — ∞</span>
+                </div>
+                <div class="meta-box">
+                  <span class="meta-icon">🧠</span>
+                  <span class="meta-text">Strategy</span>
+                </div>
+              </div>
+              <span class="play-link play-link-next-line">
+                Play Now <span class="arrow">→</span>
+              </span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p class="footer-text">Bored. Overreacted. Build this game!</p>
+      <p class="footer-heart">Made with <span class="heart-css"></span></p>
+    </footer>
+  </div>
+  <script>
+    // Staggered card entrance handled by CSS (cardReveal keyframes)
+  </script>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script>
+    // Long-press on main logo to reset all game data
+    (function () {
+      const logo = document.querySelector('.main-logo');
+      if (!logo) return;
+      let holdTimer = null;
+      const HOLD_MS = 800;
+
+      function startHold(e) {
+        holdTimer = setTimeout(() => {
+          e.preventDefault();
+          const confirmed = confirm('Reset ALL game data?\n\nThis clears saved player names, word pair history, and session data for all games.');
+          if (confirmed) {
+            // Odd One In / Mafia questions
+            localStorage.removeItem('ooi_used_tier1_broad');
+            localStorage.removeItem('ooi_used_tier2_medium');
+            localStorage.removeItem('ooi_used_tier3_narrow');
+            localStorage.removeItem('ooi_session');
+            // Undercover words
+            localStorage.removeItem('uc_used_tier1_broad');
+            localStorage.removeItem('uc_used_tier2_medium');
+            localStorage.removeItem('uc_used_tier3_narrow');
+            localStorage.removeItem('uc_session');
+            // Mafia
+            localStorage.removeItem('mafia_players');
+            localStorage.removeItem('mafia_session');
+            // Act-O-Matic
+            localStorage.removeItem('aom_used_actions');
+            // Also clear anything matching known patterns
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k && (k.startsWith('ooi_') || k.startsWith('uc_') || k.startsWith('mafia_') || k.startsWith('aom_'))) {
+                keysToRemove.push(k);
+              }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+            alert('All game data has been reset!');
+          }
+        }, HOLD_MS);
+      }
+
+      function cancelHold() {
+        if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+      }
+
+      logo.addEventListener('touchstart', startHold, { passive: true });
+      logo.addEventListener('touchend', cancelHold);
+      logo.addEventListener('touchcancel', cancelHold);
+      logo.addEventListener('mousedown', startHold);
+      logo.addEventListener('mouseup', cancelHold);
+      logo.addEventListener('mouseleave', cancelHold);
+    })();
+  </script>
+</body>
+
+</html>

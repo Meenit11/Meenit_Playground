@@ -1,0 +1,383 @@
+/* ============================================
+   ACT-O-MATIC — Charcoal Black & Gold Theme
+   ============================================ */
+
+:root {
+    --aom-bg: #111111;
+    --aom-surface: #1e1e1e;
+    --aom-surface-2: #2a2a2a;
+    --aom-gold: #d4a017;
+    --aom-gold-bright: #f0c040;
+    --aom-gold-dim: #9a720f;
+    --aom-text: #f0e8d0;
+    --aom-muted: #888888;
+    --aom-danger: #e05252;
+    --aom-border: rgba(212, 160, 23, 0.25);
+}
+
+body.actomatic-game {
+    background: radial-gradient(ellipse at 10% 0%, #1e1a0a 0%, #111111 45%, #0d0d0d 100%);
+    min-height: 100vh;
+    color: var(--aom-text);
+    position: relative;
+}
+
+/* Override global primary for Act-O-Matic */
+body.actomatic-game {
+    --primary: #d4a017;
+    --primary-dark: #9a720f;
+    --focus: #d4a017;
+}
+
+body.actomatic-game *:focus-visible {
+    outline: 2px solid var(--aom-gold);
+    outline-offset: 2px;
+}
+
+.game-container {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: var(--s6);
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+/* Screens */
+.screen {
+    animation: aomFadeIn 0.3s ease forwards;
+}
+
+.screen.hidden {
+    display: none !important;
+}
+
+@keyframes aomFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.screen-header {
+    text-align: center;
+    margin-bottom: var(--s6);
+}
+
+.game-title {
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+    font-weight: 900;
+    color: var(--aom-gold-bright);
+    margin: 0 0 var(--s2);
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 30px rgba(212, 160, 23, 0.4);
+}
+
+.tagline {
+    font-size: clamp(0.85rem, 3vw, 0.95rem);
+    color: var(--aom-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Content card */
+.content-card {
+    background: linear-gradient(165deg, rgba(30, 26, 10, 0.98) 0%, rgba(20, 18, 8, 0.98) 100%);
+    border: 1px solid var(--aom-border);
+    border-radius: var(--radius-xl);
+    padding: var(--s6);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 160, 23, 0.08);
+    margin-bottom: var(--s6);
+}
+
+/* Setup boxes */
+.setup-box {
+    margin-bottom: var(--s6);
+}
+
+.setup-box label {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--aom-gold);
+    margin-bottom: var(--s3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--aom-gold);
+    color: #111;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+/* Counter */
+.counter-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s4);
+}
+
+.counter-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    background: rgba(212, 160, 23, 0.12);
+    border: 1px solid rgba(212, 160, 23, 0.3);
+    color: var(--aom-gold-bright);
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.counter-btn:active {
+    background: rgba(212, 160, 23, 0.25);
+}
+
+.counter-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--aom-text);
+    min-width: 60px;
+    text-align: center;
+}
+
+.hint {
+    font-size: 0.8rem;
+    color: var(--aom-muted);
+    margin: var(--s2) 0 0;
+}
+
+/* How it works */
+.how-it-works-text {
+    font-size: 0.9rem;
+    color: var(--aom-text);
+    line-height: 1.9;
+    background: rgba(212, 160, 23, 0.06);
+    border-radius: var(--radius-md);
+    padding: var(--s4);
+    border-left: 3px solid var(--aom-gold-dim);
+}
+
+/* Buttons */
+.btn {
+    cursor: pointer;
+    border: none;
+    font-family: var(--font);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--aom-gold) 0%, var(--aom-gold-dim) 100%);
+    color: #111;
+    font-weight: 800;
+    border-radius: var(--radius-md);
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-primary:active {
+    transform: scale(0.97);
+    opacity: 0.85;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1.5px solid rgba(212, 160, 23, 0.5);
+    color: var(--aom-gold-bright);
+    border-radius: var(--radius-md);
+    transition: background 0.2s;
+}
+
+.btn-outline:active {
+    background: rgba(212, 160, 23, 0.1);
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--aom-muted);
+    border: none;
+    transition: color 0.2s;
+}
+
+.btn-ghost:active {
+    color: var(--aom-gold);
+}
+
+.btn-full {
+    display: block;
+    width: 100%;
+}
+
+.btn-lg {
+    min-height: var(--touch);
+    padding: var(--s4) var(--s6);
+    font-size: 1rem;
+}
+
+.back-link {
+    display: block;
+    text-align: center;
+    color: var(--aom-muted);
+    margin-top: var(--s4);
+    font-size: 0.9rem;
+}
+
+/* =====================
+   ROLLER
+   ===================== */
+.roller-card {
+    padding: var(--s5);
+}
+
+.roller-outer {
+    position: relative;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: var(--s5);
+    border-radius: var(--radius-md);
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(212, 160, 23, 0.4);
+    box-shadow: 0 0 20px rgba(212, 160, 23, 0.1);
+    padding: var(--s4);
+}
+
+.flash-text {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    font-weight: 800;
+    color: var(--aom-gold-dim);
+    text-align: center;
+    text-shadow: 0 0 10px rgba(212, 160, 23, 0.2);
+    line-height: 1.3;
+    transition: transform 0.05s ease, opacity 0.05s ease;
+}
+
+.flash-text.flash-active {
+    transform: scale(1.05);
+    color: var(--aom-gold-bright);
+    opacity: 0.8;
+}
+
+.flash-text.flash-winner {
+    animation: aomWinnerPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #fff8e0;
+    font-size: clamp(1.6rem, 7vw, 2.2rem);
+    text-shadow: 0 0 30px rgba(212, 160, 23, 1), 0 0 50px rgba(212, 160, 23, 0.6);
+}
+
+@keyframes aomWinnerPop {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Result banner */
+.roller-result-banner {
+    background: linear-gradient(135deg, rgba(212, 160, 23, 0.15) 0%, rgba(212, 160, 23, 0.05) 100%);
+    border: 1px solid rgba(212, 160, 23, 0.4);
+    border-radius: var(--radius-md);
+    padding: var(--s4);
+    text-align: center;
+    margin-bottom: var(--s5);
+    color: var(--aom-gold-bright);
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.roller-result-banner.hidden {
+    display: none;
+}
+
+/* =====================
+   REVEAL BOX (inline in roller screen)
+   ===================== */
+.reveal-box {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(212, 160, 23, 0.6);
+    border-radius: var(--radius-xl);
+    padding: var(--s6);
+    margin-bottom: var(--s5);
+    text-align: center;
+    box-shadow: 0 0 40px rgba(212, 160, 23, 0.15), 0 0 80px rgba(212, 160, 23, 0.05);
+    animation: aomRevealPop 0.4s var(--ease-bounce);
+}
+
+@keyframes aomRevealPop {
+    from {
+        transform: scale(0.92);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.reveal-box.hidden {
+    display: none;
+}
+
+.reveal-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--aom-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin: 0 0 var(--s3);
+}
+
+.reveal-action-text {
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    font-weight: 900;
+    color: var(--aom-gold-bright);
+    text-shadow: 0 0 20px rgba(212, 160, 23, 0.5);
+    line-height: 1.3;
+    margin: 0 0 var(--s3);
+}
+
+.reveal-hint {
+    font-size: 0.82rem;
+    color: var(--aom-muted);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* step-badge tweaks for text content (How to Play label) */
+.step-badge {
+    width: auto;
+    height: auto;
+    padding: var(--s1) var(--s3);
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+}
