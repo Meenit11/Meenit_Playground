@@ -2,5 +2,8 @@
   "name": "playground-odd-one-in-api",
   "version": "1.0.0",
   "description": "Simple API for Odd One In multi-device play",
-  "main": "server.js"
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
 }
