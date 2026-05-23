@@ -67,32 +67,29 @@ Play three exciting party games with your friends: **Odd One In**, **Undercover*
 
 ---
 
-## 🚀 Quick Start
+## 🌐 Odd One In Multiplayer (Play on Phones!)
 
-### Local Play
-1. Download or clone this repository
-2. **Run a local server** (so CSS and assets load correctly):
-   ```bash
-   cd Playground
-   python3 -m http.server 8000
-   ```
-   Then open **http://localhost:8000** in your browser.
-3. Or open `index.html` directly (some browsers may block CSS when using `file://`).
+Unlike Mafia and Undercover, **Odd One In** supports networked play where everyone uses their own phone.
 
-**No build step, no npm required!**
+### **Option A: 100% Mobile (No Laptop needed)**
+1. **Host the Website:** Enable **GitHub Pages** in your repo settings. Everyone opens your `github.io` link.
+2. **Host the "Brain" (Server):** 
+   - Create a free account on [Render.com](https://render.com).
+   - Create a **New Web Service** and connect this GitHub repo.
+   - Set **Root Directory** to `server` and **Start Command** to `node server.js`.
+   - Once deployed, copy your Render URL (e.g., `https://my-game.onrender.com`).
+3. **Connect:** Open the game on your phone, tap **⚙️ Server Settings**, and paste that Render URL.
+
+### **Option B: Local Play (Laptop required)**
+1. Open a terminal in the `server` folder and run `node server.js`.
+2. To play across different networks (e.g. mobile data), run a tunnel like `npx localtunnel --port 3001`.
+3. Paste the tunnel link into the game's **⚙️ Server Settings**.
+
+**⚠️ Important:** If using a tunnel (localtunnel/ngrok), each player must open the tunnel link once in their mobile browser and click **"Continue"** to unlock it before playing.
 
 ---
 
-## 🌐 Deploy to Render.com
-
-1. Push this repository to GitHub
-2. Go to [Render.com](https://render.com) and create a new **Static Site**
-3. Connect your GitHub repository
-4. Set the following:
-   - **Build Command:** (leave empty)
-   - **Publish Directory:** `.` (root directory)
-5. Click "Create Static Site"
-6. Share the generated URL with your friends!
+## 🚀 Quick Start (Local Pass-and-Play)
 
 ---
 
