@@ -1,3 +1,4 @@
+// Separate-phones client is disabled (one phone only); the saved copy is in the scratchpad folder undercover-before-revert/ (/tmp/claude-1000/-home-apex-work/08ed2031-8497-42e3-b228-d87fd84fc155/scratchpad/undercover-before-revert/).
 // ================================
 // UNDERCOVER - COMPLETE GAME LOGIC
 // ================================
@@ -91,10 +92,13 @@ function updatePlayersSummary() {
     if (!el) return;
     const n = gameState.totalPlayers;
     const names = gameState.players;
+    const left = n - names.length;
     if (names.length === 0) {
-        el.textContent = `Total: ${n} players — add names below`;
+        el.textContent = `${n} players: add ${n} names below`;
+    } else if (left > 0) {
+        el.textContent = `${names.length} of ${n} added. ${left} more to go.`;
     } else {
-        el.textContent = `Total: ${n} players — ${names.join(', ')}`;
+        el.textContent = `All ${n} players are in. Ready to start.`;
     }
 }
 
@@ -163,7 +167,7 @@ function renderPlayerList() {
         chip.innerHTML = `
             <button class="move-btn" ${index === 0 ? 'disabled' : ''} data-dir="-1" data-idx="${index}">▲</button>
             <button class="move-btn" ${index === total - 1 ? 'disabled' : ''} data-dir="1" data-idx="${index}">▼</button>
-            <span class="player-chip-name">${name}</span>
+            <span class="player-chip-name">${escapeHtml(name)}</span>
             <button class="remove-player" data-idx="${index}">×</button>
         `;
         chip.querySelector('.remove-player').addEventListener('click', () => removePlayer(index));
@@ -233,6 +237,33 @@ function calculateAgents() {
 // ================================
 // RULES MODAL
 // ================================
+// Popups live at body level so no screen container can clip or stack above them.
+function liftModalsToBody() {
+    document.querySelectorAll('.modal').forEach(m => {
+        if (m.parentElement !== document.body) document.body.appendChild(m);
+    });
+}
+liftModalsToBody();
+
+// In-game back button: confirm in-page, keep names and settings, return to setup.
+function setupBackToSetup() {
+    const btn = document.getElementById('ingame-back-btn');
+    const modal = document.getElementById('back-setup-modal');
+    if (!btn || !modal) return;
+    const close = () => modal.classList.add('hidden');
+    // On the winner screen the game is over: go straight home, no question.
+    btn.onclick = () => {
+        const winner = document.getElementById('screen-game-over');
+        if (winner && !winner.classList.contains('hidden')) { window.location.href = '../index.html'; return; }
+        modal.classList.remove('hidden');
+    };
+    document.getElementById('back-setup-no').onclick = close;
+    document.getElementById('back-setup-overlay').onclick = close;
+    // Names and role settings are saved, so a reload lands on a filled-in setup screen.
+    document.getElementById('back-setup-yes').onclick = () => { savePlayersToStorage(); location.reload(); };
+}
+setupBackToSetup();
+
 rulesBtn.addEventListener('click', () => {
     rulesModal.classList.remove('hidden');
 });
@@ -287,11 +318,11 @@ startGameBtn.addEventListener('click', () => {
 function assignRoles() {
     // Word pair selection with cooldown
     const available = getAvailablePairs();
-    const chosen = available[Math.floor(Math.random() * available.length)];
+    const chosen = available[randomBelow(available.length)];
     markPairUsed(chosen.idx);
 
     // Randomly swap which word is agent vs spy
-    if (Math.random() < 0.5) {
+    if (randomBelow(2) === 0) {
         gameState.agentWord = chosen.pair[0];
         gameState.spyWord = chosen.pair[1];
     } else {
@@ -328,16 +359,29 @@ function assignRoles() {
     });
 
     // Select random starting player
-    gameState.startPlayerIndex = Math.floor(Math.random() * gameState.playerRoles.length);
+    gameState.startPlayerIndex = randomBelow(gameState.playerRoles.length);
     gameState.currentPlayerIndex = 0;
     gameState.alivePlayers = [...gameState.playerRoles];
     gameState.roundNumber = 1;
 }
 
-// Fisher-Yates (Knuth) shuffle — unbiased
+// Uniform random integer in [0, n) from the browser's cryptographic generator,
+// with rejection sampling so no value is favoured. Falls back to Math.random.
+function randomBelow(n) {
+    const c = window.crypto || window.msCrypto;
+    if (c && c.getRandomValues) {
+        const limit = Math.floor(0x100000000 / n) * n;
+        const buf = new Uint32Array(1);
+        do { c.getRandomValues(buf); } while (buf[0] >= limit);
+        return buf[0] % n;
+    }
+    return Math.floor(Math.random() * n);
+}
+
+// Fisher-Yates (Knuth) shuffle — unbiased, cryptographic source
 function fisherYatesShuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = randomBelow(i + 1);
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
@@ -441,6 +485,8 @@ function showRoleDisplay() {
     } else {
         nextPlayerName.textContent = 'Game Master';
     }
+    const hint = document.getElementById('next-player-hint');
+    if (hint) hint.textContent = nextPlayerName.textContent === 'Game Master' ? 'the Game Master' : nextPlayerName.textContent;
 }
 
 document.getElementById('next-player-btn').addEventListener('click', () => {
@@ -466,10 +512,14 @@ function showGameStart() {
     if (roundEl) roundEl.textContent = 'Round ' + gameState.roundNumber;
 
     // Pick a new random speaker from all alive players for this round
-    const randomIndex = Math.floor(Math.random() * gameState.alivePlayers.length);
+    const randomIndex = randomBelow(gameState.alivePlayers.length);
     const currentSpeaker = gameState.alivePlayers[randomIndex].name;
 
-    document.getElementById('current-speaker-name').textContent = currentSpeaker;
+    const speakerEl = document.getElementById('current-speaker-name');
+    speakerEl.textContent = currentSpeaker;
+    speakerEl.classList.remove('uc-new-speaker');
+    void speakerEl.offsetWidth; // restart the reveal every round
+    speakerEl.classList.add('uc-new-speaker');
 }
 
 // ================================
@@ -494,7 +544,7 @@ function showEliminationScreen() {
     gameState.alivePlayers.forEach((player, index) => {
         const playerDiv = document.createElement('div');
         playerDiv.className = 'elimination-player';
-        playerDiv.innerHTML = `<span class="elimination-player-name">${player.name}</span>`;
+        playerDiv.innerHTML = `<span class="elimination-player-name">${escapeHtml(player.name)}</span>`;
         playerDiv.addEventListener('click', () => selectPlayerForElimination(index, playerDiv));
         eliminationList.appendChild(playerDiv);
     });
@@ -543,6 +593,12 @@ function showRoleReveal(player) {
     if (player.actualRole === 'Mr. White') {
         gameState.eliminatedMrWhite = player;
     }
+    // Same plain reveal as when a player first sees their role: the card slides in with the screen.
+    const card = document.querySelector('#screen-role-reveal .reveal-card');
+    if (card) {
+        card.classList.remove('uc-reveal-play');
+        card.querySelectorAll('.uc-spot-sweep').forEach(el => el.remove());
+    }
 }
 
 document.getElementById('continue-after-elimination-btn').addEventListener('click', () => {
@@ -572,12 +628,15 @@ document.getElementById('submit-guess-btn').addEventListener('click', () => {
     const aliveAgents = gameState.alivePlayers.filter(p => p.actualRole === 'Agent');
     const wordToGuess = aliveAgents.length >= 1 ? gameState.agentWord : gameState.spyWord;
 
-    if (guess === wordToGuess.toLowerCase()) {
-        showGameOver('Mr. White Wins!', 'Mr. White correctly guessed the word upon elimination!', 'mrwhite');
-    } else {
-        gameState.eliminatedMrWhite = null;
-        checkWinConditions();
-    }
+    const correct = guess === wordToGuess.toLowerCase();
+    playGuessVerdict(correct, () => {
+        if (correct) {
+            showGameOver('Mr. White Wins!', 'Mr. White correctly guessed the word upon elimination!', 'mrwhite');
+        } else {
+            gameState.eliminatedMrWhite = null;
+            checkWinConditions();
+        }
+    });
 });
 
 // ================================
@@ -651,7 +710,7 @@ function showGameOver(title, message, winnerType) {
         playersToShow.forEach(p => {
             const div = document.createElement('div');
             div.className = 'winner-player-item';
-            div.innerHTML = `<img src="../images/${p.actualRole}.png" alt="${p.actualRole}" class="winner-role-img"><span class="winner-player-name">${p.name}</span>`;
+            div.innerHTML = `<img src="../images/${p.actualRole}.png" alt="${p.actualRole}" class="winner-role-img"><span class="winner-player-name">${escapeHtml(p.name)}</span>`;
             listEl.appendChild(div);
         });
     }
@@ -659,28 +718,122 @@ function showGameOver(title, message, winnerType) {
     createConfetti(winnerType);
 }
 
+// Team-coloured celebration: a burst of light behind the title, a stamped title,
+// staggered winners and swaying confetti in the winning team's colours.
 function createConfetti(winnerType) {
     const container = document.getElementById('confetti-container');
     container.innerHTML = '';
+    const center = document.querySelector('#screen-game-over .game-over-center');
+    const team = winnerType === 'spy' ? 'spies' : (winnerType || 'none');
+    if (center) {
+        center.querySelectorAll('.uc-go-burst').forEach(el => el.remove());
+        center.classList.remove('uc-go-play', 'uc-go-agents', 'uc-go-spies', 'uc-go-mrwhite');
+        center.querySelectorAll('.winner-player-item').forEach((el, i) => el.style.setProperty('--uc-i', i));
+    }
+    if (prefersReducedMotion()) return;
+
+    if (center) {
+        const burst = document.createElement('div');
+        burst.className = 'uc-go-burst';
+        burst.setAttribute('aria-hidden', 'true');
+        burst.innerHTML = '<span class="uc-go-rays"></span><span class="uc-go-ring"></span><span class="uc-go-ring uc-go-ring-2"></span>';
+        center.insertBefore(burst, center.firstChild);
+        void center.offsetWidth;
+        center.classList.add('uc-go-play', 'uc-go-' + team);
+    }
 
     const colorSets = {
-        agents: ['#8b6914', '#6b4a0a', '#a08020', '#5c4010'],
-        spy: ['#2d2d2d', '#1a1a1a', '#404040', '#0d0d0d'],
-        spies: ['#2d2d2d', '#1a1a1a', '#404040', '#0d0d0d'],
-        mrwhite: ['#e8e8e8', '#f5f5f5', '#d0d0d0', '#ffffff']
+        agents: ['#ffd700', '#c9a86c', '#a08020', '#f0dc88'],
+        spies: ['#e0e0e0', '#a0a0a8', '#6a6a74', '#f5f5f5'],
+        mrwhite: ['#ffffff', '#d0d0d0', '#9a9aa0', '#4a4a4a']
     };
-    const colors = colorSets[winnerType] || ['#d97706', '#b91c1c', '#fbbf24'];
+    const colors = colorSets[team] || ['#d97706', '#b91c1c', '#fbbf24'];
 
-    const count = 70;
+    const count = 80;
     for (let i = 0; i < count; i++) {
         const p = document.createElement('div');
-        const size = 6 + Math.random() * 10;
+        const size = 6 + Math.random() * 9;
         const left = Math.random() * 100;
-        const delay = Math.random() * 0.6;
-        p.style.cssText = `position:absolute;width:${size}px;height:${size}px;background:${colors[i % colors.length]};left:${left}%;top:-20px;border-radius:2px;animation:ucPartyFall 3s ease-in ${delay}s forwards;`;
+        const delay = Math.random() * 0.9;
+        const dur = 2.6 + Math.random() * 1.6;
+        const sway = (Math.random() * 120 - 60).toFixed(0);
+        const spin = (Math.random() < 0.5 ? -1 : 1) * (360 + Math.round(Math.random() * 540));
+        const shape = i % 3 === 0 ? '50%' : '2px';
+        const w = i % 3 === 1 ? size * 0.5 : size;
+        p.className = 'uc-confetti';
+        p.style.cssText = `width:${w}px;height:${size}px;background:${colors[i % colors.length]};left:${left}%;border-radius:${shape};--uc-sway:${sway}px;--uc-spin:${spin}deg;animation-duration:${dur}s;animation-delay:${delay}s;`;
         container.appendChild(p);
-        setTimeout(() => p.remove(), 3600);
+        setTimeout(() => p.remove(), (dur + delay) * 1000 + 200);
     }
+}
+
+// ================================
+// MOTION SET PIECES (additive, transform and opacity only)
+// ================================
+function prefersReducedMotion() {
+    try {
+        return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (e) { return false; }
+}
+
+// Eliminated player's role: a spotlight sweeps the card, then a redaction bar lifts off the role.
+function playRevealSetPiece() {
+    const card = document.querySelector('#screen-role-reveal .reveal-card');
+    const roleEl = document.getElementById('eliminated-role-name');
+    if (!card || !roleEl) return;
+    card.classList.remove('uc-reveal-play');
+    card.querySelectorAll('.uc-spot-sweep').forEach(el => el.remove());
+    if (prefersReducedMotion()) return;
+
+    const text = roleEl.textContent;
+    roleEl.textContent = '';
+    const wrap = document.createElement('span');
+    wrap.className = 'uc-redact-wrap';
+    wrap.textContent = text;
+    const bar = document.createElement('span');
+    bar.className = 'uc-redact-bar';
+    bar.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(bar);
+    roleEl.appendChild(wrap);
+
+    const sweep = document.createElement('span');
+    sweep.className = 'uc-spot-sweep';
+    sweep.setAttribute('aria-hidden', 'true');
+    card.appendChild(sweep);
+    void card.offsetWidth;
+    card.classList.add('uc-reveal-play');
+}
+
+// Mr. White's guess: a tense heartbeat pulse, then a right or wrong beat, then the original outcome.
+let guessInFlight = false;
+function playGuessVerdict(correct, done) {
+    if (guessInFlight) return;
+    const center = document.querySelector('#screen-mrwhite-guess .guess-center');
+    if (!center || prefersReducedMotion()) { done(); return; }
+    guessInFlight = true;
+    const submit = document.getElementById('submit-guess-btn');
+    const input = document.getElementById('mrwhite-guess-input');
+    submit.disabled = true;
+    input.readOnly = true;
+    center.classList.remove('uc-guess-right', 'uc-guess-wrong');
+    center.classList.add('uc-guess-tense');
+    setTimeout(() => {
+        center.classList.remove('uc-guess-tense');
+        center.classList.add(correct ? 'uc-guess-right' : 'uc-guess-wrong');
+        setTimeout(() => {
+            center.classList.remove('uc-guess-right', 'uc-guess-wrong');
+            submit.disabled = false;
+            input.readOnly = false;
+            guessInFlight = false;
+            done();
+        }, 750);
+    }, 1500);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
 }
 
 document.getElementById('play-again-btn').addEventListener('click', () => {
@@ -706,6 +859,8 @@ function hideAllScreens() {
 function setUndercoverTheme(theme) {
     document.body.classList.remove('uc-theme-setup', 'uc-theme-role-view', 'uc-theme-role-display', 'uc-theme-speaking', 'uc-theme-elimination', 'uc-theme-reveal', 'uc-theme-guess', 'uc-theme-gameover');
     if (theme) document.body.classList.add(theme);
+    const backBtn = document.getElementById('ingame-back-btn');
+    if (backBtn) backBtn.classList.toggle('hidden', theme === 'uc-theme-setup');
 }
 
 // ================================

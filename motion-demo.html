@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Motion demo - Meenit's Playground</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#12101c">
+  <script>(function () { var r = document.documentElement, t = r.getAttribute('data-theme-lock'); if (t !== 'light' && t !== 'dark') { t = 'dark'; try { t = localStorage.getItem('pg_theme') === 'light' ? 'light' : 'dark' } catch (e) { } } r.setAttribute('data-theme', t); var m = document.querySelector('meta[name="theme-color"]'); if (m) { m.setAttribute('data-dark', m.getAttribute('content')); if (t === 'light') m.setAttribute('content', '#f6f2ea') } })()</script>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/brand.css">
+  <style>
+    .game-container {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: var(--s6);
+      padding-top: calc(var(--touch) + var(--s5) + var(--safe-top));
+      position: relative;
+      z-index: 1;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: var(--s1);
+    }
+
+    .lead {
+      color: var(--text-muted);
+      margin-bottom: var(--s6);
+    }
+
+    .demo {
+      margin-bottom: var(--s6);
+    }
+
+    .demo h3 {
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: var(--s3);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s2);
+      margin-bottom: var(--s3);
+    }
+
+    .row .btn {
+      flex: 1 1 auto;
+    }
+
+    .role-card {
+      min-height: 200px;
+      border-radius: var(--radius-xl);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      padding: var(--s6);
+      text-align: center;
+    }
+
+    .role-card h4 {
+      color: #e0434f;
+      font-size: 1.5rem;
+      margin-bottom: var(--s2);
+    }
+
+    .char {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto var(--s3);
+      object-fit: contain;
+    }
+
+    .char-stage {
+      text-align: center;
+      padding: var(--s4) 0;
+    }
+
+    .podium {
+      text-align: center;
+      padding: var(--s6);
+    }
+
+    .podium .name {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .timer-stage {
+      display: flex;
+      justify-content: center;
+      padding: var(--s3) 0;
+    }
+
+    .screen-b {
+      --primary: #8b5cf6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="pg-fab-row" data-pg-toggles></div>
+
+  <div class="game-container">
+
+    <!-- Screen A -->
+    <div id="screen-a" class="screen">
+      <h1>Motion demo</h1>
+      <p class="lead">Every Motion, SFX and Theme call, one tap each. Judge it on a phone.</p>
+
+      <div class="demo card">
+        <h3>Screen transitions</h3>
+        <div class="row">
+          <button class="btn btn-primary" id="go-forward">Forward to B</button>
+          <button class="btn btn-outline" id="go-none">Crossfade to B</button>
+        </div>
+        <p class="text-muted">Outgoing screen leaves while the incoming one slides in. Scroll resets. Lists marked
+          <code>data-stagger</code> animate on arrival.</p>
+      </div>
+
+      <div class="demo card">
+        <h3>Stagger and press</h3>
+        <ul class="list" id="stagger-list">
+          <li class="list-item" role="button"><span class="grow">Priya</span><span class="chip">host</span></li>
+          <li class="list-item" role="button"><span class="grow">Arjun</span></li>
+          <li class="list-item" role="button"><span class="grow">Sanne</span></li>
+          <li class="list-item" role="button"><span class="grow">Daan</span></li>
+          <li class="list-item" role="button"><span class="grow">Fatima</span></li>
+        </ul>
+        <div class="row mt-md">
+          <button class="btn btn-outline" id="do-stagger">Replay stagger</button>
+          <button class="btn btn-ghost" id="do-pulse">Pulse me</button>
+        </div>
+      </div>
+
+      <div class="demo card">
+        <h3>Hold to reveal</h3>
+        <div class="role-card" id="role-card">
+          <h4>Mafia</h4>
+          <p>You eliminate one player each night. Stay calm by day.</p>
+        </div>
+        <div class="row mt-md">
+          <button class="btn btn-outline" id="do-flip-reset">Reset card</button>
+        </div>
+      </div>
+
+      <div class="demo card">
+        <h3>Character entrance</h3>
+        <div class="char-stage" id="char-stage">
+          <img class="char" id="char-img" src="images/Detective.png" alt="Detective">
+          <div class="text-muted">Detective</div>
+        </div>
+        <div class="row">
+          <button class="btn btn-outline" id="do-char">Enter with glow</button>
+        </div>
+      </div>
+
+      <div class="demo card">
+        <h3>Eliminate</h3>
+        <ul class="list" id="elim-list">
+          <li class="list-item"><span class="grow">Arjun</span></li>
+          <li class="list-item"><span class="grow">Sanne</span></li>
+          <li class="list-item"><span class="grow">Daan</span></li>
+        </ul>
+        <div class="row mt-md">
+          <button class="btn btn-danger" id="do-elim">Eliminate next</button>
+          <button class="btn btn-outline" id="do-elim-shake">With shake</button>
+        </div>
+      </div>
+
+      <div class="demo card">
+        <h3>Day and night</h3>
+        <div class="row">
+          <button class="btn btn-outline" id="do-night">Night</button>
+          <button class="btn btn-outline" id="do-morning">Morning</button>
+          <button class="btn btn-outline" id="do-day">Day</button>
+        </div>
+        <p class="text-muted">Resolves when the sky covers the screen (about 1.1 s). Swap screens then.</p>
+      </div>
+
+      <div class="demo card">
+        <h3>Timer ring</h3>
+        <div class="timer-stage"><div id="timer"></div></div>
+        <div class="row">
+          <button class="btn btn-primary" id="do-timer">Start 8 s</button>
+          <button class="btn btn-ghost" id="do-timer-stop">Stop</button>
+        </div>
+      </div>
+
+      <div class="demo card">
+        <h3>Winner</h3>
+        <div class="podium" id="podium">
+          <div class="text-muted">Winner</div>
+          <div class="name">Priya</div>
+        </div>
+        <div class="row">
+          <button class="btn btn-success" id="do-winner">Podium and confetti</button>
+        </div>
+      </div>
+
+      <div class="demo card">
+        <h3>Toasts</h3>
+        <div class="row">
+          <button class="btn btn-outline" id="t-info">Info</button>
+          <button class="btn btn-outline" id="t-success">Success</button>
+          <button class="btn btn-outline" id="t-warn">Warn</button>
+          <button class="btn btn-outline" id="t-error">Error</button>
+        </div>
+      </div>
+
+      <div class="demo card">
+        <h3>Sounds</h3>
+        <div class="row" id="sfx-row"></div>
+        <div class="row">
+          <button class="btn btn-ghost" id="h-light">Haptic light</button>
+          <button class="btn btn-ghost" id="h-heavy">Haptic heavy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen B -->
+    <div id="screen-b" class="screen screen-b hidden">
+      <h1>Screen B</h1>
+      <p class="lead">This list staggered in on arrival.</p>
+      <ul class="list" data-stagger="60">
+        <li class="list-item"><span class="grow">One</span></li>
+        <li class="list-item"><span class="grow">Two</span></li>
+        <li class="list-item"><span class="grow">Three</span></li>
+        <li class="list-item"><span class="grow">Four</span></li>
+      </ul>
+      <div class="row mt-lg">
+        <button class="btn btn-primary btn-full" id="go-back">Back to A</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/motion.js"></script>
+  <script src="js/sfx.js"></script>
+  <script src="js/theme.js"></script>
+  <script>
+    (function () {
+      const on = (id, fn) => document.getElementById(id).addEventListener('click', fn);
+
+      on('go-forward', () => Motion.screen('screen-a', 'screen-b', { direction: 'forward' }));
+      on('go-none', () => Motion.screen('screen-a', 'screen-b', { direction: 'none' }));
+      on('go-back', () => Motion.screen('screen-b', 'screen-a', { direction: 'back' }));
+
+      on('do-stagger', () => Motion.stagger('stagger-list', { delay: 70 }));
+      on('do-pulse', e => Motion.pulse(e.currentTarget));
+
+      const card = document.getElementById('role-card');
+      Motion.flipReveal(card, { onRevealed: () => Motion.toast('Revealed. Pass the phone.', { kind: 'success' }) });
+      on('do-flip-reset', () => card._pgFlip.reset());
+
+      on('do-char', () => Motion.characterEnter('char-img', { glowColor: '#6aa6ff' }));
+
+      let elimIdx = 0;
+      const elimItems = () => Array.from(document.querySelectorAll('#elim-list .list-item'));
+      function elim(shake) {
+        const items = elimItems();
+        if (elimIdx >= items.length) {
+          items.forEach(li => { li.classList.remove('is-eliminated'); li.querySelector('.pg-strike')?.remove(); });
+          elimIdx = 0;
+          return;
+        }
+        Motion.eliminate(items[elimIdx++], { shake });
+      }
+      on('do-elim', () => elim(false));
+      on('do-elim-shake', () => elim(true));
+
+      on('do-night', () => Motion.dayNight('night'));
+      on('do-morning', () => Motion.dayNight('morning'));
+      on('do-day', () => Motion.dayNight('day'));
+
+      let timer = null;
+      on('do-timer', () => {
+        timer = Motion.timerRing('timer', { seconds: 8, onTick: n => { }, onDone: () => Motion.toast("Time's up", { kind: 'warn' }) });
+      });
+      on('do-timer-stop', () => timer && timer.stop());
+
+      on('do-winner', () => Motion.winner('podium', { color: '#10b981' }));
+
+      on('t-info', () => Motion.toast('Waiting for Priya to answer', { kind: 'info' }));
+      on('t-success', () => Motion.toast('Room 4821 created', { kind: 'success' }));
+      on('t-warn', () => Motion.toast('Add at least 5 players', { kind: 'warn' }));
+      on('t-error', () => Motion.toast('Could not reach the server. Retry.', { kind: 'error' }));
+
+      const row = document.getElementById('sfx-row');
+      ['tap', 'tick', 'urgent', 'reveal', 'elim', 'night', 'day', 'win', 'error'].forEach(name => {
+        const b = document.createElement('button');
+        b.className = 'btn btn-sm btn-outline';
+        b.textContent = name;
+        b.addEventListener('click', () => SFX.play(name));
+        row.appendChild(b);
+      });
+      on('h-light', () => Haptic.light());
+      on('h-heavy', () => Haptic.heavy());
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+# Render Blueprint: one free web service that serves the site and the room server together.
+# In Render: New, then Blueprint, pick this repository, and Render reads this file.
+services:
+  - type: web
+    name: meenits-playground
+    runtime: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && node server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: PG_STATIC_DIR
+        value: ..
+      - key: NODE_VERSION
+        value: 20

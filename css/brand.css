@@ -1,0 +1,184 @@
+/* ============================================
+   MEENIT'S PLAYGROUND – Brand assets
+   Owned by the branding agent. See BRAND.md.
+   Load after global.css on every page.
+   ============================================ */
+
+:root {
+  --pg-brand-base: #12101c;
+  --pg-brand-indigo: #2b2f7c;
+  --pg-brand-indigo-light: #4a52c7;
+  --pg-brand-indigo-deep: #15173f;
+  --pg-brand-gold: #f2b63d;
+  --pg-brand-gold-light: #ffd166;
+  --pg-brand-gold-dark: #b07a14;
+  --pg-brand-ink: #f4efe4;
+}
+
+[data-theme="light"] {
+  --pg-brand-ink: #1b1a2e;
+}
+
+/* ---------- Home page wordmark ---------- */
+.brand-wordmark {
+  display: block;
+  width: min(220px, 62vw);
+  max-width: 100%;
+  margin: 0 auto;
+  color: var(--pg-brand-ink);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.brand-wordmark svg,
+.brand-wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Inline SVG: let the page colour win over the SVG's built-in default */
+.brand-wordmark > svg {
+  color: inherit;
+}
+
+/* Small square mark, for headers and footers */
+.brand-mark {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  vertical-align: middle;
+}
+
+.brand-mark svg,
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Game titles ---------- */
+.brand-title {
+  display: block;
+  width: min(100%, 320px);
+  margin: 0 auto var(--s4, 1rem);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.brand-title svg,
+.brand-title img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Inline SVG: the wrapper's tokens override the SVG's own defaults.
+   When the wrapper sets nothing, the SVG falls back to its built-in palette. */
+.brand-title > svg {
+  color: inherit;
+  --t-ink: inherit;
+  --t-accent: inherit;
+  --t-shade: inherit;
+  --t-glint: inherit;
+}
+
+/* Mafia: tall condensed letters, narrower box */
+.brand-title--mafia {
+  width: min(100%, 250px);
+  color: #8b3a4a;
+  --t-accent: #c9a86c;
+  --t-shade: #0a080c;
+  --t-glint: #ff3b5c;
+}
+
+[data-theme="light"] .brand-title--mafia {
+  color: #6e2d3a;
+  --t-accent: #8a6a2e;
+  --t-shade: #2a1016;
+  --t-glint: #e0304e;
+}
+
+.brand-title--undercover {
+  color: #e8e4dc;
+  --t-accent: #8b5cf6;
+  --t-shade: #4c1d95;
+}
+
+[data-theme="light"] .brand-title--undercover {
+  color: #2a1f4a;
+  --t-accent: #6d28d9;
+  --t-shade: #c4b5fd;
+}
+
+.brand-title--odd-one-in {
+  color: #e9e4cf;
+  --t-accent: #d4b84a;
+  --t-shade: #2a3314;
+}
+
+[data-theme="light"] .brand-title--odd-one-in {
+  color: #2e3a14;
+  --t-accent: #b8981c;
+  --t-shade: #c9cfa8;
+}
+
+.brand-title--act-o-matic {
+  color: #f0c040;
+  --t-accent: #d4a017;
+  --t-shade: #5a3d05;
+}
+
+[data-theme="light"] .brand-title--act-o-matic {
+  color: #8a5f00;
+  --t-accent: #b8860b;
+  --t-shade: #f3dfa1;
+}
+
+/* ---------- Entrance hooks ----------
+   The SVGs animate themselves on load (entrance under 1.2 s, then a subtle idle loop).
+   These hooks are for the wrapper: use .brand-enter when a title is mounted into a
+   screen that is already visible, or .brand-enter-delayed when the screen itself
+   transitions first (Motion.screen takes ~300 ms). */
+.brand-enter {
+  animation: brandEnter 600ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.brand-enter-delayed {
+  animation: brandEnter 600ms cubic-bezier(0.2, 0, 0, 1) 320ms both;
+}
+
+@keyframes brandEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Freeze every brand animation (wrapper and inside inline SVGs).
+   Motion/theme code can set data-motion="off" on the wrapper or on <html>. */
+.brand-title[data-motion="off"],
+.brand-wordmark[data-motion="off"],
+[data-motion="off"] .brand-title,
+[data-motion="off"] .brand-wordmark {
+  animation: none;
+}
+
+.brand-title[data-motion="off"] svg *,
+.brand-wordmark[data-motion="off"] svg *,
+[data-motion="off"] .brand-title svg *,
+[data-motion="off"] .brand-wordmark svg * {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-enter,
+  .brand-enter-delayed {
+    animation: none;
+  }
+}

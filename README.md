@@ -1,228 +1,113 @@
-# 🎮 Meenit's Playground
+# Meenit's Playground
 
-**Mobile-first party games for unforgettable game nights!**
+Mobile party games in plain HTML, CSS and JavaScript. No framework and no build step.
+The site is static (GitHub Pages). A small Node.js room server (Render) is only needed
+when players use their own phones.
 
-Play three exciting party games with your friends: **Odd One In**, **Undercover**, and **Mafia**. Built with pure HTML, CSS, and vanilla JavaScript - no frameworks, no dependencies, just pure fun!
+## The games
 
----
+| Game | Players | One phone | Own phones | In short |
+|------|---------|-----------|------------|----------|
+| Act-O-Matic | 2+ | Yes | No | Roll a secret action, act it out without words, then guess what you did. |
+| Odd One In | 3 to 20 | Yes | Yes | Everyone answers the same question against a timer. Blank, bogus or duplicate answers go out. Last one standing wins. |
+| Undercover | 4+ | Yes | Yes | Agents share a word, Spies get a similar one, Mr. White gets none. Describe your word, vote out the impostors. Mr. White, once voted out, can still win by guessing the Agents' word. |
+| Mafia | 5 to 20 | Yes | Yes | Night: Mafia pick a victim, the Doctor protects, the Detective checks. Day: the town votes someone out. Optional Jester, Bomber and Lover. |
 
-## 🎯 Games
+## Two ways to play
 
-### 🎲 Odd One In
-**Players:** 3-20  
-**Duration:** Quick rounds (10 seconds each)  
-**Description:** Answer questions in 10 seconds! The Game Master eliminates players withthe oddest answers. Last one standing wins!
+**One phone.** Pass a single phone around the table. The app shows each secret
+(role, word, answer box) to one player at a time behind a "pass the phone" screen.
+In Mafia one person is the Game Master and reads the night aloud; in Undercover and
+Odd One In the phone runs the rounds. Nothing is sent over the network, so this works
+offline.
 
-**How to Play:**
-1. GM creates a room and shares the code
-2. Players join and enter their names
-3. Each round, everyone answers a question in 10 seconds
-4. GM sees all answers sorted alphabetically (blanks first)
-5. GM eliminates the odd ones out
-6. Last player remaining wins!
+**Own phones** (the "Everyone's phone" card). One player taps Create a room and gets
+a 4-digit code. Everyone else opens the same game, taps Everyone's phone and enters
+the code. Each phone shows only that player's secret, and the server keeps everyone in
+step. A phone that refreshes or locks rejoins the room automatically for 3 hours.
+In Mafia the host can play or act as Game Master (GM). In Mafia and Undercover the
+room chooses whether the GM picks who goes out by day or everyone votes.
 
----
+## Deploy
 
-### 🕵️ Undercover
-**Players:** 4-12  
-**Duration:** 15-30 minutes  
-**Description:** Agents vs Spies! Everyone gets a word - except Mr. White. Find the imposters before they find you!
+### Easiest: one Render service for the site and the server
 
-**How to Play:**
-1. GM sets player count and role distribution
-2. Players view their roles and words secretly (pass-phone)
-3. Each round, players speak in random order describing their word
-4. Vote to eliminate suspicious players
-5. **Win Conditions:**
-   - **Agents win:** All Spies + Mr. Whites eliminated
-   - **Spies/Mr. White win:** Outnumber Agents
-   - **Mr. White solo win:** Correctly guesses both words
+1. Push this folder to a GitHub repository.
+2. In Render choose New, then Blueprint, and pick the repository. Render reads `render.yaml`
+   and creates one free web service that serves the site and runs the room server.
+   Without the Blueprint, create a Web Service by hand with: root directory empty,
+   build command `cd server && npm install`, start command `cd server && node server.js`,
+   and an environment variable `PG_STATIC_DIR` set to `..`.
+3. Open the service URL, for example `https://meenits-playground.onrender.com`. That is the
+   game. Share that link; the phones talk to the same address, so no server settings are needed.
+4. Keep it awake: a free service sleeps after 15 minutes. Set up a free job at cron-job.org that
+   requests `https://<your-service>.onrender.com/api/health` every 10 minutes.
 
----
+Every push to the repository redeploys automatically.
 
-### 🔫 Mafia
-**Players:** 5-15  
-**Duration:** 20-45 minutes  
-**Description:** The classic social deduction game! Civilians hunt the Mafia during the day, while Mafia strikes at night.
+### Alternative: site on GitHub Pages, server on Render
 
-**Roles:**
-- **God:** Game Master who sees everything
-- **Mafia:** Eliminate civilians at night
-- **Civilian:** Find and vote out the Mafia
-- **Detective:** Investigate one player each night
-- **Jester:** Win by getting voted out!
-- **Suicide Bomber:** Take someone with you when eliminated
-- **Lovers:** If one dies, both die
+Host the folder on GitHub Pages and run only the server on Render (same build and start
+commands, no `PG_STATIC_DIR`). Then set the server address once: edit `js/net.js` and put your
+Render host in `DEFAULT_RENDER_HOST`, or enter it under Odd One In, Create a room, Server settings.
+The site is served over https, so the server address must be https too.
 
-**How to Play:**
-1. GM assigns roles (randomized pass-phone viewing)
-2. **Night Phase:** GM reads instructions aloud (Mafia chooses target, Detective investigates)
-3. **Day Phase:** Players discuss and vote to eliminate someone
-4. Repeat until win condition is met
+## Run locally
 
-**Win Conditions:**
-- **Civilians win:** All Mafia eliminated
-- **Mafia wins:** Mafia count ≥ remaining civilians
-- **Jester wins:** Voted out during day phase
+One command serves the site and the room server on the same port:
 
----
-
-## 🌐 Odd One In Multiplayer (Play on Phones!)
-
-Unlike Mafia and Undercover, **Odd One In** supports networked play where everyone uses their own phone.
-
-### **Option A: 100% Mobile (No Laptop needed)**
-1. **Host the Website:** Enable **GitHub Pages** in your repo settings. Everyone opens your `github.io` link.
-2. **Host the "Brain" (Server):** 
-   - Create a free account on [Render.com](https://render.com).
-   - Create a **New Web Service** and connect this GitHub repo.
-   - Set **Root Directory** to `server` and **Start Command** to `node server.js`.
-   - Once deployed, copy your Render URL (e.g., `https://my-game.onrender.com`).
-3. **Connect:** Open the game on your phone, tap **⚙️ Server Settings**, and paste that Render URL.
-
-### **Option B: Local Play (Laptop required)**
-1. Open a terminal in the `server` folder and run `node server.js`.
-2. To play across different networks (e.g. mobile data), run a tunnel like `npx localtunnel --port 3001`.
-3. Paste the tunnel link into the game's **⚙️ Server Settings**.
-
-**⚠️ Important:** If using a tunnel (localtunnel/ngrok), each player must open the tunnel link once in their mobile browser and click **"Continue"** to unlock it before playing.
-
----
-
-## 🚀 Quick Start (Local Pass-and-Play)
-
----
-
-## 📂 Project Structure
-
-```
-Playground/
-├── index.html                 # Landing page
-├── css/
-│   ├── global.css            # Shared styles & animations
-│   ├── home.css              # Landing page styles
-│   ├── odd-one-in.css        # Odd One In styles
-│   ├── undercover.css        # Undercover styles
-│   └── mafia.css             # Mafia styles
-├── js/
-│   ├── utils.js              # Shared utilities
-│   ├── odd-one-in.js         # Odd One In logic
-│   ├── undercover.js         # Undercover logic
-│   └── mafia.js              # Mafia logic
-├── games/
-│   ├── odd-one-in.html
-│   ├── undercover.html
-│   └── mafia.html
-├── images/
-│   └── [game logos and role images]
-├── data/
-│   ├── questions.json        # Questions for Odd One In
-│   └── words.json            # Word pairs for Undercover
-└── README.md
+```bash
+cd server && npm install
+PORT=8080 PG_STATIC_DIR=.. node server.js
 ```
 
----
+Open `localhost:8080` in a browser. Phones on the same Wi-Fi open `<your-computer-ip>:8080`.
+No server settings are needed: when the server also serves the site, every page talks to the
+address it was opened from. This also works through port forwarding, tunnels and dev containers,
+because only one port is involved.
 
-## 💻 Tech Stack
+`PG_STATIC_DIR` is for local testing only. On Render, leave it unset and host the site on
+GitHub Pages as described above.
 
-- **HTML5** - Structure
-- **CSS3** - Styling with custom properties & animations
-- **Vanilla JavaScript (ES6+)** - Game logic
-- **LocalStorage** - Game state persistence
-- **Google Fonts** - Poppins font family
+`motion-demo.html` at the root plays every animation, sound and haptic on demand.
 
-**Zero external dependencies!**
+## Tests
 
----
+Node 20 or newer. From the repository root:
 
-## 📱 Mobile-First Design
+```bash
+# game rules and reducers
+for f in tests/*.test.js; do node --test "$f"; done
 
-- Optimized for **375px - 428px** (mobile screens)
-- Touch-friendly buttons (minimum 44px height)
-- Smooth animations using `transform` and `opacity`
-- Works offline after first load
-- Responsive up to desktop sizes
+# server: REST, WebSocket, persistence, expiry and a two-phone end-to-end run
+cd server && npm install && for f in test/*.test.js; do node --test "$f"; done
+```
 
----
+No real browser test runs in this repository. Use `REVIEW.md` for the phone checklist.
 
-## ✨ Features
+## Project layout
 
-- 🎨 **Rich Animations:** Confetti, card flips, shake effects, pulse animations
-- 📲 **Pass-and-Play:** Single device, pass between players
-- 💾 **Auto-Save:** Games save to LocalStorage (resume anytime)
-- 🎭 **Role Reveals:** Animated card flips with randomized viewing order
-- ⏱️ **Timer System:** Pause/resume/reset functionality (Odd One In)
-- 🔀 **Drag-to-Reorder:** Touch-friendly player reordering (Undercover)
-- 🎯 **Smart Question Selection:** Tiered questions based on player count
+| Path | What |
+|------|------|
+| `index.html` | Home with splash and game cards |
+| `games/*.html`, `js/*.js`, `css/*.css` | One page, script and stylesheet per game |
+| `js/rules/` | Pure game rules, shared by the one-phone mode and the server |
+| `js/net.js` | Client for the room server (REST, WebSocket, polling fallback, rejoin) |
+| `js/motion.js`, `js/sfx.js`, `js/theme.js` | Animations, sound and haptics, dark and light theme |
+| `server/` | Room server, see `server/README.md` and `server/PROTOCOL.md` |
+| `images/brand/`, `icons/`, `manifest.webmanifest`, `BRAND.md` | Branding and app icons |
+| `images/legacy/` | Old PNG logos, kept for reference, not used |
+| `words.json`, `questions.json`, `actions.json` | Game content |
 
----
+## Known limits
 
-## 🎨 Design Philosophy
-
-- **Vibrant Colors:** Purple, pink, orange gradients
-- **Glassmorphism:** Frosted glass effects for modern look
-- **Floating Shapes:** Animated background elements
-- **Instant Feedback:** Every tap has visual response
-- **Smooth Transitions:** 60fps animations
-
----
-
-## 🧠 Game Data
-
-### Odd One In Questions
-- **Tier 1 (10+ players):** Broad questions (250+ options)
-- **Tier 2 (5-9 players):** Medium difficulty (60+ options)
-- **Tier 3 (2-4 players):** Trivia-style questions
-
-### Undercover Words
-- 100+ Indian-themed word pairs
-- Bollywood, food, culture, tech references
-- Easily customizable or use manual input
-
----
-
-## 🤝 Contributing
-
-This is a personal project, but feel free to:
-- Fork and customize for your group
-- Add new questions to `questions.json`
-- Add new word pairs to `words.json`
-- Translate to other languages
-
----
-
-## 📄 License
-
-Free to use for personal and educational purposes.
-
----
-
-## 🎉 Credits
-
-**Created with 💜 for game nights**
-
-- Design & Development: AI-assisted creation
-- Inspiration: Classic party games
-- Special thanks to all playtester friends!
-
----
-
-## 🐛 Known Limitations
-
-- **Single Device:** Designed for pass-and-play (not networked multiplayer)
-- **Browser Only:** Requires modern browser (Chrome, Safari, Firefox)
-- **LocalStorage:** Limited to ~5MB (sufficient for normal gameplay)
-
----
-
-## 📞 Support
-
-Having issues?
-1. Check browser console for errors
-2. Clear LocalStorage and refresh (`localStorage.clear()` in console)
-3. Ensure you're using a modern browser
-4. Try incognito/private mode
-
----
-
-**Ready to play? Open `index.html` and let the games begin! 🎮**
+- The free Render server sleeps when idle (see the pinger above) and loses all rooms
+  on a redeploy or spin-down. A game in progress is lost if that happens.
+- Rooms expire 6 hours after the last action. Codes are 4 digits.
+- One server instance only. Do not scale it to two.
+- Mafia and Undercover are dark only by design; the theme toggle appears on the home
+  page, Odd One In and Act-O-Matic.
+- Server URL setting in the app lives in Odd One In only (it applies to every game).
+- Tested with Node unit tests and a simulated browser (jsdom), not on real phones yet.
+  Run through `REVIEW.md` before a party.
+- Long-press the logo on the home page to reset all saved names, words and sessions.

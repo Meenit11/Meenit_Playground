@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Failed to load actions.json', e);
     }
 
+    setupRulesPopup();
     document.getElementById('start-btn').addEventListener('click', () => {
         buildIdleRoller();
         showScreen('screen-roller');
@@ -112,6 +113,10 @@ function pickAction() {
 // ROLLER: IDLE STATE
 // ================================
 function buildIdleRoller() {
+    const oldStage = document.querySelector('#roller-outer .roll-stage');
+    if (oldStage) oldStage.remove();
+    const ft = document.getElementById('flash-text');
+    if (ft) ft.classList.remove('roll-hidden');
     const flashText = document.getElementById('flash-text');
     flashText.textContent = "Ready to Roll?";
     flashText.className = 'flash-text';
@@ -153,29 +158,7 @@ async function rollAction() {
         ...fullShuffle(allActions)
     ].filter(a => a !== winner); // keep winner out until the very end
 
-    const TOTAL_FLIPS = Math.min(spinSequence.length, 60); // show up to 60 items
-    let delayMs = 35; // start fast
-
-    flashText.className = 'flash-text';
-
-    for (let i = 0; i < TOTAL_FLIPS; i++) {
-        flashText.textContent = spinSequence[i];
-
-        flashText.classList.remove('flash-active');
-        void flashText.offsetWidth; // reflow to restart animation
-        flashText.classList.add('flash-active');
-
-        await delay(delayMs);
-
-        // Start braking after halfway point
-        if (i > TOTAL_FLIPS * 0.5) {
-            delayMs += (i - TOTAL_FLIPS * 0.5) * 1.2;
-        }
-    }
-
-    // Land on winner
-    flashText.textContent = winner;
-    flashText.className = 'flash-text flash-winner';
+    await deckRoll(spinSequence, winner);
 
     chosenAction = winner;
 
@@ -198,6 +181,104 @@ async function rollAction() {
 // ================================
 // ANIMATION HELPERS
 // ================================
+// Roll animation: action cards flip past on a small deck, slowing down,
+// then the chosen card lands with a bounce and a burst of light.
+function rollReduced() {
+    try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+}
+
+function rollStage() {
+    const outer = document.getElementById('roller-outer');
+    let stage = outer.querySelector('.roll-stage');
+    if (!stage) {
+        stage = document.createElement('div');
+        stage.className = 'roll-stage';
+        stage.innerHTML =
+            '<div class="roll-card roll-card-under u2"></div>' +
+            '<div class="roll-card roll-card-under u1"></div>' +
+            '<div class="roll-card roll-card-top"><span class="roll-card-text"></span></div>' +
+            '<div class="roll-burst"></div>';
+        outer.appendChild(stage);
+    }
+    return stage;
+}
+
+async function deckRoll(sequence, winner) {
+    const flashText = document.getElementById('flash-text');
+    flashText.classList.add('roll-hidden');
+    const stage = rollStage();
+    const card = stage.querySelector('.roll-card-top');
+    const text = card.querySelector('.roll-card-text');
+    stage.classList.remove('is-landed');
+    stage.classList.add('is-rolling');
+    const canAnim = typeof card.animate === 'function' && !rollReduced();
+    // Constant fast speed all the way, so no earlier action is readable; then the card lands.
+    const steps = Math.min(sequence.length, 18);
+    for (let i = 0; i < steps; i++) {
+        const dur = 70;
+        text.textContent = sequence[i];
+        if (canAnim) {
+            await card.animate([
+                { transform: 'translateY(16px) rotateX(-70deg)', opacity: 0.35 },
+                { transform: 'translateY(0) rotateX(0deg)', opacity: 1 }
+            ], { duration: dur * 0.55, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }).finished.catch(() => { });
+        }
+        await delay(dur * 0.45);
+        if (canAnim && i < steps - 1) {
+            await card.animate([
+                { transform: 'none', opacity: 1 },
+                { transform: 'translateY(-16px) rotateX(70deg)', opacity: 0.35 }
+            ], { duration: Math.max(40, dur * 0.35), easing: 'ease-in' }).finished.catch(() => { });
+        }
+    }
+    text.textContent = winner;
+    stage.classList.remove('is-rolling');
+    stage.classList.add('is-landed');
+    if (canAnim) {
+        card.animate([
+            { transform: 'translateY(26px) rotateX(-90deg) scale(0.9)', opacity: 0 },
+            { transform: 'translateY(-6px) rotateX(8deg) scale(1.1)', opacity: 1, offset: 0.6 },
+            { transform: 'none', opacity: 1 }
+        ], { duration: 650, easing: 'cubic-bezier(0.2, 1.3, 0.4, 1)' });
+        rollBurst(stage);
+    }
+    try { if (navigator.vibrate) navigator.vibrate(30); } catch (e) { }
+}
+
+function rollBurst(stage) {
+    const ring = stage.querySelector('.roll-burst');
+    ring.animate([
+        { transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0.9 },
+        { transform: 'translate(-50%, -50%) scale(2.4)', opacity: 0 }
+    ], { duration: 700, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
+    for (let i = 0; i < 14; i++) {
+        const spark = document.createElement('span');
+        spark.className = 'roll-spark';
+        stage.appendChild(spark);
+        const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
+        const dist = 80 + Math.random() * 60;
+        spark.animate([
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+            { transform: 'translate(calc(-50% + ' + Math.cos(angle) * dist + 'px), calc(-50% + ' + Math.sin(angle) * dist + 'px)) scale(0.2)', opacity: 0 }
+        ], { duration: 650 + Math.random() * 250, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' })
+            .finished.then(() => spark.remove(), () => spark.remove());
+    }
+}
+
 function delay(ms) {
     return new Promise(r => setTimeout(r, ms));
+}
+
+
+// Rules popup, the same as Mafia and Undercover. Lives at page level so no screen animation can trap it.
+function setupRulesPopup() {
+    const modal = document.getElementById('rules-modal');
+    const btn = document.getElementById('rules-btn');
+    if (!modal || !btn) return;
+    if (modal.parentElement !== document.body) document.body.appendChild(modal);
+    const open = () => { modal.classList.remove('hidden'); const s = modal.querySelector('.rules-scroll'); if (s) s.scrollTop = 0; };
+    const close = () => modal.classList.add('hidden');
+    btn.addEventListener('click', open);
+    document.getElementById('close-rules').addEventListener('click', close);
+    document.getElementById('rules-modal-overlay').addEventListener('click', close);
 }

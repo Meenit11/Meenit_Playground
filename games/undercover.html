@@ -9,19 +9,38 @@
     <meta name="theme-color" content="#0c0c14">
     <title>Undercover — Meenit's Playground</title>
 
-    <link rel="stylesheet" href="../css/global.css">
+    <script src="../js/enter.js"></script>
+
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <!-- Original shared stylesheet, frozen so the original Undercover look stays intact. -->
+    <link rel="stylesheet" href="../css/original-global.css">
     <link rel="stylesheet" href="../css/undercover.css">
 </head>
 
 <body class="undercover-game">
+    <!-- Background ambience: slow drifting spotlights behind all content -->
+    <div class="uc-ambience" aria-hidden="true"><span></span><span></span><span></span></div>
     <div class="game-container">
+        <!-- In-game back to setup (hidden on the setup screen) -->
+        <button type="button" class="ingame-back hidden" id="ingame-back-btn" aria-label="Back to game setup">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
 
         <!-- SCREEN 1: Setup -->
         <div id="screen-setup" class="screen">
+            <div class="setup-topbar">
+                <a href="../index.html" class="topbar-back" aria-label="Back to home">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <button type="button" class="topbar-rules" id="rules-btn">Rules</button>
+            </div>
             <!-- Header: Logo, Name, Tagline -->
             <div class="screen-header">
                 <h1 class="game-title">Undercover</h1>
-                <p class="game-tagline">Describe. Deceive. Survive. One word changes everything.</p>
+                <p class="game-tagline">Describe. Deceive. Survive.<br>One word changes everything.</p>
             </div>
 
             <div class="content-card">
@@ -40,8 +59,7 @@
                 <!-- Step 2: Player Names -->
                 <div class="setup-box">
                     <label><span class="step-badge">2</span> Player names</label>
-                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 4 players — add names
-                        below</p>
+                    <p id="players-summary" class="players-summary" aria-live="polite">4 players: add 4 names below</p>
                     <input type="text" id="player-name-input" class="name-input"
                         placeholder="Type name and press Enter">
                     <div id="player-list" class="player-chips"></div>
@@ -58,9 +76,9 @@
                         <p>Doesn't know the word</p>
                     </div>
                     <div class="counter-control-vertical">
-                        <button class="counter-btn-small" id="increase-mrwhite">+</button>
+                        <button type="button" class="counter-btn-small" id="decrease-mrwhite">−</button>
                         <span class="counter-value-small" id="mrwhite-count">1</span>
-                        <button class="counter-btn-small" id="decrease-mrwhite">−</button>
+                        <button type="button" class="counter-btn-small" id="increase-mrwhite">+</button>
                     </div>
                 </div>
 
@@ -72,9 +90,9 @@
                         <p>Gets different word</p>
                     </div>
                     <div class="counter-control-vertical">
-                        <button class="counter-btn-small" id="increase-spies">+</button>
+                        <button type="button" class="counter-btn-small" id="decrease-spies">−</button>
                         <span class="counter-value-small" id="spies-count">0</span>
-                        <button class="counter-btn-small" id="decrease-spies">−</button>
+                        <button type="button" class="counter-btn-small" id="increase-spies">+</button>
                     </div>
                 </div>
 
@@ -90,9 +108,6 @@
 
                 <!-- Action Buttons -->
                 <button class="btn btn-primary btn-full" id="start-game-btn">Start Game</button>
-                <button class="btn btn-outline btn-full uc-btn-spacing" id="rules-btn">Rules</button>
-
-                <a href="../index.html" class="uc-back-to-home-link uc-back-link">Back to Home</a>
             </div>
         </div>
 
@@ -149,6 +164,17 @@
             </div>
         </div>
 
+        <!-- Back to setup confirmation (in-page, keeps names and settings) -->
+        <div id="back-setup-modal" class="modal hidden">
+            <div class="modal-overlay" id="back-setup-overlay"></div>
+            <div class="modal-content text-center">
+                <h2 class="back-setup-title">Back to game setup?</h2>
+                <p class="back-setup-text">This game will end. Player names and role settings are kept, so you can change them and start again.</p>
+                <button type="button" class="btn btn-primary btn-full" id="back-setup-yes">Yes, go to setup</button>
+                <button type="button" class="btn btn-outline btn-full uc-btn-spacing" id="back-setup-no">Keep playing</button>
+            </div>
+        </div>
+
         <!-- SCREEN 2: Role Viewing -->
         <div id="screen-role-viewing" class="screen hidden">
             <div class="role-viewing-center">
@@ -157,8 +183,9 @@
                 <div class="pass-phone-box">
                     <p class="player-name-large" id="next-viewer-name">Player Name</p>
                 </div>
+                <p class="reveal-note">Make sure nobody else can see the screen.</p>
 
-                <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">👁️ Reveal My Role</button>
+                <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">Reveal My Role</button>
             </div>
         </div>
 
@@ -174,8 +201,9 @@
                     </div>
                 </div>
 
-                <button class="btn btn-primary btn-full btn-lg" id="next-player-btn">Pass Phone to&nbsp;<span
-                        id="next-player-name">Next Player</span></button>
+                <p class="pass-hint">Remember your role. Tap Done, then pass the phone to <strong id="next-player-hint">the next player</strong>.</p>
+                <button class="btn btn-primary btn-full btn-lg" id="next-player-btn"><span class="btn-label">Done, pass to <span
+                        id="next-player-name">Next Player</span></span></button>
             </div>
         </div>
 
@@ -183,7 +211,7 @@
         <div id="screen-game-start" class="screen hidden">
             <div class="game-start-center">
                 <p class="round-badge" id="game-round-badge">Round 1</p>
-                <h1 class="game-start-title">🎮 Game Begins!</h1>
+                <h1 class="game-start-title">Game Begins!</h1>
 
                 <div class="speaker-box">
                     <p class="speaker-label">Current Speaker:</p>
@@ -262,7 +290,6 @@
                 </div>
 
                 <button class="btn btn-primary btn-full btn-lg" id="play-again-btn">Play Again</button>
-                <a href="../index.html" class="uc-back-to-home-link">Back to Home</a>
             </div>
         </div>
 

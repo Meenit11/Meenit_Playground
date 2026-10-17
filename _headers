@@ -1,5 +1,5 @@
-/*
-  Content-Type: text/html; charset=UTF-8
+# Used by Netlify and Cloudflare Pages. GitHub Pages ignores this file and sets types itself.
+# No catch-all /* rule: matching rules are merged, so a /* type would clash with these.
 
 /*.html
   Content-Type: text/html; charset=UTF-8
@@ -9,3 +9,18 @@
 
 /*.js
   Content-Type: application/javascript; charset=UTF-8
+
+/*.json
+  Content-Type: application/json; charset=UTF-8
+
+/*.webmanifest
+  Content-Type: application/manifest+json; charset=UTF-8
+
+/*.svg
+  Content-Type: image/svg+xml; charset=UTF-8
+
+/*.ico
+  Content-Type: image/x-icon
+
+/*.png
+  Content-Type: image/png

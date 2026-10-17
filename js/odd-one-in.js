@@ -1,1151 +1,873 @@
-// ================================
-// ODD ONE IN – Multi-device game via Local Backend
-// Each player on their own phone. Sync via shared Node server.
-// ================================
+/*
+ * Odd One In: client.
+ * Mode A (everyone's phone): window.Net room, the server reducer owns the clock and the answers.
+ * Mode B (one phone): pass-to-type, pure OoiRules in this file, nothing leaves the device.
+ * Motion, SFX, Haptic and Theme are optional and always called guarded.
+ */
+(function () {
+  'use strict';
 
-// ================================
-// BACKEND CONFIGURATION
-// ================================
-// Priority: 1. localStorage 'ooi_server_url' | 2. Current hostname | 3. Localhost
-const DEFAULT_BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ? 'http://localhost:3001/api/rooms'
-  : `http://${window.location.hostname}:3001/api/rooms`;
+  const R = window.OoiRules;
+  const $ = (id) => document.getElementById(id);
 
-let savedUrl = localStorage.getItem('ooi_server_url');
-if (savedUrl && !savedUrl.endsWith('/api/rooms')) {
-  // Automatically fix the URL if the user pasted the base tunnel link
-  savedUrl = savedUrl.replace(/\/$/, '') + '/api/rooms';
-}
+  const KEY_USED = 'pg_ooi_used';     // device memory of recent questions (host)
+  const KEY_NAME = 'pg_ooi_name';
+  const KEY_TIMER = 'pg_ooi_timer';
+  const KEY_LOCAL = 'pg_ooi_local';   // one-phone game in progress
+  const KEY_SERVER_LEGACY = 'ooi_server_url';
+  const KEY_SERVER = 'pg_server_url';
+  const GOLD = '#d6a84a';
 
-const BACKEND_URL = savedUrl || DEFAULT_BACKEND_URL;
-
-// Question cooldown window – prevent repeats for ~2 hours per device
-const OOI_QUESTION_COOLDOWN_MS = 2 * 60 * 60 * 1000;
-
-// Round theme palette (10 non-red, non-grey theme keys)
-const OOI_ROUND_THEMES = [
-  'ooi-theme-round-1',
-  'ooi-theme-round-2',
-  'ooi-theme-round-3',
-  'ooi-theme-round-4',
-  'ooi-theme-round-5',
-  'ooi-theme-round-6',
-  'ooi-theme-round-7',
-  'ooi-theme-round-8',
-  'ooi-theme-round-9',
-  'ooi-theme-round-10',
-];
-
-let localState = {
-  myName: '',
-  myId: '',
-  isGM: false,
-  roomCode: '',
-  blobId: '',     // In local mode, this is just the roomCode
-  lastUpdate: 0,
-  pollTimer: null,
-  timerInterval: null,
-  getReadyInterval: null,
-  myLastAnswer: '',   // Cache my last answer for current round
-  myLastAnswerRound: 0,
-};
-
-let allQuestions = { tier1: [], tier2: [], tier3: [] };
-
-// ================================
-// INIT
-// ================================
-document.addEventListener('DOMContentLoaded', () => {
-  loadQuestions();
-  setupEventListeners();
-  tryRejoin();
-  // Default theme before joining / creating a room
-  applyOddOneTheme(null);
-});
-
-async function loadQuestions() {
-  try {
-    const res = await fetch('../questions.json');
-    const data = await res.json();
-    allQuestions.tier1 = data.tier1_broad?.questions || [];
-    allQuestions.tier2 = data.tier2_medium?.questions || [];
-    allQuestions.tier3 = data.tier3_narrow?.questions || [];
-  } catch (e) {
-    console.error('Failed to load questions', e);
-    allQuestions.tier1 = ['Name a fruit.', 'Name an animal.', 'Name a color.'];
-    allQuestions.tier2 = ['Name a primary color.', 'Name a season.'];
-    allQuestions.tier3 = ['What color is grass?', 'How many days in a week?'];
-  }
-}
-
-function setupEventListeners() {
-  // Mode select
-  document.getElementById('create-room-btn').addEventListener('click', () => showScreen('screen-create'));
-  document.getElementById('join-room-btn').addEventListener('click', () => showScreen('screen-join'));
-
-  // Create room
-  document.getElementById('do-create-btn').addEventListener('click', createRoom);
-  document.getElementById('back-from-create-btn').addEventListener('click', () => showScreen('screen-mode-select'));
-  document.getElementById('create-name-input').addEventListener('keypress', e => e.key === 'Enter' && createRoom());
-
-  // Join room
-  document.getElementById('do-join-btn').addEventListener('click', joinRoom);
-  document.getElementById('back-from-join-btn').addEventListener('click', () => showScreen('screen-mode-select'));
-  document.getElementById('join-name-input').addEventListener('keypress', e => e.key === 'Enter' && joinRoom());
-
-  // Lobby
-  document.getElementById('start-game-btn').addEventListener('click', gmStartGame);
-  document.getElementById('leave-lobby-btn').addEventListener('click', leaveRoom);
-  document.getElementById('share-whatsapp-btn').addEventListener('click', shareWhatsApp);
-  document.getElementById('share-copy-btn').addEventListener('click', shareCopyLink);
-
-  // Question
-  document.getElementById('submit-answer-btn').addEventListener('click', submitAnswer);
-  document.getElementById('answer-input').addEventListener('keypress', e => e.key === 'Enter' && submitAnswer());
-  document.getElementById('gm-edit-btn').addEventListener('click', gmEditQuestion);
-  document.getElementById('gm-pause-btn').addEventListener('click', gmPause);
-  document.getElementById('gm-reset-btn').addEventListener('click', gmReset);
-  document.getElementById('gm-skip-btn').addEventListener('click', gmSkip);
-  document.getElementById('gm-end-game-btn').addEventListener('click', gmEndGame);
-
-  // Review
-  document.getElementById('eliminate-selected-btn').addEventListener('click', eliminateSelected);
-  document.getElementById('next-round-no-elim-btn').addEventListener('click', nextRoundNoElim);
-
-  // Winner
-  document.getElementById('play-again-btn').addEventListener('click', playAgain);
-
-  // Reset saved data (cooldowns + session) from main mode-select screen
-  const resetBtn = document.getElementById('reset-ooi-storage-btn');
-  if (resetBtn) {
-    resetBtn.addEventListener('click', () => {
-      try {
-        clearSession();
-        localStorage.removeItem('ooi_used_tier1_broad');
-        localStorage.removeItem('ooi_used_tier2_medium');
-        localStorage.removeItem('ooi_used_tier3_narrow');
-      } catch (e) { /* ignore */ }
-      applyOddOneTheme(null);
-      showScreen('screen-mode-select');
-      alert('Saved Odd One In data has been reset on this device.');
-    });
-  }
-
-  // Rules modal (Game Setup)
-  const rulesBtn = document.getElementById('rules-btn');
-  const rulesModal = document.getElementById('rules-modal');
-  const rulesOverlay = document.getElementById('ooi-rules-overlay');
-  const closeRulesBtn = document.getElementById('close-rules');
-
-  if (rulesBtn && rulesModal && rulesOverlay && closeRulesBtn) {
-  rulesBtn.addEventListener('click', () => rulesModal.classList.remove('hidden'));
-  closeRulesBtn.addEventListener('click', () => rulesModal.classList.add('hidden'));
-  rulesOverlay.addEventListener('click', () => rulesModal.classList.add('hidden'));
-  }
-
-  // Server Settings modal
-  const settingsBtn = document.getElementById('server-settings-btn');
-  const settingsModal = document.getElementById('settings-modal');
-  const settingsOverlay = document.getElementById('ooi-settings-overlay');
-  const closeSettingsBtn = document.getElementById('close-settings');
-  const saveSettingsBtn = document.getElementById('save-settings-btn');
-  const serverUrlInput = document.getElementById('server-url-input');
-
-  if (settingsBtn && settingsModal && settingsOverlay && closeSettingsBtn && saveSettingsBtn && serverUrlInput) {
-  settingsBtn.addEventListener('click', () => {
-    serverUrlInput.value = BACKEND_URL;
-    settingsModal.classList.remove('hidden');
-  });
-  closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-  settingsOverlay.addEventListener('click', () => settingsModal.classList.add('hidden'));
-  saveSettingsBtn.addEventListener('click', () => {
-    const url = serverUrlInput.value.trim();
-    if (url) {
-      localStorage.setItem('ooi_server_url', url);
-      location.reload();
-    } else {
-      localStorage.removeItem('ooi_server_url');
-      location.reload();
-    }
-  });
-  }
-  // Auto-join from URL params (?code=CODE)
-  const params = new URLSearchParams(window.location.search);
-  const codeParam = params.get('code') || params.get('blob'); // support both
-  if (codeParam) {
-    const input = document.getElementById('room-code-input');
-    input.value = codeParam;
-    showScreen('screen-join');
-  }
-}
-
-// ================================
-// SERVER HELPERS (Replaces JSONBlob)
-// ================================
-async function createRoomOnServer(gmName, initialState) {
-  const res = await fetch(BACKEND_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ gmName, initialState }),
-  });
-  if (!res.ok) throw new Error('Failed to create room');
-  return await res.json();
-}
-
-async function joinRoomOnServer(code, playerName) {
-  const res = await fetch(`${BACKEND_URL}/${code}/join`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playerName }),
-  });
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(err.error || 'Failed to join room');
-  }
-  return await res.json();
-}
-
-async function readBlob(code) {
-  const res = await fetch(`${BACKEND_URL}/${code}`);
-  if (!res.ok) throw new Error('Failed to read room');
-  const data = await res.json();
-  return data.state;
-}
-
-async function updateBlob(code, state) {
-  const res = await fetch(`${BACKEND_URL}/${code}/state`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ state }),
-  });
-  if (!res.ok) throw new Error('Failed to update room');
-  return await res.json();
-}
-
-// ================================
-// SCREEN MANAGEMENT + THEMES
-// ================================
-function showScreen(id) {
-  const el = document.getElementById(id);
-  if (el && !el.classList.contains('hidden')) return; // Prevent focus loss and DOM bounce
-
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  if (el) el.classList.remove('hidden');
-}
-
-function showError(elId, msg) {
-  const el = document.getElementById(elId);
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 4000);
-}
-
-function applyOddOneTheme(roomData) {
-  const body = document.body;
-  if (!body) return;
-
-  const allClasses = [
-    'ooi-theme-setup',
-    'ooi-theme-review',
-    'ooi-theme-winner',
-    'ooi-theme-round-1',
-    'ooi-theme-round-2',
-    'ooi-theme-round-3',
-    'ooi-theme-round-4',
-    'ooi-theme-round-5',
-    'ooi-theme-round-6',
-    'ooi-theme-round-7',
-    'ooi-theme-round-8',
-    'ooi-theme-round-9',
-    'ooi-theme-round-10',
-  ];
-
-  allClasses.forEach(cls => body.classList.remove(cls));
-
-  // Default when no room yet or in lobby/setup
-  if (!roomData || roomData.gameState === 'lobby' || !roomData.gameState) {
-    body.classList.add('ooi-theme-setup');
-    return;
-  }
-
-  if (roomData.gameState === 'question') {
-    const theme = roomData.roundTheme && OOI_ROUND_THEMES.includes(roomData.roundTheme)
-      ? roomData.roundTheme
-      : OOI_ROUND_THEMES[0];
-    body.classList.add(theme);
-    return;
-  }
-
-  if (roomData.gameState === 'review') {
-    body.classList.add('ooi-theme-review');
-    return;
-  }
-
-  if (roomData.gameState === 'winner') {
-    body.classList.add('ooi-theme-winner');
-  }
-}
-
-// ================================
-// ROOM MANAGEMENT
-// ================================
-function generateRoomCode() {
-  return String(Math.floor(1000 + Math.random() * 9000));
-}
-
-function generatePlayerId() {
-  return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-}
-
-async function createRoom() {
-  const name = document.getElementById('create-name-input').value.trim();
-  if (name.length < 2) { showError('create-error', 'Name must be at least 2 characters'); return; }
-
-  const btn = document.getElementById('do-create-btn');
-  btn.disabled = true;
-  btn.textContent = 'Creating...';
-
-  try {
-    const initialState = buildFreshRoom('', '', name); // Server will fill in code and GM ID
-    const data = await createRoomOnServer(name, initialState);
-
-    localState.myName = name;
-    localState.myId = data.state.gameMaster;
-    localState.isGM = true;
-    localState.roomCode = data.code;
-    localState.blobId = data.code; // We use code as the ID now
-
-    saveSession();
-    enterLobby(data.state);
-  } catch (e) {
-    showError('create-error', 'Failed to connect to backend. Is the server running?');
-    console.error(e);
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Create Room';
-}
-
-function buildFreshRoom(code, gmId, gmName) {
-  return {
-    roomCode: code,
-    gameMaster: gmId,
-    players: [{ id: gmId, name: gmName, isGM: true, isEliminated: false }],
-    gameState: 'lobby',
-    currentRound: 0,
-    currentQuestion: '',
-    answers: {},
-    selectedForElim: [],
-    timerSeconds: 10,
-    timerPaused: false,
-    timerPhase: '', // getready, answering, done
-    getReadyCountdown: 3,
-    winnerNames: [],
-    lastUpdate: Date.now(),
-    roomActive: true,
+  const S = {
+    screen: 'screen-home',
+    mode: null,          // 'net' | 'local'
+    room: null,
+    state: null,         // latest private view (net)
+    offset: 0,           // serverNow minus Date.now()
+    clock: null,
+    ring: null,
+    clockKey: '',
+    listKey: '',
+    elimKey: '',
+    winnerKey: '',
+    tickRetry: null,
+    questions: null,
+    local: null,
+    timerSeconds: R.TIMER.default,
+    localNames: [],
   };
-}
 
-async function joinRoom() {
-  const code = document.getElementById('room-code-input').value.trim().toUpperCase();
-  const name = document.getElementById('join-name-input').value.trim();
-
-  if (!code) { showError('join-error', 'Enter the room code'); return; }
-  if (name.length < 2) { showError('join-error', 'Name must be at least 2 characters'); return; }
-
-  const btn = document.getElementById('do-join-btn');
-  btn.disabled = true;
-  btn.textContent = 'Joining...';
-
-  try {
-    const data = await joinRoomOnServer(code, name);
-    
-    localState.myName = name;
-    localState.myId = data.playerId;
-    localState.isGM = false;
-    localState.roomCode = code;
-    localState.blobId = code;
-
-    saveSession();
-    enterLobby(data.state);
-  } catch (e) {
-    showError('join-error', e.message || 'Room not found or server error');
-    console.error(e);
+  // ---------------------------------------------------------------- helpers
+  function esc(text) { const d = document.createElement('div'); d.textContent = text == null ? '' : String(text); return d.innerHTML; }
+  function store(key, value) { try { if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* private mode */ } }
+  function load(key, fallback) { try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; } }
+  function sfx(name) { try { window.SFX?.play?.(name); } catch (e) { /* ignore */ } }
+  function haptic(kind) { try { (kind === 'heavy' ? window.Haptic?.heavy : window.Haptic?.light)?.(); } catch (e) { /* ignore */ } }
+  function joinNames(names) {
+    if (!names.length) return '';
+    if (names.length === 1) return names[0];
+    if (names.length <= 3) return names.slice(0, -1).join(', ') + ' and ' + names[names.length - 1];
+    return names.slice(0, 2).join(', ') + ' and ' + (names.length - 2) + ' more';
   }
 
-  btn.disabled = false;
-  btn.textContent = 'Join Room';
-}
+  function toast(text, kind) {
+    if (window.Motion?.toast) { try { window.Motion.toast(text, { kind: kind || 'info' }); return; } catch (e) { /* fall through */ } }
+    const el = $('ooi-toast');
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'ooi-toast' + (kind === 'error' ? ' error' : '');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.add('hidden'), 2600);
+  }
 
-// ================================
-// SESSION PERSISTENCE (survive refresh)
-// ================================
-function saveSession() {
-  localStorage.setItem('ooi_session', JSON.stringify({
-    myName: localState.myName,
-    myId: localState.myId,
-    isGM: localState.isGM,
-    roomCode: localState.roomCode,
-    blobId: localState.blobId,
-    lastSeenAt: Date.now(),
-  }));
-}
+  function showErr(id, msg) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.remove('hidden');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.add('hidden'), 4000);
+  }
 
-function clearSession() {
-  localStorage.removeItem('ooi_session');
-}
-
-function tryRejoin() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('ooi_session'));
-    if (saved?.blobId) {
-      const MAX_SESSION_AGE_MS = 30 * 60 * 1000; // 30 minutes
-      if (saved.lastSeenAt && (Date.now() - saved.lastSeenAt) > MAX_SESSION_AGE_MS) {
-        clearSession();
-        return;
-      }
-      Object.assign(localState, saved);
-      rejoinRoom();
+  async function go(id, direction) {
+    if (S.screen === id) return;
+    const from = S.screen;
+    S.screen = id;
+    const M = window.Motion;
+    if (M?.screen) {
+      try { await M.screen(from, id, { direction: direction || 'forward' }); } catch (e) { /* fallback below */ }
     }
-  } catch (e) { /* no session */ }
-}
+    if (S.screen !== id) return; // another transition started meanwhile
+    document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('hidden', s.id !== id));
+  }
 
-async function rejoinRoom() {
-  try {
-    const roomData = await readBlob(localState.blobId);
-    if (!roomData.roomActive || roomData.gameState === 'winner') {
-      // If room is closed or already finished, don't jump back into old state.
-      clearSession();
-      showScreen('screen-mode-select');
-      applyOddOneTheme(null);
+  function setTone(round) { document.body.dataset.tone = round ? String(((round - 1) % 8) + 1) : '0'; }
+  function setView(view) {
+    document.body.classList.toggle('ooi-view-out', view === 'out');
+    document.body.classList.toggle('ooi-view-winner', view === 'winner');
+  }
+
+  // In-page confirmation box for leaving, closing or removing. Never a native dialog.
+  function askConfirm(title, text, yesLabel, onYes) {
+    const box = $('ooi-confirm');
+    if (!box) { onYes(); return; }
+    if (box.parentElement !== document.body) document.body.appendChild(box);
+    $('ooi-confirm-title').textContent = title;
+    $('ooi-confirm-text').textContent = text;
+    $('ooi-confirm-yes').textContent = yesLabel;
+    const close = () => { box.classList.add('hidden'); $('ooi-confirm-yes').onclick = null; };
+    $('ooi-confirm-yes').onclick = () => { close(); onYes(); };
+    $('ooi-confirm-no').onclick = close;
+    $('ooi-confirm-overlay').onclick = close;
+    box.classList.remove('hidden');
+  }
+
+  // Two-tap destructive confirmation, no confirm() anywhere.
+  function armDanger(btn, fn) {
+    if (btn.dataset.armed === '1') {
+      btn.dataset.armed = '';
+      btn.textContent = btn.dataset.label;
+      fn();
       return;
     }
-    const me = roomData.players.find(p => p.id === localState.myId);
-    if (!me) { clearSession(); return; }
-    localState.isGM = me.isGM;
-    routeToScreen(roomData);
-    startPolling();
-  } catch (e) {
-    clearSession();
-  }
-}
-
-// ================================
-// LOBBY
-// ================================
-function enterLobby(roomData) {
-  showScreen('screen-lobby');
-  renderLobby(roomData);
-  startPolling();
-}
-
-function renderLobby(roomData) {
-  document.getElementById('lobby-room-code').textContent = roomData.roomCode;
-
-  const count = roomData.players.length;
-  document.getElementById('lobby-player-count').textContent = `${count} player${count !== 1 ? 's' : ''} in lobby`;
-
-  const list = document.getElementById('lobby-player-list');
-  list.innerHTML = '';
-  roomData.players.forEach(p => {
-    const item = document.createElement('div');
-    item.className = 'lobby-player-item';
-    let html = `<span class="lobby-player-name">${p.isGM ? '👑 ' : ''}${esc(p.name)}</span>`;
-    if (localState.isGM && !p.isGM) {
-      html += `<button class="lobby-kick-btn" data-id="${p.id}">❌</button>`;
-    }
-    item.innerHTML = html;
-    list.appendChild(item);
-  });
-
-  // Kick handlers
-  list.querySelectorAll('.lobby-kick-btn').forEach(btn => {
-    btn.addEventListener('click', () => kickPlayer(btn.dataset.id));
-  });
-
-  const startBtn = document.getElementById('start-game-btn');
-  const startHint = document.getElementById('start-game-hint');
-  const waitMsg = document.getElementById('lobby-waiting');
-
-  if (localState.isGM) {
-    startBtn.classList.remove('hidden');
-    startBtn.disabled = count < 3;
-    startHint.textContent = count < 3 ? 'Need at least 3 players to start' : `${count} players ready!`;
-    startHint.classList.remove('hidden');
-    waitMsg.classList.add('hidden');
-    document.getElementById('leave-lobby-btn').textContent = 'Close Room & Go Home';
-  } else {
-    startBtn.classList.add('hidden');
-    startHint.classList.add('hidden');
-    waitMsg.classList.remove('hidden');
-    document.getElementById('leave-lobby-btn').textContent = 'Leave Room';
-  }
-}
-
-async function kickPlayer(playerId) {
-  try {
-    const rd = await readBlob(localState.blobId);
-    rd.players = rd.players.filter(p => p.id !== playerId);
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-  } catch (e) { console.error(e); }
-}
-
-async function leaveRoom() {
-  try {
-    const rd = await readBlob(localState.blobId);
-    if (localState.isGM) {
-      rd.roomActive = false;
-    } else {
-      rd.players = rd.players.filter(p => p.id !== localState.myId);
-    }
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-  } catch (e) { /* best effort */ }
-  stopPolling();
-  clearSession();
-  window.location.href = '../index.html';
-}
-
-function shareWhatsApp() {
-  const url = `${window.location.origin}${window.location.pathname}?code=${localState.blobId}`;
-  const msg = `Join my Odd One In game! 🎮\nRoom: ${localState.roomCode}\nJoin here: ${url}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-}
-
-function shareCopyLink() {
-  const url = `${window.location.origin}${window.location.pathname}?code=${localState.blobId}`;
-  navigator.clipboard.writeText(url).then(() => {
-    const fb = document.getElementById('copy-feedback');
-    fb.classList.remove('hidden');
-    setTimeout(() => fb.classList.add('hidden'), 2500);
-  }).catch(() => {
-    prompt('Copy this link:', url);
-  });
-}
-
-// ================================
-// GAME START (GM only)
-// ================================
-async function gmStartGame() {
-  if (!localState.isGM) return;
-  try {
-    const rd = await readBlob(localState.blobId);
-    if (rd.players.length < 3) return;
-
-    const alive = rd.players.filter(p => !p.isEliminated);
-    rd.gameState = 'question';
-    rd.currentRound = 1;
-    rd.answers = {};
-    rd.selectedForElim = [];
-    const picked = pickQuestion(alive.length);
-    rd.currentQuestion = picked.question;
-    rd.questionTier = picked.tierKey;
-    rd.roundTheme = pickRoundTheme(rd);
-    rd.timerSeconds = 10;
-    rd.timerPaused = false;
-    rd.timerPhase = 'getready';
-    rd.getReadyCountdown = 3;
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-  } catch (e) { console.error(e); }
-}
-
-function getAvailableQuestionsForTier(tierKey, pool) {
-  const now = Date.now();
-  let used = [];
-  try {
-    used = JSON.parse(localStorage.getItem(`ooi_used_${tierKey}`) || '[]');
-  } catch (e) {
-    used = [];
+    btn.dataset.label = btn.dataset.label || btn.textContent;
+    btn.dataset.armed = '1';
+    btn.textContent = 'Tap again to end';
+    clearTimeout(btn._t);
+    btn._t = setTimeout(() => { btn.dataset.armed = ''; btn.textContent = btn.dataset.label; }, 3000);
   }
 
-  used = used.filter(entry => (now - entry.time) < OOI_QUESTION_COOLDOWN_MS);
-
-  try {
-    localStorage.setItem(`ooi_used_${tierKey}`, JSON.stringify(used));
-  } catch (e) { /* ignore */ }
-
-  const usedIndices = new Set(used.map(e => e.idx));
-  let available = pool.map((q, idx) => ({ q, idx })).filter(item => !usedIndices.has(item.idx));
-
-  // If everything is on cooldown, reset and allow full pool again
-  if (!available.length) {
-    try { localStorage.removeItem(`ooi_used_${tierKey}`); } catch (e) { /* ignore */ }
-    available = pool.map((q, idx) => ({ q, idx }));
+  // Device memory of recent questions, host side, pruned to the cooldown.
+  function deviceUsed() { return R.pruneUsed(load(KEY_USED, []), Date.now()); }
+  function rememberUsed(list) {
+    const map = new Map();
+    deviceUsed().concat(list || []).forEach((e) => { if (e && e.q) map.set(e.q, Math.max(e.at || 0, map.get(e.q) || 0)); });
+    store(KEY_USED, R.pruneUsed(Array.from(map, ([q, at]) => ({ q, at })), Date.now()));
   }
 
-  return available;
-}
-
-function markQuestionUsed(tierKey, idx) {
-  let used = [];
-  try {
-    used = JSON.parse(localStorage.getItem(`ooi_used_${tierKey}`) || '[]');
-  } catch (e) {
-    used = [];
-  }
-  used.push({ idx, time: Date.now() });
-  try {
-    localStorage.setItem(`ooi_used_${tierKey}`, JSON.stringify(used));
-  } catch (e) { /* ignore */ }
-}
-
-function pickQuestion(count) {
-  let pool;
-  let tierKey;
-  if (count >= 10) {
-    pool = allQuestions.tier1;
-    tierKey = 'tier1_broad';
-  } else if (count >= 5) {
-    pool = allQuestions.tier2;
-    tierKey = 'tier2_medium';
-  } else {
-    pool = allQuestions.tier3;
-    tierKey = 'tier3_narrow';
+  function setTimerSetting(value) {
+    S.timerSeconds = Math.min(R.TIMER.max, Math.max(R.TIMER.min, value));
+    store(KEY_TIMER, S.timerSeconds);
+    $('local-timer-value').textContent = S.timerSeconds;
   }
 
-  if (!pool || !pool.length) {
-    pool = allQuestions.tier1;
-    tierKey = 'tier1_broad';
+  // ---------------------------------------------------------------- clock
+  // One loop owns the countdown. Remaining time comes from a function so the
+  // server deadline (net) or the local deadline (one phone) is the only truth.
+  function stopClock() {
+    if (S.clock) { clearInterval(S.clock); S.clock = null; }
+    try { S.ring?.stop?.(true); } catch (e) { /* ignore */ }
+    S.ring = null;
   }
-  if (!pool || !pool.length) {
-    return { question: 'Name something!', tierKey: 'fallback' };
-  }
 
-  const available = getAvailableQuestionsForTier(tierKey, pool);
-  const choice = available[Math.floor(Math.random() * available.length)];
-  markQuestionUsed(tierKey, choice.idx);
+  function runClock(opts) {
+    stopClock();
+    const ringEl = opts.ring ? $('timer-ring') : null;
+    const numEl = opts.num ? $(opts.num) : null;
+    const total = Math.max(1, opts.totalMs);
+    let lastSec = null;
+    let motionRing = false;
 
-  return { question: choice.q, tierKey };
-}
-
-function pickRoundTheme(rd) {
-  rd.usedRoundThemes = rd.usedRoundThemes || [];
-  const usedSet = new Set(rd.usedRoundThemes);
-  const remaining = OOI_ROUND_THEMES.filter(t => !usedSet.has(t));
-  const pool = remaining.length ? remaining : OOI_ROUND_THEMES;
-  const choice = pool[Math.floor(Math.random() * pool.length)];
-  if (!usedSet.has(choice)) {
-    rd.usedRoundThemes.push(choice);
-  }
-  return choice;
-}
-
-// ================================
-// POLLING — Real-time sync
-// ================================
-function startPolling() {
-  stopPolling();
-  // Poll every 2s
-  localState.pollTimer = setInterval(pollRoom, 2000);
-  pollRoom(); // immediate first poll
-}
-
-async function pollRoom() {
-  try {
-    const rd = await readBlob(localState.blobId);
-
-    if (!rd.roomActive) {
-      stopPolling(); clearSession();
-      alert('Room has been closed by the Game Master.');
-      showScreen('screen-mode-select'); return;
-    }
-
-    const me = rd.players.find(p => p.id === localState.myId);
-    if (!me) {
-      stopPolling(); clearSession();
-      alert('You were removed from the room.');
-      showScreen('screen-mode-select'); return;
-    }
-
-    if (rd.lastUpdate > localState.lastUpdate) {
-      localState.lastUpdate = rd.lastUpdate;
-      saveSession();
-      routeToScreen(rd);
-    }
-  } catch (e) { console.error('Poll error', e); }
-}
-
-function stopPolling() {
-  if (localState.pollTimer) { clearInterval(localState.pollTimer); localState.pollTimer = null; }
-  clearTimers();
-}
-
-function clearTimers() {
-  if (localState.timerInterval) { clearInterval(localState.timerInterval); localState.timerInterval = null; }
-  if (localState.getReadyInterval) { clearInterval(localState.getReadyInterval); localState.getReadyInterval = null; }
-}
-
-// ================================
-// SCREEN ROUTING
-// ================================
-function routeToScreen(rd) {
-  applyOddOneTheme(rd);
-  switch (rd.gameState) {
-    case 'lobby': showScreen('screen-lobby'); renderLobby(rd); break;
-    case 'question': showScreen('screen-question'); renderQuestion(rd); break;
-    case 'review': showScreen('screen-review'); renderReview(rd); break;
-    case 'winner': showScreen('screen-winner'); renderWinner(rd); break;
-  }
-}
-
-// ================================
-// QUESTION ROUND
-// ================================
-function renderQuestion(rd) {
-  document.getElementById('question-text').textContent = rd.currentQuestion;
-
-  const me = rd.players.find(p => p.id === localState.myId);
-  const isEliminated = me?.isEliminated;
-  const serverHasAnswered = rd.answers.hasOwnProperty(localState.myId);
-
-  // Persistence fix: Check local cache if server hasn't updated yet
-  const hasLocalAnswer = localState.myLastAnswerRound === rd.currentRound && localState.myLastAnswer !== '';
-  const hasAnswered = serverHasAnswered || hasLocalAnswer || (localState.optimisticSubmitRound === rd.currentRound);
-
-  const getReadyEl = document.getElementById('get-ready-phase');
-  const answerPhaseEl = document.getElementById('answer-phase');
-  const answerSection = document.getElementById('answer-section');
-  const submittedMsg = document.getElementById('answer-submitted-msg');
-  const eliminatedMsg = document.getElementById('eliminated-msg');
-  const gmControls = document.getElementById('gm-controls');
-  const gmStatusMsg = document.getElementById('gm-status-msg');
-
-  // Grey-out theme for eliminated players (spectator view)
-  document.body.classList.toggle('ooi-eliminated-view', !!isEliminated);
-
-  // Get Ready phase
-  if (rd.timerPhase === 'getready') {
-    getReadyEl.classList.remove('hidden');
-    answerPhaseEl.classList.add('hidden');
-    document.getElementById('get-ready-countdown').textContent = rd.getReadyCountdown || 3;
-
-    // GM drives the countdown
-    if (localState.isGM && !localState.getReadyInterval) {
-      localState.getReadyInterval = setInterval(async () => {
+    if (ringEl) {
+      ringEl.classList.toggle('paused', !!opts.paused);
+      ringEl.classList.remove('motion-ring', 'timer-ring', 'is-urgent');
+      ringEl.innerHTML = '<span class="ooi-num" id="timer-num"></span>';
+      if (!opts.paused && window.Motion?.timerRing) {
         try {
-          const d = await readBlob(localState.blobId);
-          if (d.timerPhase !== 'getready') { clearInterval(localState.getReadyInterval); localState.getReadyInterval = null; return; }
-          const current = typeof d.getReadyCountdown === 'number' ? d.getReadyCountdown : 3;
-          if (current <= 1) {
-            d.timerPhase = 'answering';
-            d.timerSeconds = 10;
-            d.getReadyCountdown = 0;
-          } else {
-            d.getReadyCountdown = current - 1;
-          }
-          d.lastUpdate = Date.now();
-          await updateBlob(localState.blobId, d);
-        } catch (e) { /* retry */ }
-      }, 1000);
-    }
-    gmControls.classList.add('hidden');
-    gmStatusMsg.classList.add('hidden');
-    return;
-  }
-
-  // Answer phase
-  getReadyEl.classList.add('hidden');
-  answerPhaseEl.classList.remove('hidden');
-  if (localState.getReadyInterval) { clearInterval(localState.getReadyInterval); localState.getReadyInterval = null; }
-
-  // Timer
-  const timerEl = document.getElementById('timer-display');
-  timerEl.textContent = rd.timerSeconds;
-  timerEl.classList.toggle('timer-urgent', rd.timerSeconds <= 3 && rd.timerSeconds > 0);
-  timerEl.classList.toggle('timer-done', rd.timerSeconds <= 0);
-
-  // Answer input state
-  if (rd.timerPhase === 'done' || rd.timerSeconds <= 0) {
-    answerSection.classList.add('hidden');
-    submittedMsg.classList.remove('hidden');
-    submittedMsg.querySelector('p').textContent = '⏰ Time\'s up!';
-    eliminatedMsg.classList.add('hidden');
-  } else if (isEliminated) {
-    answerSection.classList.add('hidden');
-    submittedMsg.classList.add('hidden');
-    eliminatedMsg.classList.remove('hidden');
-  } else if (hasAnswered) {
-    answerSection.classList.add('hidden');
-    submittedMsg.classList.remove('hidden');
-    submittedMsg.querySelector('p').textContent = '✓ Answer Submitted';
-    eliminatedMsg.classList.add('hidden');
-  } else {
-    answerSection.classList.remove('hidden');
-    submittedMsg.classList.add('hidden');
-    eliminatedMsg.classList.add('hidden');
-    const inputEl = document.getElementById('answer-input');
-    const submitBtn = document.getElementById('submit-answer-btn');
-    if (inputEl) {
-      inputEl.disabled = false;
-      if (localState._lastRenderedRound !== rd.currentRound) {
-        localState._lastRenderedRound = rd.currentRound;
-        inputEl.value = '';
-        if (localState.myLastAnswerRound !== rd.currentRound) {
-          localState.myLastAnswer = '';
-          localState.myLastAnswerRound = rd.currentRound;
-        }
+          S.ring = window.Motion.timerRing(ringEl, { seconds: Math.ceil(opts.remaining() / 1000) }) || null;
+          motionRing = !!S.ring;
+          if (motionRing) ringEl.classList.add('motion-ring');
+        } catch (e) { motionRing = false; }
       }
     }
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Answer';
-    }
-  }
 
-  // GM controls
-  if (localState.isGM) {
-    gmControls.classList.remove('hidden');
-    document.getElementById('gm-pause-btn').textContent = rd.timerPaused ? '▶️ Resume' : '⏸️ Pause';
-  } else {
-    gmControls.classList.add('hidden');
-  }
-
-  // Paused indicator
-  if (rd.timerPaused) {
-    gmStatusMsg.textContent = '⏸️ Timer paused by Game Master';
-    gmStatusMsg.classList.remove('hidden');
-  } else {
-    gmStatusMsg.classList.add('hidden');
-  }
-
-  // GM drives the countdown timer
-  if (localState.isGM && rd.timerPhase === 'answering' && !rd.timerPaused && !localState.timerInterval) {
-    localState.timerInterval = setInterval(async () => {
-      try {
-        const d = await readBlob(localState.blobId);
-        if (d.timerPhase !== 'answering' || d.timerPaused) {
-          clearInterval(localState.timerInterval); localState.timerInterval = null; return;
-        }
-        d.timerSeconds = Math.max(0, d.timerSeconds - 1);
-        if (d.timerSeconds <= 0) {
-          d.timerPhase = 'done';
-          d.players.forEach(p => {
-            if (!p.isEliminated && !d.answers.hasOwnProperty(p.id)) {
-              d.answers[p.id] = '';
-            }
-          });
-          d.gameState = 'review';
-          clearInterval(localState.timerInterval); localState.timerInterval = null;
-        }
-        d.lastUpdate = Date.now();
-        await updateBlob(localState.blobId, d);
-      } catch (e) { /* retry */ }
-    }, 1000);
-  }
-}
-
-async function submitAnswer() {
-  const input = document.getElementById('answer-input');
-  const answer = input.value.trim();
-  if (!answer) return;
-
-  input.disabled = true;
-  document.getElementById('submit-answer-btn').disabled = true;
-  document.getElementById('submit-answer-btn').textContent = 'Submitted ✓';
-
-  localState.myLastAnswer = answer;
-  localState.myLastAnswerRound = localState._lastRenderedRound;
-  localState.optimisticSubmitRound = localState._lastRenderedRound;
-  
-  const answerSection = document.getElementById('answer-section');
-  const submittedMsg = document.getElementById('answer-submitted-msg');
-  if (answerSection && submittedMsg) {
-    answerSection.classList.add('hidden');
-    submittedMsg.classList.remove('hidden');
-    submittedMsg.querySelector('p').textContent = '✓ Answer Submitted';
-  }
-
-  try {
-    const rd = await readBlob(localState.blobId);
-    rd.answers[localState.myId] = answer;
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-  } catch (e) {
-    console.error(e);
-    localState.optimisticSubmitRound = null;
-    input.disabled = false;
-    document.getElementById('submit-answer-btn').disabled = false;
-    document.getElementById('submit-answer-btn').textContent = 'Submit Answer';
-    if (answerSection && submittedMsg) {
-      answerSection.classList.remove('hidden');
-      submittedMsg.classList.add('hidden');
-    }
-  }
-}
-
-// GM controls
-async function gmPause() {
-  try {
-    const rd = await readBlob(localState.blobId);
-    rd.timerPaused = !rd.timerPaused;
-    if (rd.timerPaused) { clearInterval(localState.timerInterval); localState.timerInterval = null; }
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-    pollRoom();
-  } catch (e) { console.error(e); }
-}
-
-async function gmReset() {
-  try {
-    const rd = await readBlob(localState.blobId);
-    rd.timerSeconds = 10;
-    rd.timerPaused = false;
-    rd.timerPhase = 'answering';
-    rd.answers = {};
-    clearInterval(localState.timerInterval); localState.timerInterval = null;
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-    pollRoom();
-  } catch (e) { console.error(e); }
-}
-
-async function gmSkip() {
-  try {
-    const rd = await readBlob(localState.blobId);
-    rd.timerPhase = 'done';
-    rd.timerSeconds = 0;
-    rd.players.forEach(p => {
-      if (!p.isEliminated && !rd.answers.hasOwnProperty(p.id)) rd.answers[p.id] = '';
-    });
-    rd.gameState = 'review';
-    clearInterval(localState.timerInterval); localState.timerInterval = null;
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-    pollRoom();
-  } catch (e) { console.error(e); }
-}
-
-async function gmEditQuestion() {
-  const newQ = prompt("Enter a new question:");
-  if (newQ && newQ.trim().length > 0) {
-    try {
-      const rd = await readBlob(localState.blobId);
-      rd.currentQuestion = newQ.trim();
-      rd.lastUpdate = Date.now();
-      await updateBlob(localState.blobId, rd);
-      pollRoom();
-    } catch (e) { console.error(e); }
-  }
-}
-
-async function gmEndGame() {
-  if (confirm("End the game and send everyone back to the home screen?")) {
-    try {
-      const rd = await readBlob(localState.blobId);
-      rd.roomActive = false;
-      rd.lastUpdate = Date.now();
-      await updateBlob(localState.blobId, rd);
-      pollRoom();
-    } catch (e) { console.error(e); }
-  }
-}
-
-// ================================
-// ANSWER REVIEW
-// ================================
-function renderReview(rd) {
-  clearTimers();
-  document.getElementById('review-round-num').textContent = rd.currentRound;
-
-  const container = document.getElementById('answers-container');
-  container.innerHTML = '';
-
-  const alive = rd.players.filter(p => !p.isEliminated);
-  const answerList = alive.map(p => {
-    let ansTxt = (rd.answers[p.id] || '').trim();
-    if (p.id === localState.myId && !ansTxt && localState.myLastAnswerRound === rd.currentRound) {
-      ansTxt = localState.myLastAnswer;
-    }
-    return {
-      id: p.id,
-      name: p.name,
-      answer: ansTxt || '(No Answer)',
+    const paint = () => {
+      const rem = Math.max(0, opts.remaining());
+      const sec = Math.ceil(rem / 1000);
+      if (ringEl && !motionRing) {
+        ringEl.style.setProperty('--ooi-progress', String(rem / total));
+        const n = $('timer-num');
+        if (n) n.textContent = String(sec);
+        ringEl.classList.toggle('urgent', !opts.paused && sec > 0 && sec <= 3);
+      }
+      if (numEl && sec > 0 && numEl.textContent !== String(sec)) {
+        numEl.textContent = String(sec);
+        numEl.classList.remove('bump');
+        void numEl.offsetWidth;
+        numEl.classList.add('bump');
+      }
+      if (!opts.paused && sec !== lastSec) {
+        // Motion's ring plays its own tick and urgent sounds; only the fallback does it here.
+        if (lastSec !== null && sec > 0 && !motionRing) sfx(sec <= 3 ? 'urgent' : 'tick');
+        lastSec = sec;
+      }
+      if (!opts.paused && rem <= 0) {
+        stopClock();
+        if (ringEl && !motionRing) { const n = $('timer-num'); if (n) n.textContent = '0'; }
+        opts.onDone?.();
+      }
     };
-  });
+    paint();
+    if (!opts.paused) S.clock = setInterval(paint, 100);
+  }
 
-  answerList.sort((a, b) => {
-    const aB = a.answer === '(No Answer)' ? 0 : 1;
-    const bB = b.answer === '(No Answer)' ? 0 : 1;
-    if (aB !== bB) return aB - bB;
-    return a.answer.toLowerCase().localeCompare(b.answer.toLowerCase());
-  });
+  // ---------------------------------------------------------------- shared renderers
+  function renderLobby(vm) {
+    $('lobby-code').textContent = vm.code;
+    $('lobby-status').textContent = vm.isHost
+      ? (vm.players.length < R.MIN_PLAYERS ? 'Share the code with your friends' : 'Everyone in? Tap start')
+      : 'Waiting for ' + vm.hostName + ' to start';
+    $('lobby-share').classList.toggle('hidden', !vm.isHost);
+    const list = $('lobby-players');
+    list.innerHTML = vm.players.map((p) =>
+      '<li class="player-item" data-id="' + esc(p.id) + '"><span>' + esc(p.name) + (p.isHost ? '<span class="tag">Game Master</span>' : '') + '' + '</span>' +
+      (vm.isHost && !p.isHost ? '<button type="button" class="remove-btn" data-remove="' + esc(p.id) + '" aria-label="Remove ' + esc(p.name) + '" data-name="' + esc(p.name) + '">&times;</button>' : '') + '</li>').join('');
+    $('lobby-timer-setting').classList.toggle('hidden', !vm.isHost);
+    $('lobby-timer-value').textContent = vm.timerSeconds;
+    const start = $('lobby-start-btn');
+    start.classList.toggle('hidden', !vm.isHost);
+    start.disabled = vm.players.length < R.MIN_PLAYERS;
+    const missing = R.MIN_PLAYERS - vm.players.length;
+    $('lobby-hint').textContent = vm.isHost
+      ? (missing > 0 ? 'Need ' + missing + ' more player' + (missing > 1 ? 's' : '') : vm.players.length + ' players, ' + vm.timerSeconds + ' seconds per answer')
+      : 'Answer time ' + vm.timerSeconds + ' seconds';
+    $('lobby-leave-btn').textContent = vm.isHost ? 'Close room' : 'Leave room';
+  }
 
-  const counts = {};
-  answerList.forEach(a => { const k = a.answer.toLowerCase(); counts[k] = (counts[k] || 0) + 1; });
-
-  const selected = new Set(rd.selectedForElim || []);
-
-  answerList.forEach(ans => {
-    const isDup = counts[ans.answer.toLowerCase()] > 1 && ans.answer !== '(No Answer)';
-    const isBlank = ans.answer === '(No Answer)';
-    const isSel = selected.has(ans.id);
-
-    const item = document.createElement('div');
-    item.className = `answer-item${isDup ? ' answer-duplicate' : ''}${isBlank ? ' answer-blank' : ''}${isSel ? ' answer-selected' : ''}`;
-    item.innerHTML = `
-      <div class="ans-content">
-        <span class="ans-text">${esc(ans.answer)}</span>
-        <span class="ans-author">— ${esc(ans.name)}</span>
-      </div>
-    `;
-
-    if (localState.isGM) {
-      item.style.cursor = 'pointer';
-      item.addEventListener('click', () => {
-        const currentlySelected = item.classList.toggle('answer-selected');
-        toggleSelection(ans.id, currentlySelected);
-      });
+  function renderReady(vm) {
+    setTone(vm.round);
+    setView(vm.meOut ? 'out' : null);
+    $('ready-round').textContent = 'Round ' + vm.round;
+    $('ready-question').textContent = vm.question;
+    $('ready-hint').textContent = vm.meOut ? "You're out. Watch this round." : '';
+    const key = 'ready:' + vm.round + ':' + vm.clockKey;
+    if (S.clockKey !== key) {
+      S.clockKey = key;
+      runClock({ num: 'ready-count', totalMs: R.GET_READY_MS, remaining: vm.remaining, paused: vm.paused, onDone: vm.onDone });
     }
-    container.appendChild(item);
-  });
+    go('screen-ready');
+  }
 
-  const elimControls = document.getElementById('elimination-controls');
-  const subtitle = document.getElementById('review-subtitle');
-  if (localState.isGM) {
-    elimControls.classList.remove('hidden');
-    subtitle.textContent = 'Tap answers to select, then eliminate or skip';
-  } else {
-    elimControls.classList.add('hidden');
-    subtitle.textContent = 'Game Master is deciding...';
-    if (selected.size > 0) {
-      subtitle.textContent = `Game Master selected ${selected.size} player${selected.size > 1 ? 's' : ''}...`;
+  function renderAnswer(vm) {
+    setTone(vm.round);
+    setView(vm.meOut ? 'out' : null);
+    $('answer-round').textContent = 'Round ' + vm.round + (vm.turnLabel ? ', ' + vm.turnLabel : '');
+    $('answer-question').textContent = vm.question;
+    $('answer-form').classList.toggle('hidden', vm.meOut || vm.answered);
+    $('answer-locked').classList.toggle('hidden', vm.meOut || !vm.answered);
+    $('answer-out').classList.toggle('hidden', !vm.meOut);
+    if (vm.answered) $('answer-locked-text').textContent = vm.answer || '';
+    const waiting = vm.waitingFor.length ? 'Waiting for ' + joinNames(vm.waitingFor) : 'Everyone is in. Locking answers';
+    $('answer-waiting').textContent = waiting;
+    $('answer-out-waiting').textContent = waiting;
+    $('answer-paused').classList.toggle('hidden', !vm.paused);
+    $('answer-paused-by').textContent = vm.hostName || 'the Game Master';
+    $('answer-host-row').classList.toggle('hidden', !vm.hostControls);
+    $('host-pause-btn').textContent = vm.paused ? 'Resume' : 'Pause';
+    const input = $('answer-input');
+    input.disabled = !!vm.paused;
+    $('answer-submit-btn').disabled = !!vm.paused;
+    const key = 'answer:' + vm.round + ':' + vm.clockKey + ':' + (vm.paused ? 'p' : 'r');
+    if (S.clockKey !== key) {
+      S.clockKey = key;
+      if (!vm.keepInput) input.value = '';
+      runClock({ ring: true, totalMs: vm.totalMs, remaining: vm.remaining, paused: vm.paused, onDone: vm.onDone });
+    }
+    go('screen-answer').then(() => { if (!vm.meOut && !vm.answered && !vm.paused && S.screen === 'screen-answer') input.focus({ preventScroll: true }); });
+  }
+
+  function renderReview(vm) {
+    stopClock();
+    setTone(vm.round);
+    setView(vm.meOut ? 'out' : null);
+    $('review-round').textContent = 'Round ' + vm.round;
+    $('review-question').textContent = vm.question;
+    const list = $('review-list');
+    const listKey = 'review:' + vm.round + ':' + vm.list.map((x) => x.id).join(',') + ':' + (vm.isHost ? 'h' : 'p');
+    if (S.listKey !== listKey) {
+      S.listKey = listKey;
+      S.elimKey = '';
+      list.innerHTML = vm.list.map((a) => {
+        const tag = vm.isHost && !a.eliminated ? 'button' : 'div';
+        const flag = a.blank ? 'No answer' : (a.duplicate ? 'Duplicate' : '');
+        return '<' + tag + (tag === 'button' ? ' type="button"' : '') + ' class="answer-item' + (a.blank ? ' is-blank' : '') + (a.duplicate ? ' is-duplicate' : '') + (a.eliminated ? ' is-out' : '') + '" data-id="' + esc(a.id) + '">' +
+          '<span class="ans-main"><span class="ans-text">' + (a.blank ? 'Nothing' : esc(a.answer)) + '</span><span class="ans-name">' + esc(a.name) + (a.isHost ? ', Game Master' : '') + '' + '</span></span>' +
+          (flag ? '<span class="ans-flag">' + flag + '</span>' : '') +
+          (vm.isHost ? '<span class="ans-check" aria-hidden="true">&#10003;</span>' : '') +
+          '</' + tag + '>';
+      }).join('');
+      try { window.Motion?.stagger?.(list, { selector: '.answer-item', delay: 50 }); } catch (e) { /* ignore */ }
+    }
+    list.querySelectorAll('.answer-item').forEach((el) => el.classList.toggle('is-selected', vm.selected.has(el.dataset.id)));
+
+    // Eliminations animate once per round on every phone.
+    const elimKey = 'elim:' + vm.round + ':' + vm.eliminatedThisRound.join(',');
+    if (vm.reviewDone && vm.eliminatedThisRound.length && S.elimKey !== elimKey) {
+      S.elimKey = elimKey;
+      const hasMotion = typeof window.Motion?.eliminate === 'function';
+      if (!hasMotion) { sfx('elim'); haptic('heavy'); }
+      vm.eliminatedThisRound.forEach((id, i) => {
+        const el = list.querySelector('.answer-item[data-id="' + CSS.escape(id) + '"]');
+        if (!el) return;
+        el.classList.remove('is-selected');
+        if (el.tagName === 'BUTTON') el.disabled = true;
+        setTimeout(() => {
+          let done = false;
+          if (hasMotion) { try { done = !!window.Motion.eliminate(el, { shake: i === 0 }); } catch (e) { done = false; } }
+          if (!done) el.classList.add('ooi-fall');
+          el.classList.add('is-out');
+        }, i * 220);
+      });
+    } else if (vm.reviewDone) {
+      vm.eliminatedThisRound.forEach((id) => list.querySelector('.answer-item[data-id="' + CSS.escape(id) + '"]')?.classList.add('is-out'));
+    }
+
+    $('review-host').classList.toggle('hidden', !vm.isHost);
+    const primary = $('review-primary-btn');
+    primary.classList.remove('btn-out');
+    if (vm.isHost) {
+      if (vm.reviewDone) {
+        primary.textContent = 'Next round';
+        $('review-sub').textContent = vm.eliminatedThisRound.length + ' out, ' + vm.aliveCount + ' still in';
+      } else if (vm.selected.size) {
+        primary.textContent = 'Eliminate ' + vm.selected.size;
+        primary.classList.add('btn-out');
+        $('review-sub').textContent = vm.selected.size + ' selected';
+      } else {
+        primary.textContent = 'Nobody out, next round';
+        $('review-sub').textContent = 'Tap who is out: blank, bogus or duplicate';
+      }
+    } else {
+      $('review-sub').textContent = vm.reviewDone
+        ? vm.eliminatedThisRound.length + ' out. Waiting for ' + vm.hostName
+        : (vm.selected.size ? vm.hostName + ' picked ' + vm.selected.size : vm.hostName + ' is deciding');
+    }
+    go('screen-review');
+  }
+
+  function renderWinner(vm) {
+    stopClock();
+    setTone(0);
+    setView('winner');
+    $('winner-name').textContent = vm.name;
+    $('winner-again-btn').classList.toggle('hidden', !vm.isHost);
+    $('winner-hint').textContent = vm.isHost ? '' : 'Waiting for ' + vm.hostName + ' to play again';
+    const key = 'winner:' + vm.key;
+    go('screen-winner').then(() => {
+      if (S.winnerKey === key) return;
+      S.winnerKey = key;
+      sfx('win');
+      haptic('heavy');
+      try { window.Motion?.winner?.($('winner-card'), { color: GOLD }); } catch (e) { /* ignore */ }
+    });
+  }
+
+  function resetRenderKeys() { S.clockKey = S.listKey = S.elimKey = S.winnerKey = ''; }
+
+  // ---------------------------------------------------------------- mode A: everyone's phone
+  function serverNow() { return Date.now() + S.offset; }
+
+  function attachRoom(room) {
+    S.mode = 'net';
+    S.room = room;
+    S.local = null;
+    resetRenderKeys();
+    room.on?.('state', onNetState);
+    room.on?.('status', onNetStatus);
+    if (room.state) onNetState(room.state);
+  }
+
+  function onNetStatus(status) {
+    if (status === 'waking') toast('Waking up the server, hang on');
+    else if (status === 'offline') toast('Connection lost, retrying', 'error');
+  }
+
+  function send(type, payload) {
+    if (!S.room) return Promise.resolve(null);
+    return S.room.send(type, payload || {}).then((state) => {
+      if (state && (!S.state || state.version >= S.state.version)) onNetState(state);
+      return state;
+    }).catch((e) => { toast(e?.message || 'Something went wrong', 'error'); return null; });
+  }
+
+  // The clock ran out on this phone: ask the server to settle. It uses its own clock,
+  // so retry until the phase actually moves on.
+  function requestTick() {
+    clearTimeout(S.tickRetry);
+    const key = S.state ? S.state.phase + ':' + S.state.deadline : '';
+    let tries = 0;
+    const attempt = () => {
+      if (S.mode !== 'net' || !S.room || !S.state) return;
+      if (S.state.phase + ':' + S.state.deadline !== key) return;
+      tries += 1;
+      S.room.send('tick', {}).then((st) => { if (st) onNetState(st); }).catch(() => {}).finally(() => {
+        if (S.state && S.state.phase + ':' + S.state.deadline === key && tries < 20) S.tickRetry = setTimeout(attempt, 500);
+      });
+    };
+    attempt();
+  }
+
+  function onNetState(state) {
+    if (!state || S.mode !== 'net') return;
+    if (S.state && typeof state.version === 'number' && state.version < S.state.version) return;
+    const prev = S.state;
+    S.state = state;
+    if (typeof state.serverNow === 'number') S.offset = state.serverNow - Date.now();
+    const me = state.me || {};
+    const players = state.players || [];
+    const host = players.find((p) => p.id === state.hostId) || {};
+    if (me.isHost && Array.isArray(state.used)) rememberUsed(state.used);
+    if (!players.some((p) => p.id === me.id) && state.phase !== 'lobby') { leaveToHome('You were removed from the room'); return; }
+    if (prev && prev.phase !== 'lobby' && state.phase === 'lobby' && state.endedEarly) toast('Game ended by ' + (me.isHost ? 'you' : host.name));
+
+    const remaining = () => R.remainingMs(state, serverNow());
+    const waitingFor = R.alivePlayers(players).filter((p) => !(state.answered || []).includes(p.id)).map((p) => p.name);
+    const settings = state.settings || { timerSeconds: R.TIMER.default };
+
+    switch (state.phase) {
+      case 'lobby':
+        stopClock();
+        setTone(0);
+        setView(null);
+        renderLobby({ code: state.code, players, isHost: !!me.isHost, meId: me.id, hostName: host.name || 'the Game Master', timerSeconds: settings.timerSeconds });
+        go('screen-lobby', prev && prev.phase !== 'lobby' ? 'back' : 'forward');
+        break;
+      case 'ready':
+        renderReady({ round: state.round, question: state.question, meOut: !!me.eliminated, clockKey: state.deadline, remaining, paused: state.paused, onDone: requestTick });
+        break;
+      case 'answer':
+        renderAnswer({
+          round: state.round, question: state.question, meOut: !!me.eliminated, answered: !!me.answered, answer: me.answer,
+          waitingFor, paused: state.paused, hostName: host.name, hostControls: !!me.isHost,
+          clockKey: state.deadline, totalMs: settings.timerSeconds * 1000, remaining, onDone: requestTick,
+          keepInput: !!prev && prev.phase === 'answer' && prev.round === state.round,
+        });
+        break;
+      case 'review':
+        renderReview({
+          round: state.round, question: state.question, list: state.review || [], isHost: !!me.isHost, meId: me.id, meOut: !!me.eliminated,
+          selected: new Set(state.selected || []), eliminatedThisRound: state.eliminatedThisRound || [], reviewDone: !!state.reviewDone,
+          hostName: host.name || 'the Game Master', aliveCount: R.alivePlayers(players).length,
+        });
+        break;
+      case 'winner': {
+        const w = players.find((p) => p.id === state.winnerId) || {};
+        renderWinner({ name: w.name || 'Nobody', isHost: !!me.isHost, hostName: host.name || 'the Game Master', key: state.code + ':' + state.winnerId + ':' + state.round });
+        break;
+      }
+      default:
+        break;
     }
   }
-}
 
-async function toggleSelection(playerId, isSelectedOptimistic) {
-  try {
-    const rd = await readBlob(localState.blobId);
-    rd.selectedForElim = rd.selectedForElim || [];
-    const idx = rd.selectedForElim.indexOf(playerId);
-    if (idx >= 0) {
-      rd.selectedForElim.splice(idx, 1);
-    } else {
-      rd.selectedForElim.push(playerId);
+  function leaveToHome(message) {
+    stopClock();
+    clearTimeout(S.tickRetry);
+    try { S.room?.leave?.(); } catch (e) { /* ignore */ }
+    S.room = null;
+    S.state = null;
+    S.mode = null;
+    resetRenderKeys();
+    setTone(0);
+    setView(null);
+    if (message) toast(message);
+    go('screen-home', 'back');
+  }
+
+  function netAvailable() {
+    if (window.Net && typeof window.Net.create === 'function') return true;
+    toast('Online play is not loaded on this page yet. Try One phone.', 'error');
+    return false;
+  }
+
+  async function netCreate() {
+    const name = R.cleanName($('net-name-input').value);
+    if (name.length < 2) { showErr('net-error', 'Enter your name first'); return; }
+    if (!netAvailable()) return;
+    store(KEY_NAME, name);
+    const btn = $('net-create-btn');
+    btn.disabled = true;
+    btn.textContent = 'Creating';
+    try {
+      const room = await window.Net.create('ooi', name, { timerSeconds: S.timerSeconds, recentQuestions: deviceUsed() });
+      attachRoom(room);
+    } catch (e) {
+      showErr('net-error', e?.message || 'Could not reach the server');
     }
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-  } catch (e) { console.error(e); }
-}
+    btn.disabled = false;
+    btn.textContent = 'Create a room';
+  }
 
-async function eliminateSelected() {
-  try {
-    const rdCache = await readBlob(localState.blobId);
-    const rd = JSON.parse(JSON.stringify(rdCache));
+  async function netJoin() {
+    const code = $('join-code-input').value.replace(/\D/g, '');
+    const name = R.cleanName($('join-name-input').value);
+    if (code.length !== 4) { showErr('join-error', 'Enter the 4-digit room code'); return; }
+    if (name.length < 2) { showErr('join-error', 'Enter your name first'); return; }
+    if (!netAvailable()) return;
+    store(KEY_NAME, name);
+    const btn = $('join-btn');
+    btn.disabled = true;
+    btn.textContent = 'Joining';
+    try {
+      const room = await window.Net.join('ooi', code, name);
+      attachRoom(room);
+    } catch (e) {
+      showErr('join-error', e?.message === 'started' ? 'That game has already started' : (e?.message || 'Room not found'));
+    }
+    btn.disabled = false;
+    btn.textContent = 'Join';
+  }
 
-    if (!rd.selectedForElim || rd.selectedForElim.length === 0) {
-      alert('Select at least one player to eliminate');
+  async function netRejoin() {
+    if (!window.Net?.rejoin) return false;
+    try {
+      const room = await window.Net.rejoin('ooi');
+      if (room) { attachRoom(room); return true; }
+    } catch (e) { /* no session */ }
+    return false;
+  }
+
+  // Copy that also works on plain http pages (the clipboard API needs https or localhost).
+  async function copyText(text) {
+    try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; } } catch (e) { /* fall through */ }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:-1000px;left:-1000px;opacity:0';
+      document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+      const done = document.execCommand('copy');
+      ta.remove();
+      return !!done;
+    } catch (e) { return false; }
+  }
+
+  function shareUrl() { return window.location.origin + window.location.pathname + '?code=' + (S.state?.code || ''); }
+
+  async function shareRoom() {
+    const code = S.state?.code || '';
+    const text = 'Join my Odd One In game. Room ' + code;
+    // Opens WhatsApp when it is installed, otherwise WhatsApp Web, with the invite ready to send.
+    const link = 'https://wa.me/?text=' + encodeURIComponent(text + '\n' + shareUrl());
+    const win = window.open(link, '_blank');
+    if (!win) { if (await copyText(text + '\n' + shareUrl())) toast('Invite copied, paste it in WhatsApp'); else toast('Room code ' + code); }
+  }
+
+  // ---------------------------------------------------------------- mode B: one phone
+  async function loadQuestions() {
+    if (S.questions) return S.questions;
+    try {
+      const res = await fetch('../questions.json', { cache: 'no-cache' });
+      S.questions = R.loadQuestions(await res.json());
+    } catch (e) {
+      S.questions = { tier1: ['Name a fruit.'], tier2: ['Name a season.'], tier3: ['Name a side of a coin.'] };
+    }
+    return S.questions;
+  }
+
+  function saveLocal() { store(KEY_LOCAL, S.local); }
+
+  function renderLocalSetup() {
+    $('local-players').innerHTML = S.localNames.map((n, i) =>
+      '<li class="player-item"><span>' + esc(n) + (i === 0 ? '<span class="tag">Game Master</span>' : '') + '</span><button type="button" class="remove-btn" data-remove="' + i + '" aria-label="Remove ' + esc(n) + '" data-name="' + esc(n) + '">&times;</button></li>').join('');
+    $('local-timer-value').textContent = S.timerSeconds;
+    const n = S.localNames.length;
+    $('local-start-btn').disabled = n < R.MIN_PLAYERS;
+    $('local-hint').textContent = n < R.MIN_PLAYERS
+      ? 'Add at least ' + R.MIN_PLAYERS + ' players, ' + (R.MIN_PLAYERS - n) + ' more to go'
+      : n + ' players, ' + S.timerSeconds + ' seconds per answer. The first name is the Game Master.';
+  }
+
+  function localAddName() {
+    const input = $('local-name-input');
+    const name = R.cleanName(input.value);
+    if (!name) return;
+    if (S.localNames.some((n) => n.toLowerCase() === name.toLowerCase())) { toast(name + ' is already in', 'error'); return; }
+    if (S.localNames.length >= R.MAX_PLAYERS) { toast('That is the maximum, ' + R.MAX_PLAYERS + ' players', 'error'); return; }
+    S.localNames.push(name);
+    input.value = '';
+    input.focus();
+    sfx('tap');
+    renderLocalSetup();
+  }
+
+  async function localStart() {
+    if (S.localNames.length < R.MIN_PLAYERS) return;
+    await loadQuestions();
+    S.mode = 'local';
+    resetRenderKeys();
+    S.local = {
+      players: S.localNames.map((name, i) => ({ id: 'l' + i, name, isHost: i === 0, eliminated: false })),
+      timerSeconds: S.timerSeconds,
+      round: 0, question: '', tier: null, used: deviceUsed(),
+      answers: {}, order: [], turn: 0, phase: 'pass', deadline: 0,
+      selected: [], eliminatedThisRound: [], reviewDone: false, winnerId: null,
+    };
+    localBeginRound();
+  }
+
+  function localBeginRound() {
+    const L = S.local;
+    const alive = R.alivePlayers(L.players);
+    L.round += 1;
+    L.tier = R.pickTier(alive.length);
+    const picked = R.pickQuestion(R.tierPool(S.questions, L.tier), L.used);
+    L.question = picked.question;
+    L.used = picked.used;
+    rememberUsed(L.used);
+    L.answers = {};
+    L.order = alive.map((p) => p.id);
+    L.turn = 0;
+    L.selected = [];
+    L.eliminatedThisRound = [];
+    L.reviewDone = false;
+    L.phase = 'pass';
+    saveLocal();
+    renderLocal();
+  }
+
+  function localCurrent() { const L = S.local; return L.players.find((p) => p.id === L.order[L.turn]); }
+
+  function renderLocal() {
+    const L = S.local;
+    if (!L) return;
+    const host = L.players.find((p) => p.isHost) || {};
+    switch (L.phase) {
+      case 'pass': {
+        stopClock();
+        setTone(L.round);
+        setView(null);
+        const p = localCurrent();
+        $('pass-round').textContent = 'Round ' + L.round + ', player ' + (L.turn + 1) + ' of ' + L.order.length;
+        $('pass-name').textContent = p.name;
+        $('pass-sub').textContent = 'Make sure nobody else can see the screen. Tap I\'m ready and the question and clock appear.';
+        go('screen-pass');
+        break;
+      }
+      case 'answer': {
+        const p = localCurrent();
+        renderAnswer({
+          round: L.round, turnLabel: p.name + "'s turn", question: L.question, meOut: false, answered: false, answer: '',
+          waitingFor: [], paused: false, hostName: host.name, hostControls: false,
+          clockKey: L.deadline, totalMs: L.timerSeconds * 1000, remaining: () => Math.max(0, L.deadline - Date.now()),
+          onDone: () => localLockTurn($('answer-input').value),
+        });
+        break;
+      }
+      case 'review':
+        renderReview({
+          round: L.round, question: L.question, list: R.sortForReview(L.players, L.answers), isHost: true, meId: null, meOut: false,
+          selected: new Set(L.selected), eliminatedThisRound: L.eliminatedThisRound, reviewDone: L.reviewDone,
+          hostName: host.name, aliveCount: R.alivePlayers(L.players).length,
+        });
+        break;
+      case 'winner': {
+        const w = L.players.find((p) => p.id === L.winnerId) || {};
+        renderWinner({ name: w.name || 'Nobody', isHost: true, hostName: host.name, key: 'local:' + L.round + ':' + L.winnerId });
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  function localReady() {
+    const L = S.local;
+    L.phase = 'answer';
+    L.deadline = Date.now() + L.timerSeconds * 1000;
+    saveLocal();
+    renderLocal();
+  }
+
+  // Locks this player's answer (typed text when time runs out, or the submitted text) and moves on.
+  function localLockTurn(text) {
+    const L = S.local;
+    if (!L || L.phase !== 'answer') return;
+    const p = localCurrent();
+    L.answers[p.id] = R.cleanAnswer(text);
+    stopClock();
+    L.turn += 1;
+    if (L.turn < L.order.length) {
+      L.phase = 'pass';
+    } else {
+      L.answers = R.lockAnswers(L.players, L.answers);
+      L.phase = 'review';
+    }
+    saveLocal();
+    renderLocal();
+  }
+
+  function localSelect(id) {
+    const L = S.local;
+    if (L.reviewDone) return;
+    const i = L.selected.indexOf(id);
+    if (i >= 0) L.selected.splice(i, 1); else L.selected.push(id);
+    saveLocal();
+    renderLocal();
+  }
+
+  function localPrimary() {
+    const L = S.local;
+    if (L.reviewDone || !L.selected.length) { localBeginRound(); return; }
+    const err = R.canEliminate(L.players, L.selected);
+    if (err) { toast(err, 'error'); return; }
+    L.players = R.applyEliminations(L.players, L.selected, L.round);
+    L.eliminatedThisRound = L.selected.slice();
+    L.selected = [];
+    L.reviewDone = true;
+    const winner = R.checkWinner(L.players);
+    if (winner) { L.winnerId = winner.id; L.phase = 'winner'; }
+    saveLocal();
+    renderLocal();
+  }
+
+  function localEnd(toSetup) {
+    stopClock();
+    S.local = null;
+    S.mode = null;
+    store(KEY_LOCAL, null);
+    resetRenderKeys();
+    setTone(0);
+    setView(null);
+    if (toSetup) { renderLocalSetup(); go('screen-local-setup', 'back'); }
+    else go('screen-home', 'back');
+  }
+
+  function localResume() {
+    const saved = load(KEY_LOCAL, null);
+    if (!saved || !Array.isArray(saved.players) || saved.phase === 'winner') { store(KEY_LOCAL, null); return false; }
+    S.local = saved;
+    S.mode = 'local';
+    S.localNames = saved.players.map((p) => p.name);
+    if (saved.phase === 'answer') saved.phase = 'pass'; // the clock does not survive a refresh, restart this player's turn
+    loadQuestions().then(renderLocal);
+    return true;
+  }
+
+  // ---------------------------------------------------------------- wiring
+  function wire() {
+    const savedName = load(KEY_NAME, '');
+    $('net-name-input').value = savedName;
+    $('join-name-input').value = savedName;
+    S.timerSeconds = Math.min(R.TIMER.max, Math.max(R.TIMER.min, Number(load(KEY_TIMER, R.TIMER.default)) || R.TIMER.default));
+    $('lobby-timer-value').textContent = S.timerSeconds;
+    $('local-timer-value').textContent = S.timerSeconds;
+    document.querySelectorAll('.mode-card, .stepper-btn').forEach((el) => { try { window.Motion?.press?.(el); } catch (e) { /* ignore */ } });
+
+    // home
+    $('mode-create-btn').addEventListener('click', () => { sfx('tap'); go('screen-net'); });
+    $('mode-join-btn').addEventListener('click', () => { sfx('tap'); go('screen-join'); });
+    // ONE PHONE MODE DISABLED for now: the card is commented out in the page. Restore both to bring it back.
+    // $('mode-local-btn').addEventListener('click', () => { sfx('tap'); renderLocalSetup(); go('screen-local-setup'); });
+    $('server-settings-link').addEventListener('click', () => {
+      let current = '';
+      try { current = window.Net?.getServerUrl?.() || load(KEY_SERVER, '') || localStorage.getItem(KEY_SERVER_LEGACY) || ''; } catch (e) { /* ignore */ }
+      $('server-url-input').value = current;
+      go('screen-server');
+    });
+    $('server-save-btn').addEventListener('click', () => {
+      const url = $('server-url-input').value.trim();
+      if (window.Net?.setServerUrl) window.Net.setServerUrl(url);
+      else { store(KEY_SERVER, url || null); try { if (!url) localStorage.removeItem(KEY_SERVER_LEGACY); } catch (e) { /* ignore */ } }
+      toast(url ? 'Server saved' : 'Using the default server');
+      go('screen-net', 'back');
+    });
+    $('server-back-btn').addEventListener('click', () => go('screen-net', 'back'));
+    // Top-left back icons trigger the screen's own Back button
+    document.querySelectorAll('.topbar-back[data-back]').forEach((b) => {
+      b.addEventListener('click', () => { const t = $(b.dataset.back); if (t) t.click(); });
+    });
+    // Rules popup, the same as Mafia and Undercover
+    const rulesModal = $('rules-modal');
+    if (rulesModal && $('rules-btn')) {
+      if (rulesModal.parentElement !== document.body) document.body.appendChild(rulesModal);
+      const openRules = () => { rulesModal.classList.remove('hidden'); const s = rulesModal.querySelector('.rules-scroll'); if (s) s.scrollTop = 0; };
+      const closeRules = () => rulesModal.classList.add('hidden');
+      $('rules-btn').addEventListener('click', openRules);
+      $('close-rules').addEventListener('click', closeRules);
+      $('rules-modal-overlay').addEventListener('click', closeRules);
+    }
+
+    // net setup
+    $('net-create-btn').addEventListener('click', netCreate);
+    $('net-name-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') netCreate(); });
+    $('net-back-btn').addEventListener('click', () => go('screen-home', 'back'));
+    $('join-btn').addEventListener('click', netJoin);
+    $('join-name-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') netJoin(); });
+    $('join-code-input').addEventListener('input', (e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4); });
+    $('join-back-btn').addEventListener('click', () => go('screen-home', 'back'));
+
+    // lobby
+    $('lobby-start-btn').addEventListener('click', () => { sfx('tap'); send('start'); });
+    $('lobby-leave-btn').addEventListener('click', () => leaveToHome());
+    $('lobby-back-icon').addEventListener('click', () => {
+      const host = !!S.state?.players?.find?.((p) => p.id === S.state?.me?.id)?.isHost;
+      if (host) askConfirm('Close the room?', 'The game ends and everyone is sent home.', 'Close room', () => leaveToHome());
+      else askConfirm('Leave the room?', 'You can join again with the same code.', 'Leave room', () => leaveToHome());
+    });
+    $('lobby-rules-btn').addEventListener('click', () => $('rules-btn').click());
+    $('lobby-players').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-remove]');
+      if (!btn) return;
+      askConfirm('Remove ' + (btn.dataset.name || 'this player') + '?', 'They can join again with the room code.', 'Remove', () => send('kick', { playerId: btn.dataset.remove }));
+    });
+    $('lobby-timer-minus').addEventListener('click', () => send('setTimer', { timerSeconds: Math.max(R.TIMER.min, (S.state?.settings?.timerSeconds || R.TIMER.default) - 1) }));
+    $('lobby-timer-plus').addEventListener('click', () => send('setTimer', { timerSeconds: Math.min(R.TIMER.max, (S.state?.settings?.timerSeconds || R.TIMER.default) + 1) }));
+    $('share-btn').addEventListener('click', shareRoom);
+    $('share-copy-btn').addEventListener('click', async () => {
+      const url = shareUrl();
+      if (await copyText(url)) toast('Link copied'); else toast('Could not copy. Room code ' + (S.state?.code || ''));
+    });
+
+    // local setup
+    $('local-add-form').addEventListener('submit', (e) => { e.preventDefault(); localAddName(); });
+    $('local-players').addEventListener('click', (e) => {
+      const i = e.target.closest('[data-remove]')?.dataset.remove;
+      if (i !== undefined) { S.localNames.splice(Number(i), 1); renderLocalSetup(); }
+    });
+    $('local-timer-minus').addEventListener('click', () => { setTimerSetting(S.timerSeconds - 1); renderLocalSetup(); });
+    $('local-timer-plus').addEventListener('click', () => { setTimerSetting(S.timerSeconds + 1); renderLocalSetup(); });
+    $('local-start-btn').addEventListener('click', () => { sfx('tap'); localStart(); });
+    $('local-back-btn').addEventListener('click', () => go('screen-home', 'back'));
+
+    // pass the phone
+    $('pass-ready-btn').addEventListener('click', () => { sfx('tap'); localReady(); });
+    $('pass-end-btn').addEventListener('click', (e) => armDanger(e.currentTarget, () => localEnd(true)));
+
+    // answer
+    const submit = () => {
+      const text = R.cleanAnswer($('answer-input').value);
+      if (!text) { toast('Type an answer first', 'error'); $('answer-input').focus(); return; }
+      sfx('tap');
+      haptic('light');
+      if (S.mode === 'local') { localLockTurn(text); return; }
+      $('answer-submit-btn').disabled = true;
+      send('answer', { text }).then(() => { $('answer-submit-btn').disabled = false; });
+    };
+    $('answer-submit-btn').addEventListener('click', submit);
+    $('answer-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+    $('host-pause-btn').addEventListener('click', () => send(S.state?.paused ? 'resume' : 'pause'));
+    $('host-skip-btn').addEventListener('click', () => send('skip'));
+    $('host-reset-btn').addEventListener('click', () => askConfirm('Restart the timer?', 'Everyone answers this question again from the start.', 'Restart', () => send('reset')));
+    $('host-end-btn').addEventListener('click', (e) => armDanger(e.currentTarget, () => send('endGame')));
+
+    // review
+    $('review-list').addEventListener('click', (e) => {
+      const el = e.target.closest('button.answer-item');
+      if (!el || el.disabled) return;
+      sfx('tap');
+      if (S.mode === 'local') localSelect(el.dataset.id);
+      else send('select', { playerId: el.dataset.id });
+    });
+    $('review-primary-btn').addEventListener('click', () => {
+      sfx('tap');
+      if (S.mode === 'local') { localPrimary(); return; }
+      const st = S.state;
+      if (!st) return;
+      if (st.reviewDone || !(st.selected || []).length) send('nextRound');
+      else send('eliminate');
+    });
+    $('review-end-btn').addEventListener('click', (e) => armDanger(e.currentTarget, () => { if (S.mode === 'local') localEnd(true); else send('endGame'); }));
+
+    // winner
+    $('winner-again-btn').addEventListener('click', () => { sfx('tap'); if (S.mode === 'local') localEnd(true); else send('restart'); });
+    $('winner-home-btn').addEventListener('click', () => { if (S.mode === 'local') localEnd(false); else leaveToHome(); });
+
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && S.mode === 'net' && S.state) onNetState(S.state); });
+  }
+
+  async function boot() {
+    wire();
+    const params = new URLSearchParams(window.location.search);
+    const code = (params.get('code') || '').replace(/\D/g, '').slice(0, 4);
+    if (code) {
+      $('join-code-input').value = code;
+      go('screen-join');
+      setTimeout(() => { try { $('join-name-input').focus(); } catch (e) { /* ignore */ } }, 400);
       return;
     }
-
-    const elimControls = document.getElementById('elimination-controls');
-    if (elimControls) elimControls.classList.add('hidden');
-    document.getElementById('review-subtitle').textContent = 'Eliminating...';
-
-    rd.selectedForElim.forEach(pid => {
-      const p = rd.players.find(pl => pl.id === pid);
-      if (p) p.isEliminated = true;
-    });
-
-    const alive = rd.players.filter(p => !p.isEliminated);
-    if (alive.length <= 2) {
-      rd.gameState = 'winner';
-      rd.winnerNames = alive.map(p => p.name);
-    } else {
-      rd.currentRound++;
-      rd.gameState = 'question';
-      rd.answers = {};
-      rd.selectedForElim = [];
-      const picked = pickQuestion(alive.length);
-      rd.currentQuestion = picked.question;
-      rd.questionTier = picked.tierKey;
-      rd.roundTheme = pickRoundTheme(rd);
-      rd.timerSeconds = 10;
-      rd.timerPaused = false;
-      rd.timerPhase = 'getready';
-      rd.getReadyCountdown = 3;
-    }
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-    pollRoom();
-  } catch (e) { console.error(e); pollRoom(); }
-}
-
-async function nextRoundNoElim() {
-  try {
-    const elimControls = document.getElementById('elimination-controls');
-    if (elimControls) elimControls.classList.add('hidden');
-    document.getElementById('review-subtitle').textContent = 'Starting next round...';
-
-    const rd = await readBlob(localState.blobId);
-    const alive = rd.players.filter(p => !p.isEliminated);
-    rd.currentRound++;
-    rd.gameState = 'question';
-    rd.answers = {};
-    rd.selectedForElim = [];
-    const picked = pickQuestion(alive.length);
-    rd.currentQuestion = picked.question;
-    rd.questionTier = picked.tierKey;
-    rd.roundTheme = pickRoundTheme(rd);
-    rd.timerSeconds = 10;
-    rd.timerPaused = false;
-    rd.timerPhase = 'getready';
-    rd.getReadyCountdown = 3;
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-    pollRoom();
-  } catch (e) { console.error(e); pollRoom(); }
-}
-
-// ================================
-// WINNER
-// ================================
-function renderWinner(rd) {
-  clearTimers();
-  const names = rd.winnerNames || [];
-  document.getElementById('winner-name').textContent = names.length === 1 ? names[0] : names.join(' & ');
-  const title = document.querySelector('#screen-winner .game-title');
-  title.textContent = names.length <= 1 ? '🏆 Winner! 🏆' : '🏆 Winners! 🏆';
-  spawnConfetti();
-  document.getElementById('play-again-btn').classList.toggle('hidden', !localState.isGM);
-}
-
-function spawnConfetti() {
-  const c = document.getElementById('confetti-container');
-  c.innerHTML = '';
-  const cols = ['#00d4aa', '#ff6b6b', '#ffd93d', '#6c5ce7', '#fd79a8', '#00b894', '#e17055'];
-  for (let i = 0; i < 50; i++) {
-    const p = document.createElement('div');
-    p.className = 'confetti-piece';
-    p.style.left = Math.random() * 100 + '%';
-    p.style.backgroundColor = cols[Math.floor(Math.random() * cols.length)];
-    p.style.animationDelay = Math.random() * 2 + 's';
-    p.style.animationDuration = (2 + Math.random() * 2) + 's';
-    c.appendChild(p);
+    if (await netRejoin()) return;
+    localResume();
   }
-}
 
-async function playAgain() {
-  if (!localState.isGM) return;
-  try {
-    const rd = await readBlob(localState.blobId);
-    rd.roomActive = false;
-    rd.lastUpdate = Date.now();
-    await updateBlob(localState.blobId, rd);
-  } catch (e) { console.error(e); }
-  stopPolling();
-  clearSession();
-  applyOddOneTheme(null);
-  showScreen('screen-mode-select');
-}
-
-// ================================
-// UTILITIES
-// ================================
-function esc(text) {
-  const d = document.createElement('div');
-  d.textContent = text;
-  return d.innerHTML;
-}
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+}());

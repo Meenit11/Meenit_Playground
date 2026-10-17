@@ -8,7 +8,13 @@
     <meta name="description" content="Act-O-Matic - Actions speak louder than words and look much dumber.">
     <meta name="theme-color" content="#111111">
     <title>Act-O-Matic - Meenit's Playground</title>
-    <link rel="stylesheet" href="../css/global.css">
+    <script src="../js/enter.js"></script>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <!-- Original shared stylesheet, frozen so the original look stays intact. -->
+    <link rel="stylesheet" href="../css/original-global.css">
     <link rel="stylesheet" href="../css/act-o-matic.css">
 </head>
 
@@ -17,43 +23,63 @@
 
         <!-- SCREEN 1: Setup -->
         <div id="screen-setup" class="screen">
+            <div class="setup-topbar"><a href="../index.html" class="topbar-back" aria-label="Back to home"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button type="button" class="topbar-rules" id="rules-btn">Rules</button></div>
             <div class="screen-header">
                 <h1 class="game-title">Act-O-Matic</h1>
-                <p class="tagline">Actions speak louder than words and look much dumber.</p>
+                <p class="tagline">Actions speak louder than words<br>and look much dumber.</p>
             </div>
-            <div class="content-card">
-                <div class="setup-box">
-                    <label><span class="step-badge">How to Play</span></label>
-                    <div class="how-it-works-text">
-                        <p><strong>🎯 Two Players Step Up</strong><br>
-                            Game Master picks 2 players</p>
-
-                        <p><strong>🎲 Roll for Actions</strong><br>
-                            Each player gets a secret action<br>
-                            <span style="opacity:0.8;font-size:0.85em;">(e.g., "Riding a rickshaw", "Brushing teeth",
-                                "Flying a kite")</span>
-                        </p>
-
-                        <p><strong>🎭 Act It Out</strong><br>
-                            Perform your secret action<br>
-                            No talking, no sounds!<br>
-                            Use gestures, movements, expressions<br>
-                            Other player watches</p>
-
-                        <p><strong>🤔 Guess!</strong><br>
-                            After acting, you must guess:<br>
-                            "What action did I just do?"</p>
-
-                        <p><strong>🏆 Results</strong><br>
-                            ✅ Correct guess &rarr; You WIN!<br>
-                            ❌ Wrong guess &rarr; Other player WINS!</p>
-
-                        <p><strong>🔁 Next Round</strong><br>
-                            Pick 2 new players and repeat!</p>
+            <div class="content-card intro-card">
+                <div class="intro-steps">
+                    <div class="intro-step">
+                        <span class="intro-icon">🎯</span>
+                        <div><strong>Two step up</strong><span>The Game Master picks 2 players.</span></div>
+                    </div>
+                    <div class="intro-step">
+                        <span class="intro-icon">🎲</span>
+                        <div><strong>Roll an action</strong><span>Each player gets a secret action.</span></div>
+                    </div>
+                    <div class="intro-step">
+                        <span class="intro-icon">🎭</span>
+                        <div><strong>Act it out, then guess</strong><span>No talking. Guess your own action to win.</span></div>
                     </div>
                 </div>
                 <button class="btn btn-primary btn-full btn-lg" id="start-btn">Let's Play!</button>
-                <a href="../index.html" class="back-link">Back to Home</a>
+            </div>
+        </div>
+
+        <!-- Rules popup -->
+        <div id="rules-modal" class="modal hidden">
+            <div class="modal-overlay" id="rules-modal-overlay"></div>
+            <div class="modal-content">
+                <button type="button" class="modal-close" id="close-rules">×</button>
+                <h2>How to Play</h2>
+                <div class="rules-scroll">
+                    <div class="rule-section">
+                        <h3>🎯 Game Flow</h3>
+                        <ol>
+                            <li>👥 <strong>Two Players Step Up:</strong> the Game Master picks 2 players</li>
+                            <li>🎲 <strong>Roll for Actions:</strong> each player gets a secret action</li>
+                            <li>🎭 <strong>Act It Out:</strong> perform it with gestures and expressions only</li>
+                            <li>🤔 <strong>Guess:</strong> after acting, guess "What action did I just do?"</li>
+                            <li>🔁 <strong>Next Round:</strong> pick 2 new players and repeat</li>
+                        </ol>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🤫 Acting Rules</h3>
+                        <ul>
+                            <li>🚫 No talking, no sounds</li>
+                            <li>🙌 Use gestures, movements and expressions</li>
+                            <li>👀 The other player watches closely</li>
+                        </ul>
+                    </div>
+                    <div class="rule-section">
+                        <h3>🏆 Results</h3>
+                        <ul>
+                            <li>✅ Correct guess: you WIN</li>
+                            <li>❌ Wrong guess: the other player WINS</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
 

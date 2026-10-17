@@ -245,7 +245,7 @@ body.uc-theme-elimination {
 body.uc-theme-elimination .elimination-center .content-card,
 body.uc-theme-elimination .content-card {
   background: linear-gradient(180deg, rgba(40, 15, 15, 0.98) 0%, rgba(25, 10, 10, 0.98) 100%) !important;
-  border-color: rgba(220, 38, 38, 0.45) !important;
+  border-color: rgba(139, 58, 74, 0.45) !important;
   color: #fff !important;
 }
 
@@ -784,9 +784,9 @@ body.uc-theme-gameover .winner-title {
 
 #eliminate-btn {
   margin-bottom: var(--s5);
-  background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+  background: linear-gradient(135deg, #8b3a4a, #6e2d3a) !important;
   color: #fff !important;
-  border-color: #b91c1c;
+  border-color: #6e2d3a;
   font-weight: 700;
 }
 
@@ -830,8 +830,8 @@ body.uc-theme-gameover .winner-title {
 }
 
 .elimination-player.selected {
-  border-color: #dc2626 !important;
-  background: rgba(220, 38, 38, 0.12);
+  border-color: #8b3a4a !important;
+  background: rgba(139, 58, 74, 0.12);
 }
 
 .elimination-list .btn,
@@ -1181,3 +1181,505 @@ body.uc-winner-spies .word-reveal-label {
   display: inline-block;
   margin-top: var(--s6);
 }
+
+/* =====================================================================
+   Additions on top of the original Undercover look
+   ===================================================================== */
+
+/* ===== Setup top bar: round back arrow left, Rules pill right ===== */
+.setup-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 var(--s2);
+}
+.topbar-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  text-decoration: none;
+}
+.topbar-back:active { transform: scale(0.92); }
+.topbar-rules {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.topbar-rules:active { transform: scale(0.95); }
+
+/* Back and Rules: Undercover's Start Game colours, white text */
+#screen-setup .topbar-back,
+#screen-setup .topbar-rules {
+  background: #3d2c5c;
+  border: 2px solid rgba(139, 92, 246, 0.35);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(61, 44, 92, 0.4);
+}
+
+/* Bigger title, tagline on two lines */
+body.uc-theme-setup .game-title {
+  font-size: clamp(2.6rem, 12vw, 3.4rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+body.uc-theme-setup .game-tagline { line-height: 1.5; }
+
+/* Step numbers 1, 2, 3: same row layout, number centred in its circle */
+#screen-setup .setup-box > label,
+#screen-setup .content-card > .section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  text-align: left;
+}
+#screen-setup .step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Rules popup sits high on the screen */
+#rules-modal {
+  align-items: flex-start;
+  padding-top: max(16px, env(safe-area-inset-top));
+}
+#rules-modal .modal-content {
+  margin-top: 2vh;
+  max-height: calc(100dvh - 40px);
+}
+
+/* Role card: tap first, then pass */
+.pass-hint {
+  margin: var(--s6) 0 var(--s3);
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: inherit;
+  opacity: 0.85;
+}
+#next-player-btn .btn-label { display: block; text-align: center; white-space: normal; line-height: 1.3; }
+
+/* In-game back to setup: same colours as the setup buttons */
+.ingame-back {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 12px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #fff;
+  background: #3d2c5c;
+  border: 2px solid rgba(139, 92, 246, 0.35);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+.ingame-back.hidden { display: none; }
+.ingame-back:active { transform: scale(0.92); }
+
+#back-setup-modal .modal-content {
+  background: linear-gradient(165deg, rgba(30, 20, 50, 0.98) 0%, rgba(20, 10, 30, 0.98) 100%);
+  border: 2px solid rgba(201, 168, 108, 0.4);
+  color: var(--uc-text);
+}
+.back-setup-title { margin: 0 0 var(--s3); }
+.back-setup-text { margin: 0 0 var(--s5); line-height: 1.5; opacity: 0.85; }
+#back-setup-modal .btn-primary { background: #3d2c5c; border: 2px solid rgba(139, 92, 246, 0.35); color: #fff; }
+#back-setup-modal .btn-outline { background: transparent; border-color: rgba(201, 168, 108, 0.5); color: var(--uc-golden); }
+
+/* ===== Motion: background ambience (slow drifting spotlights) ===== */
+.uc-ambience {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.uc-ambience span {
+  position: absolute;
+  width: 70vmax;
+  height: 70vmax;
+  border-radius: 50%;
+  opacity: 0.9;
+  will-change: transform;
+}
+.uc-ambience span:nth-child(1) {
+  top: -30vmax;
+  left: -25vmax;
+  background: radial-gradient(circle, rgba(201, 168, 108, 0.10) 0%, transparent 60%);
+  animation: ucDriftA 38s ease-in-out infinite alternate;
+}
+.uc-ambience span:nth-child(2) {
+  bottom: -30vmax;
+  right: -25vmax;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.11) 0%, transparent 60%);
+  animation: ucDriftB 46s ease-in-out infinite alternate;
+}
+.uc-ambience span:nth-child(3) {
+  top: 30%;
+  left: 20%;
+  width: 45vmax;
+  height: 45vmax;
+  background: radial-gradient(circle, rgba(232, 228, 220, 0.05) 0%, transparent 60%);
+  animation: ucDriftC 54s ease-in-out infinite alternate;
+}
+@keyframes ucDriftA {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(35vw, 30vh, 0); }
+}
+@keyframes ucDriftB {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-30vw, -35vh, 0); }
+}
+@keyframes ucDriftC {
+  0% { transform: translate3d(-15vw, 10vh, 0) scale(0.9); opacity: 0.5; }
+  100% { transform: translate3d(15vw, -15vh, 0) scale(1.1); opacity: 1; }
+}
+
+/* ===== Motion: elimination role reveal (spotlight sweep + redaction bar) ===== */
+#screen-role-reveal .reveal-card {
+  position: relative;
+  overflow: hidden;
+}
+.uc-spot-sweep {
+  position: absolute;
+  top: -25%;
+  bottom: -25%;
+  left: 0;
+  width: 60%;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(255, 240, 210, 0.28) 0%, rgba(255, 240, 210, 0.08) 40%, transparent 70%);
+  opacity: 0;
+  transform: translateX(-120%);
+  animation: ucSpotSweep 1.2s cubic-bezier(0.45, 0, 0.25, 1) 0.1s forwards;
+}
+@keyframes ucSpotSweep {
+  0% { opacity: 0; transform: translateX(-120%); }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(200%); }
+}
+.uc-reveal-play .eliminated-name { animation: ucRevealName 0.5s cubic-bezier(0.2, 0, 0, 1) both; }
+.uc-reveal-play .role-image-large { animation: ucRevealImg 0.7s cubic-bezier(0.2, 0, 0, 1) 0.55s both; }
+@keyframes ucRevealName {
+  0% { opacity: 0; transform: translateY(-10px); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes ucRevealImg {
+  0% { opacity: 0; transform: scale(0.82); }
+  70% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.uc-redact-wrap {
+  position: relative;
+  display: inline-block;
+}
+.uc-redact-bar {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: 8%;
+  bottom: 8%;
+  border-radius: 2px;
+  background: #050407;
+  box-shadow: 0 0 0 1px rgba(201, 168, 108, 0.35);
+  transform-origin: right center;
+  animation: ucRedactLift 0.6s cubic-bezier(0.7, 0, 0.3, 1) 1.25s forwards;
+}
+@keyframes ucRedactLift {
+  0% { transform: scaleX(1); opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: scaleX(0); opacity: 0; }
+}
+.uc-reveal-play ~ #continue-after-elimination-btn { animation: ucRevealName 0.4s ease-out 1.8s both; }
+
+/* ===== Motion: Mr. White's guess (tense pulse, then the verdict) ===== */
+#screen-mrwhite-guess .guess-center { position: relative; }
+#screen-mrwhite-guess .guess-center::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 180px;
+  height: 180px;
+  margin: -90px 0 0 -90px;
+  border-radius: 50%;
+  border: 2px solid rgba(42, 42, 42, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.5);
+}
+.uc-guess-tense .guess-input,
+.uc-guess-tense #submit-guess-btn { animation: ucHeartbeat 0.5s ease-in-out 3; }
+#screen-mrwhite-guess .uc-guess-tense::before { animation: ucPulseRing 0.5s ease-out 3; }
+.uc-guess-right .guess-input { animation: ucGuessRight 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+#screen-mrwhite-guess .uc-guess-right::before {
+  border-color: rgba(201, 168, 108, 0.9);
+  animation: ucPulseRing 0.7s ease-out both;
+}
+.uc-guess-wrong .guess-input { animation: ucGuessWrong 0.5s ease-in-out both; }
+.uc-guess-wrong #submit-guess-btn { animation: ucGuessDim 0.6s ease-out both; }
+@keyframes ucHeartbeat {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.04); }
+  50% { transform: scale(0.99); }
+  70% { transform: scale(1.02); }
+}
+@keyframes ucPulseRing {
+  0% { opacity: 0.7; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(1.8); }
+}
+@keyframes ucGuessRight {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@keyframes ucGuessWrong {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(9px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(4px); }
+}
+@keyframes ucGuessDim {
+  0% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+
+/* ===== Motion: game over (team-coloured celebration) ===== */
+#screen-game-over .game-over-center {
+  position: relative;
+  isolation: isolate;
+}
+.uc-go-burst {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -40px;
+  height: 380px;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  --uc-go-col: rgba(255, 215, 0, 0.22);
+}
+.uc-go-agents .uc-go-burst { --uc-go-col: rgba(255, 215, 0, 0.24); }
+.uc-go-spies .uc-go-burst { --uc-go-col: rgba(240, 240, 245, 0.16); }
+.uc-go-mrwhite .uc-go-burst { --uc-go-col: rgba(74, 74, 74, 0.14); }
+.uc-go-rays {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 440px;
+  height: 440px;
+  margin: -220px 0 0 -220px;
+  opacity: 0;
+  animation: ucRaysIn 0.9s cubic-bezier(0.2, 0, 0, 1) 0.15s forwards;
+}
+.uc-go-rays::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, var(--uc-go-col) 0deg 7deg, transparent 7deg 20deg);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  animation: ucRaysSpin 28s linear infinite;
+}
+.uc-go-ring {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border-radius: 50%;
+  border: 3px solid var(--uc-go-col);
+  opacity: 0;
+  transform: scale(0.2);
+  animation: ucRingOut 1.2s cubic-bezier(0.2, 0, 0, 1) 0.1s forwards;
+}
+.uc-go-ring-2 { animation-delay: 0.35s; }
+@keyframes ucRaysIn {
+  0% { opacity: 0; transform: scale(0.4); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ucRaysSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes ucRingOut {
+  0% { opacity: 1; transform: scale(0.2); }
+  100% { opacity: 0; transform: scale(3.2); }
+}
+.uc-go-play .winner-title { animation: ucGoStamp 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+.uc-go-play .winner-player-item { animation: ucGoPop 0.5s cubic-bezier(0.2, 1.3, 0.4, 1) both; animation-delay: calc(0.45s + var(--uc-i, 0) * 0.12s); }
+.uc-go-play .word-reveal-box { animation: ucGoRise 0.5s cubic-bezier(0.2, 0, 0, 1) 0.8s both; }
+.uc-go-play .word-reveal-box + .word-reveal-box { animation-delay: 0.95s; }
+@keyframes ucGoStamp {
+  0% { opacity: 0; transform: scale(1.6); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ucGoPop {
+  0% { opacity: 0; transform: translateY(12px) scale(0.6); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes ucGoRise {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: none; }
+}
+.uc-confetti {
+  position: absolute;
+  top: -20px;
+  animation-name: ucConfettiSway;
+  animation-timing-function: cubic-bezier(0.3, 0.1, 0.6, 1);
+  animation-fill-mode: both;
+}
+@keyframes ucConfettiSway {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(var(--uc-sway, 0px), 50vh, 0) rotate(calc(var(--uc-spin, 360deg) * 0.5)); }
+  100% { opacity: 0.8; transform: translate3d(calc(var(--uc-sway, 0px) * -0.5), 105vh, 0) rotate(var(--uc-spin, 360deg)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uc-ambience,
+  .uc-spot-sweep,
+  .uc-redact-bar,
+  .uc-go-burst,
+  .uc-confetti,
+  #screen-mrwhite-guess .guess-center::before { display: none !important; }
+  .uc-reveal-play *,
+  .uc-reveal-play ~ #continue-after-elimination-btn,
+  .uc-guess-tense *,
+  .uc-guess-right *,
+  .uc-guess-wrong *,
+  .uc-go-play * { animation: none !important; }
+}
+
+/* Title matches Mafia: Syne 800 in gold with a soft gold glow */
+body.uc-theme-setup .game-title {
+  font-family: var(--font);
+  font-weight: 800;
+  color: var(--uc-golden, #c9a86c) !important;
+  text-shadow: 0 0 24px rgba(201, 168, 108, 0.4);
+}
+
+
+/* Game over: no spinning rays or rings, a calm reveal instead */
+.uc-go-rays, .uc-go-ring { display: none !important; }
+.uc-go-play .winner-title { animation: ucGoTitle 0.6s cubic-bezier(0.2, 0, 0, 1) both; }
+.uc-go-play .winner-player-item { animation: ucGoCard 0.5s cubic-bezier(0.2, 0, 0, 1) both; animation-delay: calc(0.35s + var(--uc-i, 0) * 0.1s); }
+@keyframes ucGoTitle {
+  0% { opacity: 0; transform: translateY(14px); letter-spacing: 0.08em; }
+  100% { opacity: 1; transform: none; letter-spacing: normal; }
+}
+@keyframes ucGoCard {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* New speaker each round: the name settles in so a new pick is visible */
+#current-speaker-name.uc-new-speaker { animation: ucSpeaker 0.55s cubic-bezier(0.2, 1.2, 0.4, 1) both; }
+@keyframes ucSpeaker {
+  0% { opacity: 0; transform: translateY(10px) scale(0.92); }
+  100% { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .uc-go-play .winner-title, .uc-go-play .winner-player-item, #current-speaker-name.uc-new-speaker { animation: none; }
+}
+
+
+/* Title fits any phone width: no sideways scrolling */
+body.uc-theme-setup .game-title {
+  font-size: clamp(1.9rem, 10.5vw, 3rem);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+html, body.undercover-game { overflow-x: hidden; }
+
+
+/* Calm winner: each winner card flips in with a soft glow */
+.uc-go-play .winner-player-item {
+  animation: ucCalmFlip 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(0.4s + var(--uc-i, 0) * 0.12s);
+  backface-visibility: hidden;
+}
+@keyframes ucCalmFlip {
+  0% { opacity: 0; transform: perspective(600px) rotateY(-90deg); }
+  60% { opacity: 1; transform: perspective(600px) rotateY(8deg); box-shadow: 0 0 22px rgba(201, 168, 108, 0.45); }
+  100% { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .uc-go-play .winner-player-item { animation: none; } }
+
+
+/* ===== Title: one line on every phone ===== */
+body.uc-theme-setup .game-title {
+  font-size: clamp(1.6rem, 9vw, 2.6rem);
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+/* ===== Eliminated player's role: the same card look as the first role reveal ===== */
+#screen-role-reveal .reveal-card {
+  background: linear-gradient(180deg, rgba(35, 20, 50, 0.98) 0%, rgba(25, 15, 35, 0.98) 100%) !important;
+  border: 2px solid rgba(201, 168, 108, 0.45) !important;
+  border-radius: var(--radius-xl);
+  padding: var(--s8);
+  color: #fff !important;
+}
+#screen-role-reveal .eliminated-role { color: var(--uc-golden) !important; }
+#screen-role-reveal .eliminated-name { color: #fff !important; }
+#screen-role-reveal .uc-spot-sweep, #screen-role-reveal .uc-redact-bar { display: none !important; }
+#screen-role-reveal .uc-redact-wrap { background: none !important; }
+body.uc-reveal-mrwhite #screen-role-reveal .reveal-card {
+  background: #fff !important;
+  border-color: rgba(200, 200, 200, 0.5) !important;
+}
+body.uc-reveal-mrwhite #screen-role-reveal .eliminated-role,
+body.uc-reveal-mrwhite #screen-role-reveal .eliminated-name { color: #1a1a1a !important; }
+
+/* ===== Agents win: Undercover violet instead of brown, plain white title, no colour animation ===== */
+body.uc-winner-agents {
+  background: linear-gradient(165deg, #150c24 0%, #2d1f4a 50%, #150c24 100%) !important;
+  color: #ece6f5 !important;
+}
+body.uc-winner-agents .winner-title {
+  color: #ffffff !important;
+  text-shadow: none !important;
+}
+body.uc-winner-agents .winner-player-name { color: #ece6f5 !important; }
+body.uc-winner-agents .winner-card { color: #ece6f5 !important; }
+/* The title only rises and fades in; no letter spacing or colour change */
+.uc-go-play .winner-title { animation: ucGoTitlePlain 0.5s cubic-bezier(0.2, 0, 0, 1) both !important; }
+@keyframes ucGoTitlePlain {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: none; }
+}
+
+
+/* Reveal screen note and pass hint: shared wording and style */
+.reveal-note { margin: var(--s3) 0 var(--s5); font-size: 0.92rem; color: var(--uc-muted); text-align: center; }
+.pass-hint { margin: var(--s5) 0 var(--s3); font-size: 0.95rem; line-height: 1.45; text-align: center; opacity: 0.9; }
+
+body.uc-theme-setup .game-title { font-size: clamp(2rem, 10vw, 3rem); }
+
+/* No glow behind the title */
+body.uc-theme-setup .game-title { text-shadow: none !important; }

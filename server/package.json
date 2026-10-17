@@ -1,9 +1,17 @@
 {
-  "name": "playground-odd-one-in-api",
-  "version": "1.0.0",
-  "description": "Simple API for Odd One In multi-device play",
+  "name": "playground-server",
+  "version": "2.0.0",
+  "description": "Room engine for Meenit's Playground multi-phone games",
   "main": "server.js",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
   }
 }

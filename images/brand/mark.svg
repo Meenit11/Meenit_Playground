@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="pg-mark" viewBox="0 0 16 16" width="16" height="16" role="img" aria-labelledby="pg-mark-t"><title id="pg-mark-t">Meenit's Playground mark</title><desc>Pixel face with a halo and a wide grin on an indigo tile.</desc><style>
+.pg-mark .pg-mark-halo{animation:pg-mark-float 3.2s ease-in-out infinite}
+.pg-mark .pg-mark-eyes{transform-box:fill-box;transform-origin:50% 50%;animation:pg-mark-blink 5s ease-in-out infinite}
+@keyframes pg-mark-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-.45px)}}
+@keyframes pg-mark-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.12)}}
+@media (prefers-reduced-motion:reduce){.pg-mark *{animation:none!important}}
+</style><defs><linearGradient id="pg-mark-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a52c7"/><stop offset=".55" stop-color="#2b2f7c"/><stop offset="1" stop-color="#15173f"/></linearGradient></defs><rect width="16" height="16" rx="3.2" fill="url(#pg-mark-g)"/><g class="pg-mark-halo"><path d="M5 1h6v1h-6zM4 2h1v1h-1zM11 2h1v1h-1zM5 3h6v1h-6z" fill="#f2b63d"/></g><g class="pg-mark-eyes"><path d="M5 6h1v1h-1zM11 6h1v1h-1zM4 7h2v1h-2zM10 7h2v1h-2zM4 8h2v1h-2zM10 8h2v1h-2z" fill="#f2b63d"/><path d="M4 6h1v1h-1zM10 6h1v1h-1z" fill="#ffd166"/></g><path d="M6 13h4v1h-4z" fill="#b07a14"/><path d="M3 10h1v1h-1zM12 10h1v1h-1zM4 11h1v1h-1zM11 11h1v1h-1zM5 12h6v1h-6z" fill="#f4efe4"/></svg>

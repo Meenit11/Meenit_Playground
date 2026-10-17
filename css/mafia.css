@@ -1464,3 +1464,819 @@ body.winner-civilians .mafia-back-to-games-link {
   display: inline-block;
   margin-top: var(--s6);
 }
+.role-limit-note {
+    min-height: 1.2em;
+    margin: 8px 0 0;
+    font-size: 0.8rem;
+    color: var(--danger, #e0434f);
+    text-align: center;
+}
+
+
+/* ===== Setup screen layout ===== */
+.setup-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 var(--s2);
+}
+.topbar-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--mafia-bronze);
+  background: rgba(201, 168, 108, 0.1);
+  border: 1px solid rgba(201, 168, 108, 0.35);
+  text-decoration: none;
+}
+.topbar-back:active { transform: scale(0.92); }
+.topbar-rules {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--mafia-bronze);
+  background: rgba(201, 168, 108, 0.1);
+  border: 1px solid rgba(201, 168, 108, 0.35);
+  cursor: pointer;
+}
+.topbar-rules:active { transform: scale(0.95); }
+
+body.mafia-gangster .game-title-main {
+  font-size: clamp(2.6rem, 12vw, 3.4rem);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+body.mafia-gangster .game-tagline { line-height: 1.5; }
+
+/* Doctor and Detective numbers in gold, like Mafia */
+#doctor-count,
+#detective-count {
+  color: var(--mafia-bronze) !important;
+}
+
+/* Two-column role tiles */
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s3);
+}
+.role-grid .role-row-with-img {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--s2);
+  margin: 0;
+  padding: var(--s3) var(--s2);
+}
+.role-grid .role-icon {
+  width: clamp(64px, 18vw, 84px);
+  height: clamp(64px, 18vw, 84px);
+  min-width: 0;
+  min-height: 0;
+}
+.role-grid .role-info { flex: 0 0 auto; }
+.role-grid .role-desc { font-size: 0.76rem; line-height: 1.35; }
+.role-grid .number-input-vertical {
+  flex-direction: row;
+  gap: var(--s2);
+  margin-top: auto;
+}
+.role-grid .number-input-vertical input { width: 36px; padding: 0; }
+.role-grid .toggle-switch { margin-top: auto; }
+.role-grid .role-tile-wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  text-align: left;
+  padding: var(--s3) var(--s4);
+}
+.role-grid .role-tile-wide .role-info { flex: 1; }
+
+
+/* Several Lovers: one group of names per Lover */
+#lover-target-list .lover-for {
+  grid-column: 1 / -1;
+  margin: var(--s3) 0 var(--s1);
+  font-weight: 700;
+  color: var(--mafia-bronze);
+}
+#lover-target-list .lover-group {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+}
+#lover-count { color: var(--mafia-bronze) !important; }
+
+/* Step numbers 1, 2, 3: same row layout, number centred in its circle */
+#screen-setup .setup-box > label,
+#screen-setup .role-distribution > .section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  text-align: left;
+  letter-spacing: normal;
+  text-transform: none;
+}
+#screen-setup .step-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+  line-height: 1;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Back and Rules: red with gold, like the Start button */
+#screen-setup .topbar-back,
+#screen-setup .topbar-rules {
+  background: linear-gradient(135deg, #8b3a4a, #6e2d3a);
+  border: 1px solid rgba(201, 168, 108, 0.65);
+  color: var(--mafia-bronze);
+  box-shadow: 0 4px 14px rgba(139, 58, 74, 0.35);
+}
+
+/* Rules popup sits high on the screen */
+#rules-modal {
+  align-items: flex-start;
+  padding-top: max(16px, env(safe-area-inset-top));
+}
+#rules-modal .modal-content {
+  margin-top: 2vh;
+  max-height: calc(100dvh - 40px);
+}
+
+/* The "3" sits in a heading whose font metrics push the digit low: lift it slightly. */
+#screen-setup .role-distribution > .section-title .step-badge { padding-bottom: 3px; }
+
+/* Back and Rules: red with white, exactly like Start Game */
+#screen-setup .topbar-back,
+#screen-setup .topbar-rules {
+  background: linear-gradient(135deg, #8b3a4a, #6e2d3a);
+  border: 1px solid rgba(139, 58, 74, 0.5);
+  color: #fff;
+}
+
+
+/* Role card: tap first, then pass */
+.pass-hint {
+  margin: var(--s6) 0 var(--s3);
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: inherit;
+  opacity: 0.85;
+}
+
+/* In-game back to setup: same red and white as the setup buttons */
+.ingame-back {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 12px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #8b3a4a, #6e2d3a);
+  border: 1px solid rgba(139, 58, 74, 0.5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+.ingame-back.hidden { display: none; }
+.ingame-back:active { transform: scale(0.92); }
+
+#back-setup-modal .modal-content {
+  background: linear-gradient(180deg, rgba(45, 18, 18, 0.98) 0%, rgba(26, 10, 10, 0.98) 100%);
+  border: 2px solid rgba(139, 58, 74, 0.45);
+  color: #e8e0d8;
+}
+.back-setup-title { margin: 0 0 var(--s3); }
+.back-setup-text { margin: 0 0 var(--s5); line-height: 1.5; opacity: 0.85; }
+#back-setup-modal .btn-primary { background: linear-gradient(135deg, #8b3a4a, #6e2d3a); color: #fff; border-color: rgba(139, 58, 74, 0.5); }
+#back-setup-modal .btn-outline { color: #e8e0d8; border-color: rgba(232, 224, 216, 0.4); background: transparent; }
+
+/* Pass button: one label that wraps as a single line of text */
+#done-viewing-btn .btn-label { display: block; text-align: center; white-space: normal; line-height: 1.3; }
+
+
+/* =====================================================================
+   PHASE SCENERY (additive layer)
+   One continuous sky behind the existing screens. #mafia-scene sits at
+   z-index 0 behind .game-container (z-index 2). #mafia-fx-top lives inside
+   .game-container at z-index 40: above the screens, below the back button
+   (50), the banner (200) and the modals (1000). Neither takes taps.
+   Transform and opacity only for anything that moves.
+   ===================================================================== */
+.mafia-scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.9s ease, visibility 0s linear 0s;
+  contain: strict;
+}
+.mafia-scene[data-scene="off"] {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.9s ease, visibility 0s linear 0.9s;
+}
+.mafia-scene[data-scene="off"] *,
+.mafia-scene[data-scene="off"] *::before,
+.mafia-scene[data-scene="off"] *::after { animation-play-state: paused !important; }
+.mafia-scene *, .mafia-fx-top * { pointer-events: none; }
+
+/* The old falling blood animation on the morning screen is replaced by the reveal beat. */
+#screen-morning-results .morning-decor { display: none; }
+
+/* ---------- Sky layers: night is the base, others crossfade over it ---------- */
+.scene-sky {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+.sky-night { opacity: 1; background: linear-gradient(180deg, #04050d 0%, #0a1130 42%, #171c42 78%, #262352 100%); }
+.sky-dawn { background: linear-gradient(180deg, #120a1f 0%, #2a1230 38%, #622133 70%, #a84b3a 100%); }
+.sky-dusk { background: linear-gradient(180deg, #241f4a 0%, #6e3558 42%, #d26a45 78%, #f0a055 100%); }
+.sky-day { background: linear-gradient(180deg, #7dbfe4 0%, #aed8ee 48%, #e9e6d2 80%, #f6e1b6 100%); }
+.sky-civ { background: linear-gradient(180deg, #08132c 0%, #1a2b54 42%, #7d5236 78%, #eaa955 100%); }
+.sky-mafia { background: linear-gradient(180deg, #080205 0%, #24040a 48%, #4f0912 82%, #6e0f17 100%); }
+.sky-jester { background: linear-gradient(180deg, #150a29 0%, #301858 48%, #552a76 82%, #733a86 100%); }
+.mafia-scene[data-scene="dawn"] .sky-dawn,
+.mafia-scene[data-scene="dusk"] .sky-dusk,
+.mafia-scene[data-scene="day"] .sky-day,
+.mafia-scene[data-scene="win-civ"] .sky-civ,
+.mafia-scene[data-scene="win-mafia"] .sky-mafia,
+.mafia-scene[data-scene="win-jester"] .sky-jester { opacity: 1; }
+.mafia-scene[data-scene="dusk"] .sky-dusk { transition-duration: 0.8s; }
+
+/* ---------- Stars ---------- */
+.scene-stars {
+  position: absolute;
+  inset: 0 0 20% 0;
+  opacity: 0;
+  transition: opacity 1.4s ease 0.3s;
+}
+.mafia-scene[data-scene="night"] .scene-stars { opacity: 1; }
+.mafia-scene[data-scene="dawn"] .scene-stars { opacity: 0.22; transition-delay: 0s; }
+.mafia-scene[data-scene="dusk"] .scene-stars { opacity: 0.35; }
+.mafia-scene[data-scene="win-jester"] .scene-stars { opacity: 0.55; }
+.mafia-scene[data-scene="win-mafia"] .scene-stars { opacity: 0.18; }
+.mafia-scene[data-scene="day"] .scene-stars,
+.mafia-scene[data-scene="win-civ"] .scene-stars { transition-delay: 0s; transition-duration: 0.9s; }
+.scene-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff6dc;
+  opacity: 0.35;
+  animation: sceneTwinkle var(--t, 4s) ease-in-out var(--dl, 0s) infinite;
+}
+.scene-star.is-bright { box-shadow: 0 0 6px 1px rgba(255, 240, 200, 0.75); }
+@keyframes sceneTwinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.mafia-scene:not([data-scene="night"]):not([data-scene="dusk"]):not([data-scene="win-jester"]) .scene-star { animation-play-state: paused; }
+
+.scene-shooting {
+  position: absolute;
+  top: 12%;
+  left: 10%;
+  width: 130px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 250, 230, 0) 0%, rgba(255, 250, 230, 0.95) 100%);
+  box-shadow: 0 0 6px rgba(255, 245, 210, 0.7);
+  opacity: 0;
+  transform: rotate(22deg) translateX(0);
+}
+.scene-shooting.is-on { animation: sceneShoot 1.1s cubic-bezier(0.3, 0, 0.6, 1) forwards; }
+@keyframes sceneShoot {
+  0% { opacity: 0; transform: rotate(22deg) translateX(0) scaleX(0.4); }
+  12% { opacity: 1; }
+  70% { opacity: 0.9; }
+  100% { opacity: 0; transform: rotate(22deg) translateX(320px) scaleX(1); }
+}
+
+/* ---------- Moon: warm crescent with a pulsing halo ---------- */
+.scene-moon {
+  position: absolute;
+  top: max(64px, 8vh);
+  right: 7%;
+  width: 58px;
+  height: 58px;
+  opacity: 0;
+  transform: translate(-4vw, 42vh);
+  transition: transform 1.7s cubic-bezier(0.45, 0, 0.25, 1), opacity 1.3s ease;
+}
+.mafia-scene[data-scene="night"] .scene-moon { opacity: 1; transform: translate(0, 0); }
+.moon-halo {
+  position: absolute;
+  inset: -70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 232, 150, 0.32) 0%, rgba(255, 224, 140, 0.12) 38%, rgba(255, 224, 140, 0) 68%);
+  animation: sceneHalo 5.5s ease-in-out infinite;
+}
+.moon-disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset -15px 8px 0 0 #f7e7a2, 0 0 18px rgba(255, 228, 150, 0.28);
+}
+@keyframes sceneHalo {
+  0%, 100% { opacity: 0.7; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+.mafia-scene:not([data-scene="night"]) .moon-halo { animation-play-state: paused; }
+
+/* ---------- Day sun: soft disc, glow and slowly turning rays ---------- */
+.scene-sun {
+  position: absolute;
+  top: max(58px, 7vh);
+  right: 9%;
+  width: 78px;
+  height: 78px;
+  opacity: 0;
+  transform: translateY(66vh);
+  transition: transform 1.8s cubic-bezier(0.22, 0.7, 0.2, 1), opacity 1.1s ease;
+}
+.mafia-scene[data-scene="day"] .scene-sun { opacity: 1; transform: translateY(0); }
+.mafia-scene[data-scene="dusk"] .scene-sun { opacity: 1; transform: translateY(44vh); transition-duration: 0.9s, 0.4s; }
+.sun-disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 40%, #fffbea 0%, #ffeaa8 45%, #ffd172 100%);
+  box-shadow: 0 0 30px 6px rgba(255, 214, 120, 0.55), 0 0 90px 24px rgba(255, 200, 110, 0.28);
+}
+.sun-disc::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 40%, #ffd08a 0%, #f08a48 70%, #d9603a 100%);
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.mafia-scene[data-scene="dusk"] .sun-disc::after { opacity: 1; }
+.sun-glow {
+  position: absolute;
+  inset: -60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 236, 170, 0.5) 0%, rgba(255, 226, 150, 0.16) 45%, rgba(255, 226, 150, 0) 70%);
+  animation: sceneHalo 7s ease-in-out infinite;
+}
+.sun-rays {
+  position: absolute;
+  inset: -130px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 238, 180, 0) 0deg 6deg, rgba(255, 238, 180, 0.42) 7.5deg, rgba(255, 238, 180, 0) 9deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, rgba(0, 0, 0, 0.5) 40%, transparent 70%);
+  mask-image: radial-gradient(circle, #000 18%, rgba(0, 0, 0, 0.5) 40%, transparent 70%);
+  opacity: 0.55;
+  animation: sceneSpin 90s linear infinite;
+}
+@keyframes sceneSpin { to { transform: rotate(360deg); } }
+.mafia-scene:not([data-scene="day"]) .scene-sun .sun-rays,
+.mafia-scene:not([data-scene="day"]) .scene-sun .sun-glow { animation-play-state: paused; }
+
+/* Winner dawn sun: centred on the horizon, larger rays */
+.scene-dawnsun {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--city-h, 160px) - 34px);
+  width: 110px;
+  height: 110px;
+  margin-left: -55px;
+  opacity: 0;
+  transform: translateY(160px) scale(0.85);
+  transition: transform 2.2s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 1.4s ease;
+}
+.mafia-scene[data-scene="win-civ"] .scene-dawnsun { opacity: 1; transform: translateY(0) scale(1); }
+.scene-dawnsun .sun-rays { inset: -70vmax; opacity: 0.32; animation-duration: 120s; }
+.scene-dawnsun .sun-glow { inset: -140px; }
+.mafia-scene:not([data-scene="win-civ"]) .scene-dawnsun * { animation-play-state: paused; }
+
+/* ---------- Clouds ---------- */
+.scene-clouds {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.mafia-scene[data-scene="day"] .scene-clouds { opacity: 1; }
+.mafia-scene[data-scene="dusk"] .scene-clouds { opacity: 0.35; transition-duration: 0.8s; }
+.scene-cloud {
+  position: absolute;
+  left: 0;
+  width: 190px;
+  height: 54px;
+  animation: sceneDrift 120s linear infinite;
+}
+.scene-cloud span,
+.scene-cloud span::before,
+.scene-cloud span::after {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 253, 246, 0.85), rgba(255, 253, 246, 0.5) 55%, rgba(255, 253, 246, 0));
+}
+.scene-cloud span { inset: 0; }
+.scene-cloud span::before { content: ''; width: 96px; height: 80px; left: 34px; top: -32px; }
+.scene-cloud span::after { content: ''; width: 78px; height: 64px; left: 96px; top: -20px; }
+.cloud-1 { top: 17%; animation-duration: 110s; animation-delay: -30s; }
+.cloud-2 { top: 29%; animation-duration: 150s; animation-delay: -95s; opacity: 0.75; }
+.cloud-3 { top: 40%; animation-duration: 135s; animation-delay: -60s; opacity: 0.55; }
+.cloud-2 span { transform: scale(0.75); }
+.cloud-3 span { transform: scale(0.6); }
+@keyframes sceneDrift {
+  from { transform: translateX(-60vw); }
+  to { transform: translateX(120vw); }
+}
+.mafia-scene:not([data-scene="day"]):not([data-scene="dusk"]) .scene-cloud { animation-play-state: paused; }
+
+/* ---------- City skyline ---------- */
+.scene-city {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--city-h, 160px);
+}
+.scene-city svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  transition: opacity 1.5s ease-in-out;
+}
+.city-night .bk { fill: #141836; }
+.city-night .fr { fill: #06070e; }
+.city-day .bk { fill: #b4c6d6; }
+.city-day .fr { fill: #8fa6bc; }
+.city-blood .bk { fill: #3a0910; }
+.city-blood .fr { fill: #160205; }
+.city-day, .city-blood { opacity: 0; }
+.mafia-scene[data-scene="day"] .city-day { opacity: 1; }
+.mafia-scene[data-scene="dusk"] .city-day { opacity: 0; transition-duration: 0.8s; }
+.mafia-scene[data-scene="win-mafia"] .city-blood { opacity: 1; transition-duration: 2s; }
+.scene-win {
+  fill: #ffd27c;
+  opacity: 0;
+  transition: opacity 0.45s ease var(--d, 0s);
+}
+.mafia-scene[data-scene="night"] .scene-win,
+.mafia-scene[data-scene="win-jester"] .scene-win { opacity: 0.92; }
+.mafia-scene[data-scene="dawn"] .scene-win.keep { opacity: 0.7; }
+.mafia-scene[data-scene="dusk"] .scene-win.early { opacity: 0.85; }
+.mafia-scene[data-scene="win-mafia"] .scene-win { transition-duration: 0.3s; }
+.scene-flick { animation: sceneFlicker var(--f, 9s) steps(1, end) var(--fd, 0s) infinite; }
+@keyframes sceneFlicker {
+  0%, 88%, 93%, 100% { opacity: 1; }
+  90% { opacity: 0.25; }
+  91% { opacity: 0.85; }
+  92% { opacity: 0.1; }
+}
+.mafia-scene:not([data-scene="night"]) .scene-flick { animation-play-state: paused; }
+
+/* ---------- Effects layer inside the scene (behind content) ---------- */
+.scene-fx, .scene-smoke-layer { position: absolute; inset: 0; }
+.scene-ripple {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  margin: -110px 0 0 -110px;
+  border-radius: 50%;
+  border: 2px solid rgba(190, 20, 40, 0.75);
+  background: radial-gradient(circle, rgba(150, 10, 30, 0.38) 0%, rgba(120, 8, 24, 0.12) 50%, rgba(120, 8, 24, 0) 70%);
+  opacity: 0;
+  transform: scale(0.15);
+  animation: sceneRipple 2.4s cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+}
+.scene-ripple.is-rose { border-color: rgba(240, 110, 150, 0.7); background: radial-gradient(circle, rgba(230, 90, 140, 0.3) 0%, rgba(230, 90, 140, 0) 70%); }
+.scene-ripple.is-blast { border: 3px solid rgba(255, 170, 90, 0.85); background: radial-gradient(circle, rgba(255, 150, 70, 0.32) 0%, rgba(255, 120, 60, 0) 70%); animation-duration: 1.2s; }
+@keyframes sceneRipple {
+  0% { opacity: 0; transform: scale(0.15); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: scale(3.4); }
+}
+.scene-relief {
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  margin: -180px 0 0 -180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 236, 190, 0.45) 0%, rgba(255, 220, 170, 0.16) 45%, rgba(255, 220, 170, 0) 70%);
+  opacity: 0;
+  animation: sceneRelief 2.6s ease-in-out forwards;
+}
+@keyframes sceneRelief {
+  0% { opacity: 0; transform: scale(0.6); }
+  40% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+.scene-heart {
+  position: absolute;
+  width: 84px;
+  height: 76px;
+  margin: -38px 0 0 -42px;
+}
+.scene-heart i {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.scene-heart svg { display: block; width: 100%; height: 100%; fill: #e2486e; }
+.scene-heart i:first-child { clip-path: polygon(0 0, 52% 0, 44% 30%, 56% 52%, 46% 74%, 50% 100%, 0 100%); animation: sceneHeartL 2.2s ease-in-out forwards; }
+.scene-heart i:last-child { clip-path: polygon(52% 0, 100% 0, 100% 100%, 50% 100%, 46% 74%, 56% 52%, 44% 30%); animation: sceneHeartR 2.2s ease-in-out forwards; }
+@keyframes sceneHeartL {
+  0% { opacity: 0; transform: scale(0.5); }
+  20%, 42% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: translate(-22px, 46px) rotate(-24deg); }
+}
+@keyframes sceneHeartR {
+  0% { opacity: 0; transform: scale(0.5); }
+  20%, 42% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: translate(22px, 52px) rotate(26deg); }
+}
+.scene-smoke {
+  position: absolute;
+  bottom: 0;
+  width: 46vmax;
+  height: 46vmax;
+  margin-left: -23vmax;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(150, 14, 28, 0.42), rgba(110, 8, 20, 0.16) 60%, rgba(110, 8, 20, 0));
+  opacity: 0;
+  animation: sceneSmoke var(--t, 10s) ease-out var(--dl, 0s) infinite;
+}
+@keyframes sceneSmoke {
+  0% { opacity: 0; transform: translateY(20vmax) scale(0.5); }
+  30% { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-70vh) scale(1.5); }
+}
+
+/* ---------- Top overlay beats (above screens, below back button and modals) ---------- */
+.mafia-fx-top {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+}
+.fx-dim, .fx-vignette, .fx-flash { position: absolute; inset: 0; opacity: 0; }
+.fx-dim { background: #050103; }
+.fx-vignette { background: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(120, 0, 18, 0) 45%, rgba(120, 0, 18, 0.55) 78%, rgba(90, 0, 12, 0.9) 100%); }
+.fx-vignette.is-rose { background: radial-gradient(ellipse 75% 65% at 50% 45%, rgba(170, 40, 90, 0) 50%, rgba(170, 40, 90, 0.45) 82%, rgba(120, 20, 60, 0.75) 100%); }
+.fx-flash { background: radial-gradient(circle at 50% 50%, rgba(255, 214, 150, 0.85) 0%, rgba(255, 140, 60, 0.55) 45%, rgba(120, 30, 10, 0.3) 100%); }
+.fx-dim.is-on { animation: fxDim 1.7s ease-in-out forwards; }
+.fx-vignette.is-on { animation: fxVignette 2.6s ease-in-out forwards; }
+.fx-vignette.is-short { animation: fxVignette 1.6s ease-in-out forwards; }
+.fx-flash.is-on { animation: fxFlash 0.75s ease-out forwards; }
+@keyframes fxDim {
+  0% { opacity: 0; }
+  14%, 34% { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+@keyframes fxVignette {
+  0% { opacity: 0; }
+  22% { opacity: 1; }
+  42% { opacity: 0.5; }
+  58% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+@keyframes fxFlash {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.fx-ghost {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #ffe1e1;
+  text-shadow: 0 0 12px rgba(200, 20, 40, 0.9), 0 0 2px #3a0006;
+  animation: fxGhost 1.5s ease-in forwards;
+}
+.fx-ghost::after {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 50%;
+  height: 3px;
+  margin-top: -1px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(200, 20, 40, 0), #d11a34 15%, #d11a34 85%, rgba(200, 20, 40, 0));
+  box-shadow: 0 0 10px rgba(220, 30, 50, 0.8);
+  transform: scaleX(0);
+  animation: fxSlash 0.35s cubic-bezier(0.6, 0, 0.2, 1) 0.18s forwards;
+}
+@keyframes fxGhost {
+  0% { opacity: 0; transform: scale(1.05); }
+  10% { opacity: 1; transform: scale(1); }
+  18% { transform: translateX(-6px); }
+  24% { transform: translateX(6px); }
+  30% { transform: translateX(-3px); }
+  36%, 55% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateY(26px) scale(0.94); }
+}
+@keyframes fxSlash { to { transform: scaleX(1); } }
+
+/* Screen shake on the active screen only (never the container, so the
+   fixed back button does not move). Two names so it can replay. */
+#screen-morning-results.scene-shake-a { animation: sceneShakeA 0.5s ease-in-out 0.4s; }
+#screen-morning-results.scene-shake-b { animation: sceneShakeB 0.5s ease-in-out 0.4s; }
+@keyframes sceneShakeA {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-7px, 2px); }
+  40% { transform: translate(6px, -2px); }
+  60% { transform: translate(-4px, 1px); }
+  80% { transform: translate(2px, 0); }
+}
+@keyframes sceneShakeB {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-7px, 2px); }
+  40% { transform: translate(6px, -2px); }
+  60% { transform: translate(-4px, 1px); }
+  80% { transform: translate(2px, 0); }
+}
+
+/* ---------- Winner particles (in the existing confetti container) ---------- */
+.scene-mote {
+  position: absolute;
+  bottom: -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6d0 0%, #f2cf6a 60%, rgba(242, 207, 106, 0) 100%);
+  box-shadow: 0 0 8px 2px rgba(255, 214, 110, 0.55);
+  opacity: 0;
+  animation: sceneRise var(--t, 7s) ease-out var(--dl, 0s) infinite;
+}
+@keyframes sceneRise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: 0.95; }
+  100% { opacity: 0; transform: translate(var(--dx, 0px), -105vh); }
+}
+.scene-confetti {
+  position: absolute;
+  top: -24px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: sceneConfetti var(--t, 4.5s) cubic-bezier(0.25, 0.4, 0.5, 1) var(--dl, 0s) forwards;
+}
+@keyframes sceneConfetti {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg) rotateX(0deg); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(var(--dx, 0px), 110vh, 0) rotate(var(--rot, 540deg)) rotateX(720deg); }
+}
+
+/* ---------- Winner intro: title and list arrive after the background beat ---------- */
+#screen-winner.scene-intro .winner-title { animation: sceneTitleIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both; }
+#screen-winner.scene-intro .winner-details { animation: sceneRiseIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 1.3s both; }
+#screen-winner.scene-intro .mafia-play-again-btn,
+#screen-winner.scene-intro .mafia-back-to-games-link { animation: sceneRiseIn 0.6s ease-out 1.65s both; }
+body.winner-jester #screen-winner.scene-intro .winner-title { animation-name: sceneTitleSpin; animation-duration: 1s; }
+@keyframes sceneTitleIn {
+  0% { opacity: 0; transform: translateY(18px) scale(0.92); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes sceneRiseIn {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes sceneTitleSpin {
+  0% { opacity: 0; transform: rotate(-200deg) scale(0.3); }
+  70% { opacity: 1; transform: rotate(12deg) scale(1.06); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---------- Reduced motion: still scenes, no particles, no shake ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .mafia-scene *, .mafia-scene *::before, .mafia-scene *::after,
+  .mafia-fx-top *, .mafia-fx-top *::before, .mafia-fx-top *::after,
+  .scene-mote, .scene-confetti {
+    animation: none !important;
+  }
+  .mafia-scene .scene-sky, .mafia-scene .scene-stars, .mafia-scene svg, .mafia-scene .scene-clouds,
+  .mafia-scene .scene-moon, .mafia-scene .scene-sun, .mafia-scene .scene-dawnsun, .mafia-scene .scene-win {
+    transition: opacity 0.4s linear !important;
+  }
+  .scene-shooting, .scene-mote, .scene-confetti, .scene-ripple, .scene-heart, .scene-smoke, .scene-relief, .fx-ghost { display: none !important; }
+  .fx-vignette.is-calm { opacity: 0.45; transition: opacity 0.3s linear !important; }
+  #screen-morning-results.scene-shake-a, #screen-morning-results.scene-shake-b { animation: none !important; }
+  #screen-winner.scene-intro .winner-title, #screen-winner.scene-intro .winner-details,
+  #screen-winner.scene-intro .mafia-play-again-btn, #screen-winner.scene-intro .mafia-back-to-games-link { animation: none !important; }
+}
+
+
+/* ===== Night: true black sky and a real SVG crescent (no dark overlay circle) ===== */
+.sky-night { background: linear-gradient(180deg, #000000 0%, #030303 55%, #0a0a0c 100%) !important; }
+
+.moon-disc {
+  border-radius: 0;
+  box-shadow: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='38%25' cy='55%25' r='62%25'%3E%3Cstop offset='0' stop-color='%23fff6cf'/%3E%3Cstop offset='1' stop-color='%23f2d77a'/%3E%3C/radialGradient%3E%3Cmask id='m'%3E%3Crect width='100' height='100' fill='%23fff'/%3E%3Ccircle cx='64' cy='38' r='36' fill='%23000'/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='40' fill='url%28%23g%29' fill-opacity='1' mask='url%28%23m%29'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.night-card-decor .moon {
+  border-radius: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='38%25' cy='55%25' r='62%25'%3E%3Cstop offset='0' stop-color='%23fff8dc'/%3E%3Cstop offset='1' stop-color='%23d4b84a'/%3E%3C/radialGradient%3E%3Cmask id='m'%3E%3Crect width='100' height='100' fill='%23fff'/%3E%3Ccircle cx='64' cy='38' r='36' fill='%23000'/%3E%3C/mask%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='40' fill='url%28%23g%29' fill-opacity='0.55' mask='url%28%23m%29'/%3E%3C/svg%3E") center / contain no-repeat;
+  opacity: 0.55;
+}
+.night-card-decor .moon::after { content: none; display: none; }
+
+
+/* ===== Calm winner: team colour fades in, title rises, cards flip in, one light confetti ===== */
+.scene-dawnsun, .scene-smoke-layer, .scene-mote { display: none !important; }
+.mafia-scene[data-scene="win-mafia"] .city-blood { opacity: 0 !important; }
+#screen-winner.scene-intro .winner-title,
+body.winner-jester #screen-winner.scene-intro .winner-title {
+  animation: calmTitle 0.6s cubic-bezier(0.2, 0, 0, 1) 0.15s both;
+}
+#screen-winner.scene-intro .winner-details { animation: calmFade 0.4s ease-out 0.45s both; }
+#screen-winner.scene-intro .mafia-play-again-btn { animation: calmFade 0.4s ease-out 0.9s both; }
+#screen-winner.scene-intro .final-role-item-winner {
+  animation: calmFlip 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  animation-delay: calc(0.55s + var(--wi, 0) * 0.12s);
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+@keyframes calmTitle {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes calmFade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes calmFlip {
+  0% { opacity: 0; transform: perspective(600px) rotateY(-90deg); box-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+  60% { opacity: 1; transform: perspective(600px) rotateY(8deg); box-shadow: 0 0 22px rgba(255, 236, 170, 0.45); }
+  100% { opacity: 1; transform: none; box-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #screen-winner.scene-intro .final-role-item-winner { animation: none; }
+}
+
+/* ===== Day: half sun flush on the card edge, name rows full width ===== */
+#screen-day .content-card { position: relative; overflow: hidden; }
+#screen-day .day-players-box {
+  margin-left: calc(-1 * var(--s6));
+  margin-right: calc(-1 * var(--s6));
+}
+#screen-day .day-players-box > h3,
+#screen-day .day-players-box > .elimination-hint {
+  padding-left: var(--s6);
+  padding-right: var(--s6);
+}
+#screen-day #alive-players-container .elimination-player-item {
+  margin-left: 0;
+  margin-right: 0;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+}
+#screen-day .day-box-sun::before {
+  top: 50%;
+  right: 0;
+  height: min(100%, 280px);
+  min-height: 0;
+  width: auto;
+  aspect-ratio: 1 / 2;
+  transform: translateY(-50%);
+  border-radius: 999px 0 0 999px;
+  background: radial-gradient(circle at 100% 50%, rgba(255, 252, 230, 0.6) 0%, rgba(245, 225, 120, 0.42) 38%, rgba(230, 200, 80, 0.18) 66%, transparent 100%);
+}
+
+
+/* Reveal screen note and pass hint: shared wording and style */
+.reveal-note { margin: var(--s3) 0 var(--s5); font-size: 0.92rem; color: var(--mafia-muted); text-align: center; }
+.pass-hint { margin: var(--s5) 0 var(--s3); font-size: 0.95rem; line-height: 1.45; text-align: center; opacity: 0.9; }
+
+body.mafia-gangster .game-title-main { font-size: clamp(2rem, 10vw, 3rem); white-space: nowrap; }
+
+/* No glow behind the title */
+body.mafia-gangster .game-title-main { text-shadow: none !important; }

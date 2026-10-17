@@ -8,19 +8,59 @@
     <meta name="theme-color" content="#0a080c">
     <title>Mafia — Meenit's Playground</title>
 
-    <link rel="stylesheet" href="../css/global.css">
+    <script src="../js/enter.js"></script>
+
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../favicon.ico" sizes="48x48">
+    <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <!-- Original shared stylesheet, frozen for the Mafia page so its original look stays intact. -->
+    <link rel="stylesheet" href="../css/mafia-global.css">
     <link rel="stylesheet" href="../css/mafia.css">
 </head>
 
 <body class="mafia-game mafia-gangster">
+    <!-- Phase scenery: one continuous sky behind all content. Decorative only, never takes taps. -->
+    <div id="mafia-scene" class="mafia-scene" data-scene="off" aria-hidden="true">
+        <div class="scene-sky sky-night"></div>
+        <div class="scene-sky sky-dawn"></div>
+        <div class="scene-sky sky-dusk"></div>
+        <div class="scene-sky sky-day"></div>
+        <div class="scene-sky sky-civ"></div>
+        <div class="scene-sky sky-mafia"></div>
+        <div class="scene-sky sky-jester"></div>
+        <div class="scene-stars" id="scene-stars"></div>
+        <div class="scene-shooting" id="scene-shooting"></div>
+        <div class="scene-moon"><div class="moon-halo"></div><div class="moon-disc"></div></div>
+        <div class="scene-sun"><div class="sun-rays"></div><div class="sun-glow"></div><div class="sun-disc"></div></div>
+        <div class="scene-dawnsun"><div class="sun-rays"></div><div class="sun-glow"></div><div class="sun-disc"></div></div>
+        <div class="scene-clouds">
+            <div class="scene-cloud cloud-1"><span></span></div>
+            <div class="scene-cloud cloud-2"><span></span></div>
+            <div class="scene-cloud cloud-3"><span></span></div>
+        </div>
+        <div class="scene-smoke-layer" id="scene-smoke"></div>
+        <div class="scene-city" id="scene-city"></div>
+        <div class="scene-fx" id="scene-fx"></div>
+    </div>
     <div class="game-container">
+        <!-- In-game back to setup (hidden on the setup screen) -->
+        <button type="button" class="ingame-back hidden" id="ingame-back-btn" aria-label="Back to game setup">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <div id="notification-banner" class="notification-banner hidden"></div>
 
         <!-- SCREEN 1: Setup -->
         <div id="screen-setup" class="screen">
+            <div class="setup-topbar">
+                <a href="../index.html" class="topbar-back" aria-label="Back to home">
+                    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <button type="button" class="topbar-rules" id="rules-btn">Rules</button>
+            </div>
             <div class="screen-header">
                 <h1 class="game-title-main">Mafia</h1>
-                <p class="game-tagline">Surviving the night is easy. Convincing others you're innocent is hard.</p>
+                <p class="game-tagline">Surviving the night is easy.<br>Convincing others you're innocent is hard.</p>
             </div>
 
             <div class="content-card setup-card">
@@ -39,8 +79,7 @@
                 <!-- Step 2: Player Names -->
                 <div class="setup-box">
                     <label><span class="step-badge">2</span> Player names</label>
-                    <p id="players-summary" class="players-summary" aria-live="polite">Total: 5 players — add names
-                        below</p>
+                    <p id="players-summary" class="players-summary" aria-live="polite">5 players: add 5 names below</p>
                     <input type="text" id="player-name-input" class="name-input"
                         placeholder="Type name and press Enter">
                     <div id="player-list" class="player-chips"></div>
@@ -50,16 +89,7 @@
                 <div class="role-distribution">
                     <h3 class="section-title"><span class="step-badge">3</span> Role Selection</h3>
 
-                    <!-- Doctor (Fixed) -->
-                    <div class="role-row-with-img">
-                        <img src="../images/Doctor.png" alt="Doctor" class="role-icon">
-                        <div class="role-info">
-                            <span class="role-label">Doctor</span>
-                            <p class="role-desc">Can save one player each night</p>
-                        </div>
-                        <span class="role-value">1</span>
-                    </div>
-
+                    <div class="role-grid">
                     <!-- Mafia -->
                     <div class="role-row-with-img">
                         <img src="../images/Mafia.png" alt="Mafia" class="role-icon">
@@ -68,12 +98,24 @@
                             <p class="role-desc">Kill one player each night</p>
                         </div>
                         <div class="number-input-vertical">
-                            <button class="number-btn-mini" id="increase-mafia">+</button>
-                            <input type="number" id="mafia-count" value="1" min="0" max="5" readonly>
                             <button class="number-btn-mini" id="decrease-mafia">−</button>
+                            <input type="number" id="mafia-count" value="1" min="0" max="5" readonly>
+                            <button class="number-btn-mini" id="increase-mafia">+</button>
                         </div>
                     </div>
-
+                    <!-- Doctor: at least 1, always fewer than Civilians -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Doctor.png" alt="Doctor" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Doctor</span>
+                            <p class="role-desc">Can save one player each night</p>
+                        </div>
+                        <div class="number-input-vertical">
+                            <button class="number-btn-mini" id="decrease-doctor">−</button>
+                            <input type="number" id="doctor-count" value="1" min="1" readonly>
+                            <button class="number-btn-mini" id="increase-doctor">+</button>
+                        </div>
+                    </div>
                     <!-- Detective -->
                     <div class="role-row-with-img">
                         <img src="../images/Detective.png" alt="Detective" class="role-icon">
@@ -81,12 +123,25 @@
                             <span class="role-label">Detective</span>
                             <p class="role-desc">Suspect if one player each night if they are Mafia</p>
                         </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="detective-toggle">
-                            <span class="toggle-slider"></span>
-                        </label>
+                        <div class="number-input-vertical">
+                            <button class="number-btn-mini" id="decrease-detective">−</button>
+                            <input type="number" id="detective-count" value="0" min="0" readonly>
+                            <button class="number-btn-mini" id="increase-detective">+</button>
+                        </div>
                     </div>
-
+                    <!-- Lovers -->
+                    <div class="role-row-with-img">
+                        <img src="../images/Lover.png" alt="Lover" class="role-icon">
+                        <div class="role-info">
+                            <span class="role-label">Lover</span>
+                            <p class="role-desc">Protects chosen player by sacrificing self</p>
+                        </div>
+                        <div class="number-input-vertical">
+                            <button class="number-btn-mini" id="decrease-lover">−</button>
+                            <input type="number" id="lover-count" value="0" min="0" readonly>
+                            <button class="number-btn-mini" id="increase-lover">+</button>
+                        </div>
+                    </div>
                     <!-- Jester -->
                     <div class="role-row-with-img">
                         <img src="../images/Jester.png" alt="Jester" class="role-icon">
@@ -99,7 +154,6 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-
                     <!-- Bomber -->
                     <div class="role-row-with-img">
                         <img src="../images/Bomber.png" alt="Bomber" class="role-icon">
@@ -112,22 +166,8 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-
-                    <!-- Lovers -->
-                    <div class="role-row-with-img">
-                        <img src="../images/Lover.png" alt="Lover" class="role-icon">
-                        <div class="role-info">
-                            <span class="role-label">Lover</span>
-                            <p class="role-desc">Protects chosen player by sacrificing self</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="lover-toggle">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-
                     <!-- Civilians (Auto-calculated) -->
-                    <div class="role-row-with-img">
+                    <div class="role-row-with-img role-tile-wide">
                         <img src="../images/Civilian.png" alt="Civilian" class="role-icon">
                         <div class="role-info">
                             <span class="role-label">Civilians</span>
@@ -135,11 +175,11 @@
                         </div>
                         <span class="role-value" id="civilian-count">2</span>
                     </div>
+                    </div>
+                    <p class="role-limit-note" id="role-limit-note" aria-live="polite"></p>
                 </div>
 
                 <button class="btn btn-primary btn-full" id="start-game-btn">Start Game</button>
-                <button class="btn btn-outline btn-full mafia-btn-spacing" id="rules-btn">Rules</button>
-                <a href="../index.html" class="back-to-home-link mafia-back-link">Back to Home</a>
             </div>
 
             <!-- Rules Modal -->
@@ -192,6 +232,7 @@
                 <div class="pass-phone-box">
                     <p class="player-name-large" id="next-viewer-name">Player Name</p>
                 </div>
+                <p class="reveal-note">Make sure nobody else can see the screen.</p>
 
                 <button class="btn btn-primary btn-full btn-lg" id="reveal-role-btn">Reveal My Role</button>
             </div>
@@ -206,8 +247,9 @@
                     <p class="role-description" id="role-description">Find the Mafia and eliminate them!</p>
                 </div>
 
-                <button class="btn btn-primary btn-full mt-2xl" id="done-viewing-btn">Pass Phone to&nbsp;<span
-                        id="next-player-name">Next Player</span></button>
+                <p class="pass-hint">Remember your role. Tap Done, then pass the phone to <strong id="next-player-hint">the next player</strong>.</p>
+                <button class="btn btn-primary btn-full" id="done-viewing-btn"><span class="btn-label">Done, pass to <span
+                        id="next-player-name">Next Player</span></span></button>
             </div>
         </div>
 
@@ -255,7 +297,7 @@
                 </div>
 
                 <div id="lover-selection-container" class="hidden mt-lg p-md border-accent rounded-lg">
-                    <p class="subtitle text-accent mb-sm">💖 Who did the Lover kiss?</p>
+                    <p class="subtitle text-accent mb-sm" id="lover-question">💖 Who did the Lover kiss?</p>
                     <div id="lover-target-list" class="grid-2-cols gap-sm"></div>
                 </div>
 
@@ -330,13 +372,28 @@
                 </div>
 
                 <button class="btn btn-lg mt-2xl mafia-play-again-btn" id="play-again-btn">Play Again</button>
-                <a href="../index.html" class="mafia-back-to-games-link">Back to Games</a>
             </div>
         </div>
 
+        <!-- Set-piece overlay for reveal beats: above the screens, below the back button and modals. -->
+        <div id="mafia-fx-top" class="mafia-fx-top" aria-hidden="true">
+            <div class="fx-dim"></div>
+            <div class="fx-vignette"></div>
+            <div class="fx-flash"></div>
+        </div>
     </div>
 
     <!-- Elimination Modal -->
+    <div id="back-setup-modal" class="modal hidden">
+        <div class="modal-overlay" id="back-setup-overlay"></div>
+        <div class="modal-content text-center">
+            <h2 class="back-setup-title">Back to game setup?</h2>
+            <p class="back-setup-text">This game will end. Player names and role settings are kept, so you can change them and start again.</p>
+            <button class="btn btn-primary btn-full" id="back-setup-yes">Yes, go to setup</button>
+            <button class="btn btn-outline btn-full mt-md" id="back-setup-no">Keep playing</button>
+        </div>
+    </div>
+
     <div id="elimination-modal" class="modal hidden">
         <div class="modal-content">
             <h3>Select Player to Eliminate</h3>

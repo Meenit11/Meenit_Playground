@@ -381,3 +381,181 @@ body.actomatic-game *:focus-visible {
     border-radius: var(--radius-md);
     font-size: 0.8rem;
 }
+
+/* ===== Roll animation: a small deck of action cards ===== */
+.flash-text.roll-hidden { display: none; }
+.roll-stage {
+    position: relative;
+    width: 100%;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 700px;
+}
+.roll-card {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 50%;
+    min-height: 118px;
+    margin-top: -59px;
+    border-radius: 18px;
+    background: linear-gradient(160deg, var(--aom-surface-2) 0%, var(--aom-surface) 100%);
+    border: 2px solid var(--aom-border);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+.roll-card-under.u1 { transform: translateY(8px) scale(0.96); opacity: 0.7; }
+.roll-card-under.u2 { transform: translateY(16px) scale(0.92); opacity: 0.45; }
+.roll-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 20px;
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+    z-index: 2;
+}
+.roll-card-text {
+    font-size: clamp(1.15rem, 5vw, 1.45rem);
+    font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
+    color: var(--aom-gold-bright);
+}
+.roll-stage.is-rolling .roll-card-text { color: var(--aom-gold); }
+.roll-stage.is-landed .roll-card-top {
+    border-color: var(--aom-gold);
+    box-shadow: 0 0 0 1px var(--aom-gold), 0 0 34px rgba(240, 192, 64, 0.45), 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+.roll-burst {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    border: 3px solid var(--aom-gold-bright);
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+.roll-spark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--aom-gold-bright);
+    box-shadow: 0 0 10px var(--aom-gold-bright);
+    pointer-events: none;
+    z-index: 3;
+}
+
+
+/* ===== Setup fits one screen: compact how-to grid, button always visible ===== */
+#screen-setup .screen-header { margin-bottom: var(--s4); }
+#screen-setup .content-card { padding: var(--s4) var(--s4) var(--s5); }
+#screen-setup .setup-box { margin-bottom: var(--s4); }
+#screen-setup .setup-box label { margin-bottom: var(--s2); }
+.how-it-works-text {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s2) var(--s3);
+    font-size: 0.82rem;
+    line-height: 1.4;
+    padding: var(--s3);
+    max-height: calc(100dvh - 300px);
+    overflow-y: auto;
+}
+.how-it-works-text p { margin: 0; }
+@media (max-width: 340px) { .how-it-works-text { grid-template-columns: 1fr; } }
+
+/* ===== Title style shared by all games ===== */
+.game-title {
+    font-family: var(--font);
+    font-size: clamp(2rem, 10vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    white-space: nowrap;
+    color: var(--aom-gold);
+    text-shadow: 0 0 24px rgba(212, 160, 23, 0.4);
+}
+.tagline { line-height: 1.5; }
+
+/* Round back icon at the top left, same as Mafia and Undercover */
+.setup-topbar { display: flex; align-items: center; justify-content: flex-start; margin: 0 0 var(--s2); }
+.topbar-back {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 50%; text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.topbar-back:active { transform: scale(0.92); }
+.topbar-back { background: linear-gradient(135deg, var(--aom-gold) 0%, var(--aom-gold-dim) 100%); color: #111; }
+
+
+/* ===== Setup: top bar with back and Rules, three clear steps, one button ===== */
+.setup-topbar { justify-content: space-between; }
+.topbar-rules {
+    min-height: 40px; padding: 0 18px; border-radius: 999px; font: inherit; font-weight: 800; font-size: 0.9rem;
+    background: linear-gradient(135deg, var(--aom-gold) 0%, var(--aom-gold-dim) 100%); color: #111; border: 0; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.topbar-rules:active { transform: scale(0.95); }
+#screen-setup .game-title { font-size: clamp(1.6rem, 8.4vw, 2.6rem); }
+.intro-card { padding: var(--s5) var(--s5) var(--s6); }
+.intro-steps { display: flex; flex-direction: column; gap: var(--s3); margin-bottom: var(--s5); }
+.intro-step {
+    display: flex; align-items: center; gap: var(--s4);
+    padding: var(--s3) var(--s4);
+    background: rgba(212, 160, 23, 0.07);
+    border: 1px solid var(--aom-border);
+    border-radius: var(--radius-lg);
+}
+.intro-icon { font-size: 1.6rem; line-height: 1; flex: 0 0 auto; }
+.intro-step strong { display: block; color: var(--aom-gold-bright); font-size: 1rem; margin-bottom: 2px; }
+.intro-step span { display: block; color: var(--aom-text); opacity: 0.85; font-size: 0.88rem; line-height: 1.4; }
+
+/* Rules popup in the Mafia style, Act-O-Matic colours */
+#rules-modal { align-items: flex-start; padding-top: max(16px, env(safe-area-inset-top)); }
+#rules-modal .modal-content {
+    margin-top: 2vh; max-height: calc(100dvh - 40px);
+    background: linear-gradient(180deg, #1f1a0c 0%, #141108 100%) !important;
+    border: 2px solid rgba(212, 160, 23, 0.5) !important;
+    color: var(--aom-text) !important;
+    overflow-y: hidden; display: flex; flex-direction: column;
+}
+#rules-modal .modal-content h2 { flex-shrink: 0; margin-bottom: var(--s4); color: var(--aom-gold-bright); }
+#rules-modal .modal-close { color: var(--aom-text); }
+#rules-modal .rules-scroll { flex: 1; min-height: 0; overflow-y: auto; padding-right: var(--s2); scrollbar-width: none; }
+#rules-modal .rules-scroll::-webkit-scrollbar { display: none; }
+.rule-section { margin-bottom: var(--s6); }
+.rule-section h3 { margin-bottom: var(--s3); color: var(--aom-gold); }
+.rule-section ol, .rule-section ul { margin-left: var(--s6); }
+.rule-section li { margin-bottom: var(--s2); line-height: 1.5; }
+
+
+/* ===== Roller screen fits one phone screen ===== */
+#screen-roller .screen-header { margin-bottom: var(--s3); }
+#screen-roller .game-title { font-size: clamp(1.4rem, 7vw, 2rem); white-space: normal; }
+#screen-roller .tagline { font-size: 0.85rem; }
+.roller-card { padding: var(--s4); }
+.roll-stage { min-height: 124px; }
+.roll-card { min-height: 100px; margin-top: -50px; }
+.roll-card-top { padding: 12px 16px; max-height: 100px; overflow: hidden; }
+.roll-card-text {
+    font-size: clamp(1rem, 4.4vw, 1.25rem);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.reveal-box { padding: var(--s4) var(--s5); margin-bottom: var(--s4); }
+.reveal-action-text { font-size: clamp(1.2rem, 5.2vw, 1.7rem); line-height: 1.25; }
+#screen-roller .btn-lg { min-height: 48px; }
+
+/* No glow behind the title */
+.game-title { text-shadow: none !important; }
